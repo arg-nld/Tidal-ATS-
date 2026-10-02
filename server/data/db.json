@@ -1,0 +1,413 @@
+{
+  "users": [
+    {
+      "id": "user-hr-01",
+      "name": "Sarah Lin",
+      "email": "hr@tidalats.com",
+      "role": "hr",
+      "title": "Head of Talent Acquisition",
+      "company": "Tidal Technologies"
+    },
+    {
+      "id": "user-app-01",
+      "name": "Jordan Hayes",
+      "email": "jordan.hayes@example.com",
+      "role": "applicant",
+      "title": "Senior Software Engineer",
+      "phone": "+1 (555) 234-5678"
+    },
+    {
+      "id": "user-app-02",
+      "name": "Elena Rostova",
+      "email": "elena.rostova@example.com",
+      "role": "applicant",
+      "title": "Product Designer",
+      "phone": "+1 (555) 876-5432"
+    },
+    {
+      "id": "user-1790915817576-lxeqz",
+      "createdAt": 1790915817576,
+      "name": "Maya Patel",
+      "email": "maya.patel@test.com",
+      "phone": "+1 (555) 432-1098",
+      "role": "applicant",
+      "title": "Full Stack Engineer"
+    },
+    {
+      "id": "user-1790926760734-2m8xk",
+      "createdAt": 1790926760734,
+      "name": "Test User",
+      "email": "test1234@example.com",
+      "password": "password123",
+      "role": "applicant",
+      "title": "Candidate"
+    },
+    {
+      "id": "user-1790927181204-oedih",
+      "createdAt": 1790927181204,
+      "name": "Test User",
+      "email": "test_user_404@tidalats.com",
+      "password": "password123",
+      "role": "applicant",
+      "title": "Candidate"
+    },
+    {
+      "id": "user-1790928672012-vvfjq",
+      "createdAt": 1790928672012,
+      "name": "adsa",
+      "email": "asdada@gmaill.com",
+      "password": "asdasd",
+      "role": "applicant",
+      "title": "Candidate"
+    },
+    {
+      "id": "user-1790928733456-lvqdy",
+      "createdAt": 1790928733456,
+      "name": "AndreiCo",
+      "email": "andreico@gmail.com",
+      "password": "AndreiCo",
+      "role": "applicant",
+      "title": "Candidate"
+    },
+    {
+      "id": "user-1790928827094-50ktf",
+      "createdAt": 1790928827094,
+      "name": "CoAndrei",
+      "email": "coandrei@gmail.com",
+      "password": "CoAndrei",
+      "role": "hr",
+      "title": "HR Recruiter",
+      "company": "Tidal Technologies"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-01",
+      "title": "Senior Full Stack Engineer (React & Node.js)",
+      "department": "Engineering",
+      "location": "Remote / San Francisco, CA",
+      "type": "Full-time",
+      "experienceLevel": "Senior (5+ years)",
+      "salaryRange": "$145,000 - $185,000 USD",
+      "status": "open",
+      "description": "We are seeking an experienced Full Stack Engineer to lead architecture on our cloud applications. You will design resilient APIs, build high-performance React frontends, and collaborate with product teams on high-impact scalable services.\n\nRequirements:\n- 5+ years of experience with React, TypeScript/JavaScript, and Node.js.\n- Strong understanding of REST APIs, database schemas, and microservices.\n- Experience with cloud infrastructure and CI/CD pipelines.\n- Passion for clean architecture, automated testing, and developer experience.",
+      "createdAt": 1790310617455,
+      "updatedAt": 1790310617455
+    },
+    {
+      "id": "job-02",
+      "title": "Lead AI / ML Solutions Architect",
+      "department": "AI & Data Science",
+      "location": "Hybrid / New York, NY",
+      "type": "Full-time",
+      "experienceLevel": "Lead / Principal",
+      "salaryRange": "$175,000 - $220,000 USD",
+      "status": "open",
+      "description": "Lead the next generation of AI-driven recruiting and enterprise productivity intelligence. In this role, you will architect multimodal LLM pipelines, implement retrieval-augmented generation (RAG) frameworks, and deploy secure enterprise AI workflows.\n\nRequirements:\n- Deep expertise in foundation models, Gemini API, PyTorch, or Hugging Face.\n- Experience deploying scalable LLM systems in production.\n- Proven background in software engineering and distributed computing.",
+      "createdAt": 1790483417455,
+      "updatedAt": 1790483417455
+    },
+    {
+      "id": "job-03",
+      "title": "Senior Product Designer (Design Systems)",
+      "department": "Product & Design",
+      "location": "Remote / Worldwide",
+      "type": "Full-time",
+      "experienceLevel": "Mid-Senior (4+ years)",
+      "salaryRange": "$120,000 - $155,000 USD",
+      "status": "open",
+      "description": "Join our design team to craft state-of-the-art user experiences for enterprise workflow products. You will maintain our design system, facilitate user research, and build interactive prototypes.\n\nRequirements:\n- Proven portfolio showcasing high-fidelity UI/UX design and design tokens.\n- Mastery of Figma, component architecture, and accessibility (WCAG AA).\n- Strong communication skills and cross-functional leadership.",
+      "createdAt": 1790656217455,
+      "updatedAt": 1790656217455
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "userId": "user-1790915817576-lxeqz",
+      "name": "Maya Patel",
+      "email": "maya.patel@test.com",
+      "phone": "+1 (555) 432-1098",
+      "role": "Full Stack Engineer",
+      "skills": [
+        "React",
+        "Node.js",
+        "PostgreSQL"
+      ],
+      "experienceSummary": "4 years of experience building full stack web applications with React and Express.",
+      "resumeText": "MAYA PATEL - Full Stack Engineer. Skilled in React, Node.js, Express, PostgreSQL.",
+      "fileName": "",
+      "fileSize": 0,
+      "stage": "Interview Scheduled",
+      "geminiScore": 30,
+      "geminiRationale": "While the candidate lists the core technologies of React and Node.js, the resume provides no evidence of the required 5+ years of experience, cloud infrastructure knowledge, or senior-level architectural capabilities.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-08T14:00:00Z",
+        "interviewer": "David Chen & Sarah Lin",
+        "type": "Technical Interview",
+        "meetingLink": "https://meet.google.com/test-meet",
+        "notes": "Prepare a 15-minute code walkthrough.",
+        "scheduledBy": "Sarah Lin",
+        "createdAt": 1790915817679
+      },
+      "recruiterNotes": "Strong fundamentals in React. Follow up on database optimization.",
+      "evaluation": null,
+      "createdAt": 1790915817577,
+      "updatedAt": 1790915821874
+    },
+    {
+      "id": "app-01",
+      "jobId": "job-01",
+      "userId": "user-app-01",
+      "name": "Jordan Hayes",
+      "email": "jordan.hayes@example.com",
+      "phone": "+1 (555) 234-5678",
+      "role": "Senior Full Stack Developer",
+      "skills": [
+        "React",
+        "Node.js",
+        "TypeScript",
+        "PostgreSQL",
+        "Docker",
+        "GraphQL",
+        "Vite"
+      ],
+      "experienceSummary": "6 years developing enterprise SaaS platforms. Led frontend redesign reducing latency by 40%. Extensive hands-on backend Node.js and REST API engineering.",
+      "resumeText": "JORDAN HAYES\nSenior Full Stack Developer\njordan.hayes@example.com | +1 (555) 234-5678 | San Francisco, CA\n\nSUMMARY\nAccomplished Full Stack Software Engineer with 6+ years of specialized experience designing and maintaining high-throughput web applications using React, TypeScript, Node.js, and relational databases. Strong focus on clean architecture, component reusability, and automated testing.\n\nEXPERIENCE\nSenior Software Engineer - CloudScale Technologies (2022 - Present)\n- Led a squad of 5 engineers delivering high-performance customer dashboard.\n- Re-architected legacy backend services into modular Node.js REST APIs.\n- Built real-time WebSocket notifications and data pipelines.\n\nFull Stack Developer - NextGen Systems (2019 - 2022)\n- Created dynamic React components and optimized client bundle sizes.\n- Authored unit and integration test suites achieving 88% coverage.\n\nEDUCATION\nB.S. in Computer Science - University of California, Berkeley (2019)\n\nSKILLS\nReact, Node.js, Express, JavaScript, TypeScript, PostgreSQL, TailwindCSS, Docker, CI/CD, Jest",
+      "fileName": "Jordan_Hayes_Resume.pdf",
+      "fileSize": 42000,
+      "stage": "Shortlisted",
+      "geminiScore": 92,
+      "geminiRationale": "Exceptional match. Candidate boasts 6+ years of direct React and Node.js expertise with proven architectural leadership and cloud delivery.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-06T15:00:00Z",
+        "interviewer": "Sarah Lin & David Chen (Eng Lead)",
+        "type": "Technical System Design",
+        "meetingLink": "https://meet.google.com/ats-tech-interview",
+        "notes": "Prepare to discuss REST API decoupling and React state caching."
+      },
+      "recruiterNotes": "Candidate demonstrated strong technical communication in the initial screening. Impressed by their system design experience.",
+      "evaluation": {
+        "rating": 5,
+        "recommendation": "Strong Hire",
+        "comments": "Excellent culture fit, depth in Node and React architecture.",
+        "evaluatedBy": "Sarah Lin",
+        "evaluatedAt": 1790872217455
+      },
+      "createdAt": 1790569817455,
+      "updatedAt": 1790928840640
+    },
+    {
+      "id": "app-02",
+      "jobId": "job-03",
+      "userId": "user-app-02",
+      "name": "Elena Rostova",
+      "email": "elena.rostova@example.com",
+      "phone": "+1 (555) 876-5432",
+      "role": "Lead UI/UX Designer",
+      "skills": [
+        "Figma",
+        "Design Systems",
+        "Design Tokens",
+        "User Research",
+        "Prototyping",
+        "WCAG AA"
+      ],
+      "experienceSummary": "5 years crafting design systems and enterprise SaaS UX at scale. Strong advocate for accessible, human-centric design.",
+      "resumeText": "ELENA ROSTOVA\nLead Product Designer\nelena.rostova@example.com | New York, NY\n\nPROFESSIONAL SUMMARY\nProduct Designer with 5+ years of experience leading design system initiatives and building complex user flows for enterprise B2B software.\n\nEXPERIENCE\nSenior UI/UX Designer - Apex Design Lab (2021 - Present)\n- Built comprehensive multi-brand design system in Figma.\n- Conducted 60+ usability testing sessions to streamline applicant workflows.\n\nSKILLS\nFigma, Design Systems, Design Tokens, User Testing, Wireframing, CSS/HTML fundamentals",
+      "fileName": "Elena_Rostova_Portfolio_Resume.pdf",
+      "fileSize": 38000,
+      "stage": "Rejected",
+      "geminiScore": 88,
+      "geminiRationale": "Strong alignment with the Design Systems role. Extensive Figma component architecture and research experience.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": null,
+      "recruiterNotes": "Reviewing portfolio case studies. Clean aesthetic and solid design system governance.",
+      "evaluation": {
+        "rating": 4,
+        "recommendation": "Hire",
+        "comments": "",
+        "evaluatedBy": "Sarah Lin",
+        "evaluatedAt": 1790917625352
+      },
+      "createdAt": 1790742617455,
+      "updatedAt": 1790921349932
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1790928840641-ob462",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1790928840641,
+      "read": false
+    },
+    {
+      "id": "notif-1790928838588-wxufu",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1790928838588,
+      "read": false
+    },
+    {
+      "id": "notif-1790923204266-3wx10",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1790923204266,
+      "read": true
+    },
+    {
+      "id": "notif-1790923202339-6myoy",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1790923202339,
+      "read": false
+    },
+    {
+      "id": "notif-1790923200171-0zvqh",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1790923200171,
+      "read": false
+    },
+    {
+      "id": "notif-1790923197743-ef711",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1790923197743,
+      "read": false
+    },
+    {
+      "id": "notif-1790921349932-biyk8",
+      "applicationId": "app-02",
+      "jobId": "job-03",
+      "recipientEmail": "elena.rostova@example.com",
+      "recipientName": "Elena Rostova",
+      "stage": "Rejected",
+      "subject": "Update regarding your application for Senior Product Designer (Design Systems)",
+      "body": "Dear Elena Rostova,\n\nThank you very much for taking the time to apply and interview for the Senior Product Designer (Design Systems) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1790921349932,
+      "read": true
+    },
+    {
+      "id": "notif-1790921343589-m467e",
+      "applicationId": "app-02",
+      "jobId": "job-03",
+      "recipientEmail": "elena.rostova@example.com",
+      "recipientName": "Elena Rostova",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
+      "body": "Dear Elena Rostova,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1790921343589,
+      "read": true
+    },
+    {
+      "id": "notif-1790917502504-ols5t",
+      "applicationId": "app-02",
+      "jobId": "job-03",
+      "recipientEmail": "elena.rostova@example.com",
+      "recipientName": "Elena Rostova",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Product Designer (Design Systems) - Screening in Progress",
+      "body": "Dear Elena Rostova,\n\nWe are writing to let you know that your application for Senior Product Designer (Design Systems) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1790917502504,
+      "read": true
+    },
+    {
+      "id": "notif-1790917439703-4sbsl",
+      "applicationId": "app-02",
+      "jobId": "job-03",
+      "recipientEmail": "elena.rostova@example.com",
+      "recipientName": "Elena Rostova",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
+      "body": "Dear Elena Rostova,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1790917439703,
+      "read": true
+    },
+    {
+      "id": "notif-1790915817728-pwwnp",
+      "applicationId": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "recipientEmail": "maya.patel@test.com",
+      "recipientName": "Maya Patel",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
+      "body": "Dear Maya Patel,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Thursday, October 8, 2026 at 10:00 PM\n• Interviewer(s): David Chen & Sarah Lin\n• Meeting Link: https://meet.google.com/test-meet\n\nPreparation Notes:\nPrepare a 15-minute code walkthrough.\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1790915817728,
+      "read": true
+    },
+    {
+      "id": "notif-1790915817666-4bu04",
+      "applicationId": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "recipientEmail": "maya.patel@test.com",
+      "recipientName": "Maya Patel",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear Maya Patel,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1790915817666,
+      "read": true
+    },
+    {
+      "id": "notif-1790915817578-l2xue",
+      "applicationId": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "recipientEmail": "maya.patel@test.com",
+      "recipientName": "Maya Patel",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
+      "body": "Dear Maya Patel,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1790915817578,
+      "read": false
+    },
+    {
+      "id": "notif-01",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Shortlisted",
+      "subject": "Update on your application: Senior Full Stack Engineer (React & Node.js)",
+      "body": "Hi Jordan,\n\nWe are pleased to inform you that your application for Senior Full Stack Engineer (React & Node.js) has been shortlisted!\n\nOur recruiting team was very impressed with your background. We will be reaching out soon with next steps regarding scheduling your technical interview.\n\nBest regards,\nTidal Talent Team",
+      "sentAt": 1790872217455,
+      "read": true
+    }
+  ]
+}
