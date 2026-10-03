@@ -123,6 +123,49 @@
   ],
   "applications": [
     {
+      "id": "app-1790929869994-bmmci",
+      "jobId": "job-02",
+      "userId": "user-1790928733456-lvqdy",
+      "name": "Andrei Reginald C. Co",
+      "email": "andreireginaldc.co@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Computer Science Undergraduate Specializing in Data Science",
+      "skills": [
+        "Python",
+        "Java",
+        "SQL",
+        "JavaScript",
+        "Dart",
+        "Flutter",
+        "Pandas",
+        "Power BI",
+        "Tableau",
+        "SQLite"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science at UST, with practical experience in end-to-end NLP pipelines, desktop/mobile app development, and data governance.",
+      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\n\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\n\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n• Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n• Facilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\n• Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n• Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n• Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n• Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\n• Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\n• Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\n• Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\n• Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.pdf",
+      "fileSize": 124832,
+      "stage": "Interview Scheduled",
+      "geminiScore": 20,
+      "geminiRationale": "The candidate is a current undergraduate student with internship-level experience, lacking the extensive professional background, distributed computing expertise, and production-scale LLM deployment experience required for a Lead Architect role.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-05T13:00",
+        "interviewer": "Sarah Lin (Talent Lead)",
+        "type": "Technical Interview",
+        "meetingLink": "https://meet.google.com/ats-technical",
+        "notes": "",
+        "scheduledBy": "CoAndrei",
+        "createdAt": 1790930008010
+      },
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1790929869994,
+      "updatedAt": 1790930008010
+    },
+    {
       "id": "app-1790915817577-67qpr",
       "jobId": "job-01",
       "userId": "user-1790915817576-lxeqz",
@@ -241,6 +284,42 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif-1790930008065-go2t7",
+      "applicationId": "app-1790929869994-bmmci",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Andrei Reginald C. Co",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
+      "body": "Dear Andrei Reginald C. Co,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Monday, October 5, 2026 at 1:00 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1790930008065,
+      "read": false
+    },
+    {
+      "id": "notif-1790929970560-q1qyj",
+      "applicationId": "app-1790929869994-bmmci",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Andrei Reginald C. Co",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Lead AI / ML Solutions Architect",
+      "body": "Dear Andrei Reginald C. Co,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Lead AI / ML Solutions Architect position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1790929970560,
+      "read": false
+    },
+    {
+      "id": "notif-1790929869996-xwj29",
+      "applicationId": "app-1790929869994-bmmci",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Andrei Reginald C. Co",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Lead AI / ML Solutions Architect at Tidal Nexus",
+      "body": "Dear Andrei Reginald C. Co,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Lead AI / ML Solutions Architect role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1790929869996,
+      "read": false
+    },
     {
       "id": "notif-1790928840641-ob462",
       "applicationId": "app-01",
