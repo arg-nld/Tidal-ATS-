@@ -4,25 +4,31 @@
       "id": "user-hr-01",
       "name": "Sarah Lin",
       "email": "hr@tidalats.com",
+      "password": "password123",
       "role": "hr",
       "title": "Head of Talent Acquisition",
-      "company": "Tidal Technologies"
+      "company": "Tidal Technologies",
+      "emailVerified": true
     },
     {
       "id": "user-app-01",
       "name": "Jordan Hayes",
       "email": "jordan.hayes@example.com",
+      "password": "password123",
       "role": "applicant",
       "title": "Senior Software Engineer",
-      "phone": "+1 (555) 234-5678"
+      "phone": "+1 (555) 234-5678",
+      "emailVerified": true
     },
     {
       "id": "user-app-02",
       "name": "Elena Rostova",
       "email": "elena.rostova@example.com",
+      "password": "password123",
       "role": "applicant",
       "title": "Product Designer",
-      "phone": "+1 (555) 876-5432"
+      "phone": "+1 (555) 876-5432",
+      "emailVerified": true
     },
     {
       "id": "user-1790915817576-lxeqz",
@@ -31,7 +37,8 @@
       "email": "maya.patel@test.com",
       "phone": "+1 (555) 432-1098",
       "role": "applicant",
-      "title": "Full Stack Engineer"
+      "title": "Full Stack Engineer",
+      "emailVerified": true
     },
     {
       "id": "user-1790926760734-2m8xk",
@@ -40,7 +47,8 @@
       "email": "test1234@example.com",
       "password": "password123",
       "role": "applicant",
-      "title": "Candidate"
+      "title": "Candidate",
+      "emailVerified": true
     },
     {
       "id": "user-1790927181204-oedih",
@@ -49,7 +57,8 @@
       "email": "test_user_404@tidalats.com",
       "password": "password123",
       "role": "applicant",
-      "title": "Candidate"
+      "title": "Candidate",
+      "emailVerified": true
     },
     {
       "id": "user-1790928672012-vvfjq",
@@ -58,7 +67,8 @@
       "email": "asdada@gmaill.com",
       "password": "asdasd",
       "role": "applicant",
-      "title": "Candidate"
+      "title": "Candidate",
+      "emailVerified": true
     },
     {
       "id": "user-1790928733456-lvqdy",
@@ -67,7 +77,8 @@
       "email": "andreico@gmail.com",
       "password": "AndreiCo",
       "role": "applicant",
-      "title": "Candidate"
+      "title": "Candidate",
+      "emailVerified": true
     },
     {
       "id": "user-1790928827094-50ktf",
@@ -77,7 +88,18 @@
       "password": "CoAndrei",
       "role": "hr",
       "title": "HR Recruiter",
-      "company": "Tidal Technologies"
+      "company": "Tidal Technologies",
+      "emailVerified": true
+    },
+    {
+      "id": "user-1791303322233-wjvfc",
+      "createdAt": 1791303322233,
+      "name": "ben price",
+      "email": "graypjoos@gmail.com",
+      "password": "AndreiC0",
+      "role": "applicant",
+      "title": "Candidate",
+      "emailVerified": true
     }
   ],
   "jobs": [
@@ -90,6 +112,28 @@
       "experienceLevel": "Senior (5+ years)",
       "salaryRange": "$145,000 - $185,000 USD",
       "status": "open",
+      "scoringWeights": {
+        "requiredSkills": 70,
+        "nonRequiredSkills": 20,
+        "experience": 10
+      },
+      "requiredSkills": [
+        "React",
+        "TypeScript",
+        "JavaScript",
+        "Node.js",
+        "REST APIs",
+        "database",
+        "microservices",
+        "cloud",
+        "CI/CD"
+      ],
+      "nonRequiredSkills": [
+        "GraphQL",
+        "Docker",
+        "TailwindCSS",
+        "automated testing"
+      ],
       "description": "We are seeking an experienced Full Stack Engineer to lead architecture on our cloud applications. You will design resilient APIs, build high-performance React frontends, and collaborate with product teams on high-impact scalable services.\n\nRequirements:\n- 5+ years of experience with React, TypeScript/JavaScript, and Node.js.\n- Strong understanding of REST APIs, database schemas, and microservices.\n- Experience with cloud infrastructure and CI/CD pipelines.\n- Passion for clean architecture, automated testing, and developer experience.",
       "createdAt": 1790310617455,
       "updatedAt": 1790310617455
@@ -103,6 +147,26 @@
       "experienceLevel": "Lead / Principal",
       "salaryRange": "$175,000 - $220,000 USD",
       "status": "open",
+      "scoringWeights": {
+        "requiredSkills": 70,
+        "nonRequiredSkills": 20,
+        "experience": 10
+      },
+      "requiredSkills": [
+        "foundation models",
+        "Gemini API",
+        "PyTorch",
+        "Hugging Face",
+        "LLM",
+        "production",
+        "software engineering",
+        "distributed computing"
+      ],
+      "nonRequiredSkills": [
+        "RAG",
+        "multimodal",
+        "retrieval augmented generation"
+      ],
       "description": "Lead the next generation of AI-driven recruiting and enterprise productivity intelligence. In this role, you will architect multimodal LLM pipelines, implement retrieval-augmented generation (RAG) frameworks, and deploy secure enterprise AI workflows.\n\nRequirements:\n- Deep expertise in foundation models, Gemini API, PyTorch, or Hugging Face.\n- Experience deploying scalable LLM systems in production.\n- Proven background in software engineering and distributed computing.",
       "createdAt": 1790483417455,
       "updatedAt": 1790483417455
@@ -116,12 +180,230 @@
       "experienceLevel": "Mid-Senior (4+ years)",
       "salaryRange": "$120,000 - $155,000 USD",
       "status": "open",
+      "scoringWeights": {
+        "requiredSkills": 70,
+        "nonRequiredSkills": 20,
+        "experience": 10
+      },
+      "requiredSkills": [
+        "Figma",
+        "design systems",
+        "design tokens",
+        "component architecture",
+        "accessibility",
+        "user research"
+      ],
+      "nonRequiredSkills": [
+        "prototyping",
+        "wireframing",
+        "CSS",
+        "HTML"
+      ],
       "description": "Join our design team to craft state-of-the-art user experiences for enterprise workflow products. You will maintain our design system, facilitate user research, and build interactive prototypes.\n\nRequirements:\n- Proven portfolio showcasing high-fidelity UI/UX design and design tokens.\n- Mastery of Figma, component architecture, and accessibility (WCAG AA).\n- Strong communication skills and cross-functional leadership.",
       "createdAt": 1790656217455,
       "updatedAt": 1790656217455
     }
   ],
   "applications": [
+    {
+      "id": "app-1791303425428-evsq7",
+      "jobId": "job-01",
+      "userId": "user-1791303322233-wjvfc",
+      "name": "Ben",
+      "email": "graypjoos@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Data Scientist",
+      "skills": [
+        "Python",
+        "Java",
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Pandas",
+        "NumPy",
+        "Flutter",
+        "Git",
+        "NLP"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research.",
+      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.docx",
+      "fileSize": 42426,
+      "stage": "Interview Scheduled",
+      "geminiScore": 30,
+      "geminiRationale": "The candidate has a background in data science and Python/Flutter rather than the required 5+ years of professional experience in React, TypeScript/JavaScript, and Node.js for cloud applications.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-17T13:00",
+        "interviewer": "Sarah Lin (Talent Lead)",
+        "type": "Technical Interview",
+        "meetingLink": "https://meet.google.com/ats-technical",
+        "notes": "",
+        "scheduledBy": "CoAndrei",
+        "createdAt": 1791303547461
+      },
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1791303425428,
+      "updatedAt": 1791303547461
+    },
+    {
+      "id": "app-1791303379765-o5gcw",
+      "jobId": "job-02",
+      "userId": "user-1791303322233-wjvfc",
+      "name": "Ben Price",
+      "email": "andreireginaldc.co@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Data Science Undergraduate & Computer Science Student",
+      "skills": [
+        "Python",
+        "SQL",
+        "Java",
+        "Power BI",
+        "Tableau",
+        "Pandas",
+        "NumPy",
+        "Flutter",
+        "Git",
+        "SQLite"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science with practical experience in enterprise data governance at UnionBank, data analytics, and NLP research.",
+      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi  Database Dashboard  | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis \nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO \nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental \nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon \nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer \nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.docx",
+      "fileSize": 42426,
+      "stage": "Interview Scheduled",
+      "geminiScore": 35,
+      "geminiRationale": "The candidate is a computer science undergraduate with experience in data analytics, Python, and basic NLP, but lacks the senior-level requirements, production LLM system deployment, and distributed computing expertise needed for a Lead AI/ML Solutions Architect role.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-26T13:20",
+        "interviewer": "Sarah Lin (Talent Lead)",
+        "type": "Technical Interview",
+        "meetingLink": "https://meet.google.com/ats-technical",
+        "notes": "",
+        "scheduledBy": "CoAndrei",
+        "createdAt": 1791303560596
+      },
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1791303379765,
+      "updatedAt": 1791303560596
+    },
+    {
+      "id": "app-1791303355816-opqa9",
+      "jobId": "job-03",
+      "userId": "user-1791303322233-wjvfc",
+      "name": "Ben",
+      "email": "andreireginaldc.co@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Computer Science Undergraduate / Data Science",
+      "skills": [
+        "Python",
+        "Java",
+        "SQL",
+        "JavaScript",
+        "Dart",
+        "Flutter",
+        "Pandas",
+        "NumPy",
+        "Power BI",
+        "Tableau"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science with experience in end-to-end NLP pipelines, app development, and data governance internships.",
+      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\n\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\n\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n• Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n• Facilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\nTwitch SQLite Data Analysis | Data Analytics & SQL\n• Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n• Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n• Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n• Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\n• Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\n• Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\n• Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\n• Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.pdf",
+      "fileSize": 124832,
+      "stage": "Shortlisted",
+      "geminiScore": 15,
+      "geminiRationale": "The candidate's background is focused on Computer Science, Data Science, and software development rather than dedicated design systems work. While they list Figma as a tool, they lack a design systems portfolio, component architecture mastery, and demonstrated expertise in WCAG AA accessibility required for the Senior Product Designer role.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": {
+        "scheduledAt": "2026-10-17T01:20",
+        "interviewer": "Sarah Lin (Talent Lead)",
+        "type": "Technical Interview",
+        "meetingLink": "https://meet.google.com/ats-technical",
+        "notes": "",
+        "scheduledBy": "CoAndrei",
+        "createdAt": 1791303583966
+      },
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1791303355816,
+      "updatedAt": 1791385527018
+    },
+    {
+      "id": "app-1791303193482-ptry6",
+      "jobId": "job-01",
+      "userId": "user-1790928733456-lvqdy",
+      "name": "ANDREI REGINALD C. CO",
+      "email": "andreireginaldc.co@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Data Scientist / Computer Science Undergraduate",
+      "skills": [
+        "Python",
+        "Java",
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Pandas",
+        "NumPy",
+        "Flutter",
+        "Git",
+        "Data Governance"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science with practical experience in enterprise data governance at UnionBank, SQL analytics, Power BI dashboards, and NLP research.",
+      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi  Database Dashboard  | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis \nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO \nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental \nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon \nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer \nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.docx",
+      "fileSize": 42426,
+      "stage": "Initial Screening",
+      "geminiScore": 35,
+      "geminiRationale": "The candidate's profile is heavily focused on data science and Python rather than the required Senior Full Stack role, lacking the necessary 5+ years of professional experience in React, TypeScript, and Node.js.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": null,
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1791303193482,
+      "updatedAt": 1791303240472
+    },
+    {
+      "id": "app-1791303174127-2s9rl",
+      "jobId": "job-03",
+      "userId": "user-1790928733456-lvqdy",
+      "name": "ANDREI REGINALD C. CO",
+      "email": "andreireginaldc.co@gmail.com",
+      "phone": "(+63) 943-744-0155",
+      "role": "Computer Science Undergraduate / Data Science",
+      "skills": [
+        "Python",
+        "Java",
+        "SQL",
+        "JavaScript",
+        "Dart",
+        "Flutter",
+        "Pandas",
+        "NumPy",
+        "Power BI",
+        "Tableau"
+      ],
+      "experienceSummary": "Computer Science undergraduate specializing in Data Science at UST with experience in data governance, NLP pipelines, and application development.",
+      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n· Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n· Facilitated student support operations, department communications, and crisis management initiatives.\nPROJECTS\nTwitch SQLite Data Analysis | Data Analytics & SQL\n· Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n· Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n· Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n· Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\nPayroll Management System | FullStack Developer - ARCO\n· Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\nDental Book Mobile App | FullStack Developer - CAC Dental\n· Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\nAiB Banking App | Front End Developer - BPI Hackathon\n· Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\nTruck-In-N-Out Logistics System | Front End Developer\n· Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
+      "fileName": "Co_Resume.pdf",
+      "fileSize": 124832,
+      "stage": "Initial Screening",
+      "geminiScore": 10,
+      "geminiRationale": "The candidate's background is focused entirely on computer science, data science, and software engineering rather than UI/UX design and design systems, lacking the required portfolio, component architecture, and accessibility expertise.",
+      "isScreening": false,
+      "geminiError": null,
+      "interview": null,
+      "recruiterNotes": "",
+      "evaluation": null,
+      "createdAt": 1791303174127,
+      "updatedAt": 1791303236411
+    },
     {
       "id": "app-1790929869994-bmmci",
       "jobId": "job-02",
@@ -146,7 +428,7 @@
       "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\n\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\n\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n• Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n• Facilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\n• Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n• Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n• Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n• Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\n• Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\n• Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\n• Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\n• Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
       "fileName": "Co_Resume.pdf",
       "fileSize": 124832,
-      "stage": "Interview Scheduled",
+      "stage": "Initial Screening",
       "geminiScore": 20,
       "geminiRationale": "The candidate is a current undergraduate student with internship-level experience, lacking the extensive professional background, distributed computing expertise, and production-scale LLM deployment experience required for a Lead Architect role.",
       "isScreening": false,
@@ -163,7 +445,7 @@
       "recruiterNotes": "",
       "evaluation": null,
       "createdAt": 1790929869994,
-      "updatedAt": 1790930008010
+      "updatedAt": 1791303238288
     },
     {
       "id": "app-1790915817577-67qpr",
@@ -182,7 +464,7 @@
       "resumeText": "MAYA PATEL - Full Stack Engineer. Skilled in React, Node.js, Express, PostgreSQL.",
       "fileName": "",
       "fileSize": 0,
-      "stage": "Interview Scheduled",
+      "stage": "Job Offer",
       "geminiScore": 30,
       "geminiRationale": "While the candidate lists the core technologies of React and Node.js, the resume provides no evidence of the required 5+ years of experience, cloud infrastructure knowledge, or senior-level architectural capabilities.",
       "isScreening": false,
@@ -199,7 +481,7 @@
       "recruiterNotes": "Strong fundamentals in React. Follow up on database optimization.",
       "evaluation": null,
       "createdAt": 1790915817577,
-      "updatedAt": 1790915821874
+      "updatedAt": 1791367669835
     },
     {
       "id": "app-01",
@@ -222,9 +504,9 @@
       "resumeText": "JORDAN HAYES\nSenior Full Stack Developer\njordan.hayes@example.com | +1 (555) 234-5678 | San Francisco, CA\n\nSUMMARY\nAccomplished Full Stack Software Engineer with 6+ years of specialized experience designing and maintaining high-throughput web applications using React, TypeScript, Node.js, and relational databases. Strong focus on clean architecture, component reusability, and automated testing.\n\nEXPERIENCE\nSenior Software Engineer - CloudScale Technologies (2022 - Present)\n- Led a squad of 5 engineers delivering high-performance customer dashboard.\n- Re-architected legacy backend services into modular Node.js REST APIs.\n- Built real-time WebSocket notifications and data pipelines.\n\nFull Stack Developer - NextGen Systems (2019 - 2022)\n- Created dynamic React components and optimized client bundle sizes.\n- Authored unit and integration test suites achieving 88% coverage.\n\nEDUCATION\nB.S. in Computer Science - University of California, Berkeley (2019)\n\nSKILLS\nReact, Node.js, Express, JavaScript, TypeScript, PostgreSQL, TailwindCSS, Docker, CI/CD, Jest",
       "fileName": "Jordan_Hayes_Resume.pdf",
       "fileSize": 42000,
-      "stage": "Shortlisted",
-      "geminiScore": 92,
-      "geminiRationale": "Exceptional match. Candidate boasts 6+ years of direct React and Node.js expertise with proven architectural leadership and cloud delivery.",
+      "stage": "Rejected",
+      "geminiScore": 95,
+      "geminiRationale": "The candidate strongly matches the job requirements with 6+ years of experience in React, TypeScript, and Node.js, alongside proven cloud architecture and API design skills.",
       "isScreening": false,
       "geminiError": null,
       "interview": {
@@ -243,7 +525,7 @@
         "evaluatedAt": 1790872217455
       },
       "createdAt": 1790569817455,
-      "updatedAt": 1790928840640
+      "updatedAt": 1791367726857
     },
     {
       "id": "app-02",
@@ -285,6 +567,378 @@
   ],
   "notifications": [
     {
+      "id": "notif-1791385527390-kbs5w",
+      "applicationId": "app-1791303355816-opqa9",
+      "recipientUserId": "user-1791303322233-wjvfc",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Product Designer (Design Systems)",
+      "body": "Dear Ben,\n\nCongratulations! Your profile has been shortlisted for the Senior Product Designer (Design Systems) position at Tidal Nexus.\n\nOur recruiting team will contact you shortly regarding next steps.\n\nSincerely,\nTidal Nexus Talent Team",
+      "deliveryStatus": "sent",
+      "deliveryError": null,
+      "providerMessageId": "01a116e5-df8a-7170-bb1f-87a8555fd2c9",
+      "emailType": "transactional",
+      "sentAt": 1791385527390,
+      "read": false
+    },
+    {
+      "id": "notif-1791385524454-d6izn",
+      "applicationId": "app-1791303355816-opqa9",
+      "recipientUserId": "user-1791303322233-wjvfc",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
+      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus. We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "deliveryStatus": "sent",
+      "deliveryError": null,
+      "providerMessageId": "01a116e5-d400-79df-bffe-4acc8e212aaf",
+      "emailType": "transactional",
+      "sentAt": 1791385524454,
+      "read": false
+    },
+    {
+      "id": "notif-1791367726858-s784d",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Rejected",
+      "subject": "Update regarding your application for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nThank you very much for taking the time to apply and interview for the Senior Full Stack Engineer (React & Node.js) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791367726858,
+      "read": false,
+      "recipientUserId": "user-app-01"
+    },
+    {
+      "id": "notif-1791367722661-u7ac6",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Hired",
+      "subject": "Official Welcome to Tidal Nexus - You're Hired!",
+      "body": "Dear Jordan Hayes,\n\nWelcome to the team! We are ecstatic to confirm that your hiring process for Senior Full Stack Engineer (React & Node.js) is complete and official.\n\nOur People Operations team will be reaching out soon with onboarding materials, equipment shipping details, and first-day orientation schedules.\n\nWelcome aboard!\nTidal Nexus People & Culture",
+      "sentAt": 1791367722661,
+      "read": false,
+      "recipientUserId": "user-app-01"
+    },
+    {
+      "id": "notif-1791367716564-wgc9q",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Rejected",
+      "subject": "Update regarding your application for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nThank you very much for taking the time to apply and interview for the Senior Full Stack Engineer (React & Node.js) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791367716564,
+      "read": false,
+      "recipientUserId": "user-app-01"
+    },
+    {
+      "id": "notif-1791367676697-gvweh",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1791367676697,
+      "read": false,
+      "recipientUserId": "user-app-01"
+    },
+    {
+      "id": "notif-1791367674643-61agp",
+      "applicationId": "app-01",
+      "jobId": "job-01",
+      "recipientEmail": "jordan.hayes@example.com",
+      "recipientName": "Jordan Hayes",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
+      "body": "Dear Jordan Hayes,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791367674643,
+      "read": false,
+      "recipientUserId": "user-app-01"
+    },
+    {
+      "id": "notif-1791367672562-rb9ws",
+      "applicationId": "app-1791303355816-opqa9",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Product Designer (Design Systems)",
+      "body": "Dear Ben,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Product Designer (Design Systems) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1791367672562,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791367669836-ivg3t",
+      "applicationId": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "recipientEmail": "maya.patel@test.com",
+      "recipientName": "Maya Patel",
+      "stage": "Job Offer",
+      "subject": "Job Offer: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus!",
+      "body": "Dear Maya Patel,\n\nWe are thrilled to extend a formal job offer for the position of Senior Full Stack Engineer (React & Node.js) at Tidal Nexus!\n\nYour exceptional skills, background, and cultural alignment stood out during our interview rounds, and our leadership team believes you will make a tremendous impact here.\n\nPlease review your official offer documentation inside your candidate dashboard. Feel free to reply with any questions regarding compensation, benefits, or your anticipated start date.\n\nWarmest congratulations,\nExecutive Talent Team\nTidal Nexus",
+      "sentAt": 1791367669836,
+      "read": false,
+      "recipientUserId": "user-1790915817576-lxeqz"
+    },
+    {
+      "id": "notif-1791303583968-g25hx",
+      "applicationId": "app-1791303355816-opqa9",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
+      "body": "Dear Ben,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Saturday, October 17, 2026 at 1:20 AM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303583968,
+      "read": true,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303560598-p911y",
+      "applicationId": "app-1791303379765-o5gcw",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben Price",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
+      "body": "Dear Ben Price,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Monday, October 26, 2026 at 1:20 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303560598,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303547477-vlx2k",
+      "applicationId": "app-1791303425428-evsq7",
+      "jobId": "job-01",
+      "recipientEmail": "graypjoos@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
+      "body": "Dear Ben,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Saturday, October 17, 2026 at 1:00 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303547477,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303519952-mlkrb",
+      "applicationId": "app-1791303379765-o5gcw",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben Price",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
+      "body": "Dear Ben Price,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303519952,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303516519-e44tk",
+      "applicationId": "app-1791303355816-opqa9",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
+      "body": "Dear Ben,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303516519,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303514354-pawnq",
+      "applicationId": "app-1791303425428-evsq7",
+      "jobId": "job-01",
+      "recipientEmail": "graypjoos@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
+      "body": "Dear Ben,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303514354,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303425429-yjvb3",
+      "applicationId": "app-1791303425428-evsq7",
+      "jobId": "job-01",
+      "recipientEmail": "graypjoos@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
+      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791303425429,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303379766-vjt3l",
+      "applicationId": "app-1791303379765-o5gcw",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben Price",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Lead AI / ML Solutions Architect at Tidal Nexus",
+      "body": "Dear Ben Price,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Lead AI / ML Solutions Architect role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791303379766,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303355817-zgz8j",
+      "applicationId": "app-1791303355816-opqa9",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Ben",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
+      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791303355817,
+      "read": false,
+      "recipientUserId": "user-1791303322233-wjvfc"
+    },
+    {
+      "id": "notif-1791303240473-rev7g",
+      "applicationId": "app-1791303193482-ptry6",
+      "jobId": "job-01",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1791303240473,
+      "read": true,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303238289-v06p5",
+      "applicationId": "app-1790929869994-bmmci",
+      "jobId": "job-02",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "Andrei Reginald C. Co",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Lead AI / ML Solutions Architect - Screening in Progress",
+      "body": "Dear Andrei Reginald C. Co,\n\nWe are writing to let you know that your application for Lead AI / ML Solutions Architect is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1791303238289,
+      "read": true,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303236411-oxe0k",
+      "applicationId": "app-1791303174127-2s9rl",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Product Designer (Design Systems) - Screening in Progress",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nWe are writing to let you know that your application for Senior Product Designer (Design Systems) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1791303236411,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303234376-kgah1",
+      "applicationId": "app-1790915817577-67qpr",
+      "jobId": "job-01",
+      "recipientEmail": "maya.patel@test.com",
+      "recipientName": "Maya Patel",
+      "stage": "Shortlisted",
+      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
+      "body": "Dear Maya Patel,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
+      "sentAt": 1791303234376,
+      "read": false,
+      "recipientUserId": "user-1790915817576-lxeqz"
+    },
+    {
+      "id": "notif-1791303230406-2ibkn",
+      "applicationId": "app-1791303174127-2s9rl",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303230406,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303227985-d274p",
+      "applicationId": "app-1791303193482-ptry6",
+      "jobId": "job-01",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Interview Scheduled",
+      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
+      "sentAt": 1791303227985,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303225192-bcuv3",
+      "applicationId": "app-1791303174127-2s9rl",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Product Designer (Design Systems) - Screening in Progress",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nWe are writing to let you know that your application for Senior Product Designer (Design Systems) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1791303225192,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303223042-3zaqu",
+      "applicationId": "app-1791303193482-ptry6",
+      "jobId": "job-01",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Initial Screening",
+      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
+      "sentAt": 1791303223042,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303193482-frgl3",
+      "applicationId": "app-1791303193482-ptry6",
+      "jobId": "job-01",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791303193482,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
+      "id": "notif-1791303174128-vggh2",
+      "applicationId": "app-1791303174127-2s9rl",
+      "jobId": "job-03",
+      "recipientEmail": "andreireginaldc.co@gmail.com",
+      "recipientName": "ANDREI REGINALD C. CO",
+      "stage": "Application Submitted",
+      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
+      "body": "Dear ANDREI REGINALD C. CO,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
+      "sentAt": 1791303174128,
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
+    },
+    {
       "id": "notif-1790930008065-go2t7",
       "applicationId": "app-1790929869994-bmmci",
       "jobId": "job-02",
@@ -294,7 +948,8 @@
       "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
       "body": "Dear Andrei Reginald C. Co,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Monday, October 5, 2026 at 1:00 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
       "sentAt": 1790930008065,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
     },
     {
       "id": "notif-1790929970560-q1qyj",
@@ -306,7 +961,8 @@
       "subject": "Great News! You've been shortlisted for Lead AI / ML Solutions Architect",
       "body": "Dear Andrei Reginald C. Co,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Lead AI / ML Solutions Architect position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
       "sentAt": 1790929970560,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
     },
     {
       "id": "notif-1790929869996-xwj29",
@@ -318,7 +974,8 @@
       "subject": "Application Received: Lead AI / ML Solutions Architect at Tidal Nexus",
       "body": "Dear Andrei Reginald C. Co,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Lead AI / ML Solutions Architect role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
       "sentAt": 1790929869996,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-1790928733456-lvqdy"
     },
     {
       "id": "notif-1790928840641-ob462",
@@ -330,7 +987,8 @@
       "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
       "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
       "sentAt": 1790928840641,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790928838588-wxufu",
@@ -342,7 +1000,8 @@
       "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
       "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
       "sentAt": 1790928838588,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790923204266-3wx10",
@@ -354,7 +1013,8 @@
       "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
       "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
       "sentAt": 1790923204266,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790923202339-6myoy",
@@ -366,7 +1026,8 @@
       "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
       "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
       "sentAt": 1790923202339,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790923200171-0zvqh",
@@ -378,7 +1039,8 @@
       "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
       "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
       "sentAt": 1790923200171,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790923197743-ef711",
@@ -390,7 +1052,8 @@
       "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
       "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
       "sentAt": 1790923197743,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-app-01"
     },
     {
       "id": "notif-1790921349932-biyk8",
@@ -402,7 +1065,8 @@
       "subject": "Update regarding your application for Senior Product Designer (Design Systems)",
       "body": "Dear Elena Rostova,\n\nThank you very much for taking the time to apply and interview for the Senior Product Designer (Design Systems) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
       "sentAt": 1790921349932,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-02"
     },
     {
       "id": "notif-1790921343589-m467e",
@@ -414,7 +1078,8 @@
       "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
       "body": "Dear Elena Rostova,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
       "sentAt": 1790921343589,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-02"
     },
     {
       "id": "notif-1790917502504-ols5t",
@@ -426,7 +1091,8 @@
       "subject": "Application Update: Senior Product Designer (Design Systems) - Screening in Progress",
       "body": "Dear Elena Rostova,\n\nWe are writing to let you know that your application for Senior Product Designer (Design Systems) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
       "sentAt": 1790917502504,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-02"
     },
     {
       "id": "notif-1790917439703-4sbsl",
@@ -438,7 +1104,8 @@
       "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
       "body": "Dear Elena Rostova,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
       "sentAt": 1790917439703,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-02"
     },
     {
       "id": "notif-1790915817728-pwwnp",
@@ -450,7 +1117,8 @@
       "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
       "body": "Dear Maya Patel,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Thursday, October 8, 2026 at 10:00 PM\n• Interviewer(s): David Chen & Sarah Lin\n• Meeting Link: https://meet.google.com/test-meet\n\nPreparation Notes:\nPrepare a 15-minute code walkthrough.\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
       "sentAt": 1790915817728,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-1790915817576-lxeqz"
     },
     {
       "id": "notif-1790915817666-4bu04",
@@ -462,7 +1130,8 @@
       "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
       "body": "Dear Maya Patel,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
       "sentAt": 1790915817666,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-1790915817576-lxeqz"
     },
     {
       "id": "notif-1790915817578-l2xue",
@@ -474,7 +1143,8 @@
       "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
       "body": "Dear Maya Patel,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
       "sentAt": 1790915817578,
-      "read": false
+      "read": false,
+      "recipientUserId": "user-1790915817576-lxeqz"
     },
     {
       "id": "notif-01",
@@ -486,7 +1156,8 @@
       "subject": "Update on your application: Senior Full Stack Engineer (React & Node.js)",
       "body": "Hi Jordan,\n\nWe are pleased to inform you that your application for Senior Full Stack Engineer (React & Node.js) has been shortlisted!\n\nOur recruiting team was very impressed with your background. We will be reaching out soon with next steps regarding scheduling your technical interview.\n\nBest regards,\nTidal Talent Team",
       "sentAt": 1790872217455,
-      "read": true
+      "read": true,
+      "recipientUserId": "user-app-01"
     }
   ]
 }

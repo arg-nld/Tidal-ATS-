@@ -1,8 +1,3 @@
-/**
- * Centralized API Service
- * Decouples frontend components from direct database queries and backend logic.
- */
-
 const BASE_URL = '/api';
 
 async function request(endpoint, options = {}) {
@@ -10,119 +5,82 @@ async function request(endpoint, options = {}) {
   const role = localStorage.getItem('ats_role');
 
   const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(role ? { 'X-User-Role': role } : {}),
     ...(options.headers || {})
   };
 
-  // If body is FormData, delete Content-Type so browser sets boundary
-  if (options.body instanceof FormData) {
-    delete headers['Content-Type'];
-  }
+  if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers
-  });
-
+  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const errorMsg = data?.error || `Request failed with status ${response.status}`;
-    throw new Error(errorMsg);
+    const error = new Error(data?.error || `Request failed with status ${response.status}`);
+    error.status = response.status;
+    error.data = data;
+    throw error;
   }
-
   return data;
 }
 
 export const api = {
-  // --- Auth ---
   auth: {
-    login: (credentials) => request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials)
-    }),
-    register: (userData) => request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    }),
+    login: credentials => request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+    register: userData => request('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
+    verifyEmail: token => request(`/auth/verify-email/${encodeURIComponent(token)}`),
     getCurrentUser: () => request('/auth/me'),
     getUsers: () => request('/auth/users')
   },
-
-  // --- Jobs ---
   jobs: {
     getAll: (params = {}) => {
       const query = new URLSearchParams(params).toString();
       return request(`/jobs${query ? `?${query}` : ''}`);
     },
-    getById: (id) => request(`/jobs/${id}`),
-    create: (jobData) => request('/jobs', {
-      method: 'POST',
-      body: JSON.stringify(jobData)
-    }),
-    update: (id, updates) => request(`/jobs/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates)
-    }),
-    delete: (id) => request(`/jobs/${id}`, {
-      method: 'DELETE'
-    })
+    getById: id => request(`/jobs/${id}`),
+    create: jobData => request('/jobs', { method: 'POST', body: JSON.stringify(jobData) }),
+    update: (id, updates) => request(`/jobs/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+    delete: id => request(`/jobs/${id}`, { method: 'DELETE' })
   },
-
-  // --- Applications ---
   applications: {
     getAll: (params = {}) => {
       const query = new URLSearchParams(params).toString();
       return request(`/applications${query ? `?${query}` : ''}`);
     },
-    getById: (id) => request(`/applications/${id}`),
-    submit: (appData) => request('/applications', {
-      method: 'POST',
-      body: JSON.stringify(appData)
-    }),
-    updateStage: (id, { stage, customNote }) => request(`/applications/${id}/stage`, {
-      method: 'PATCH',
-      body: JSON.stringify({ stage, customNote })
-    }),
-    updateNotes: (id, notes) => request(`/applications/${id}/notes`, {
-      method: 'PATCH',
-      body: JSON.stringify({ notes })
-    }),
-    scheduleInterview: (id, interviewData) => request(`/applications/${id}/interview`, {
-      method: 'POST',
-      body: JSON.stringify(interviewData)
-    }),
-    recordEvaluation: (id, evaluationData) => request(`/applications/${id}/evaluation`, {
-      method: 'POST',
-      body: JSON.stringify(evaluationData)
-    }),
-    delete: (id) => request(`/applications/${id}`, {
-      method: 'DELETE'
-    })
+    getById: id => request(`/applications/${id}`),
+    submit: appData => request('/applications', { method: 'POST', body: appData instanceof FormData ? appData : JSON.stringify(appData) }),
+    updateStage: (id, payload) => request(`/applications/${id}/stage`, { method: 'PATCH', body: JSON.stringify(payload) }),
+    updateNotes: (id, notes) => request(`/applications/${id}/notes`, { method: 'PATCH', body: JSON.stringify({ notes }) }),
+    scheduleInterview: (id, interviewData) => request(`/applications/${id}/interview`, { method: 'POST', body: interviewData instanceof FormData ? interviewData : JSON.stringify(interviewData) }),
+    recordEvaluation: (id, evaluationData) => request(`/applications/${id}/evaluation`, { method: 'POST', body: JSON.stringify(evaluationData) }),
+    getAvailability: (date, excludeApplicationId = '') => request(`/applications/availability?${new URLSearchParams({ date, ...(excludeApplicationId ? { excludeApplicationId } : {}) }).toString()}`),
+    getResumeBlob: async id => {
+      const token = localStorage.getItem('ats_token');
+      const role = localStorage.getItem('ats_role');
+      const response = await fetch(`${BASE_URL}/applications/${id}/resume`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(role ? { 'X-User-Role': role } : {})
+        }
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || `Could not load resume (${response.status})`);
+      }
+      return {
+        blob: await response.blob(),
+        contentType: response.headers.get('Content-Type') || 'application/octet-stream'
+      };
+    },
+    delete: id => request(`/applications/${id}`, { method: 'DELETE' })
   },
-
-  // --- AI ---
   ai: {
-    screen: (candidateId) => request(`/ai/screen/${candidateId}`, {
-      method: 'POST'
-    }),
-    parseResume: (payload) => request('/ai/parse-resume', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-    parseResumeFile: (formData) => request('/ai/parse-resume', {
-      method: 'POST',
-      body: formData
-    })
+    screen: candidateId => request(`/ai/screen/${candidateId}`, { method: 'POST' }),
+    parseResume: payload => request('/ai/parse-resume', { method: 'POST', body: JSON.stringify(payload) }),
+    parseResumeFile: formData => request('/ai/parse-resume', { method: 'POST', body: formData })
   },
-
-  // --- Notifications ---
   notifications: {
     getAll: () => request('/notifications'),
-    markAsRead: (id) => request(`/notifications/${id}/read`, {
-      method: 'PATCH'
-    })
+    markAsRead: id => request(`/notifications/${id}/read`, { method: 'PATCH' })
   }
 };

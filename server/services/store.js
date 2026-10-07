@@ -16,7 +16,8 @@ const INITIAL_DATA = {
       password: 'password123',
       role: 'hr',
       title: 'Head of Talent Acquisition',
-      company: 'Tidal Technologies'
+      company: 'Tidal Technologies',
+      emailVerified: true
     },
     {
       id: 'user-app-01',
@@ -25,7 +26,8 @@ const INITIAL_DATA = {
       password: 'password123',
       role: 'applicant',
       title: 'Senior Software Engineer',
-      phone: '+1 (555) 234-5678'
+      phone: '+1 (555) 234-5678',
+      emailVerified: true
     },
     {
       id: 'user-app-02',
@@ -34,7 +36,8 @@ const INITIAL_DATA = {
       password: 'password123',
       role: 'applicant',
       title: 'Product Designer',
-      phone: '+1 (555) 876-5432'
+      phone: '+1 (555) 876-5432',
+      emailVerified: true
     }
   ],
   jobs: [
@@ -47,6 +50,9 @@ const INITIAL_DATA = {
       experienceLevel: 'Senior (5+ years)',
       salaryRange: '$145,000 - $185,000 USD',
       status: 'open',
+      scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+      requiredSkills: ["React", "TypeScript", "JavaScript", "Node.js", "REST APIs", "database", "microservices", "cloud", "CI/CD"],
+      nonRequiredSkills: ["GraphQL", "Docker", "TailwindCSS", "automated testing"],
       description: 'We are seeking an experienced Full Stack Engineer to lead architecture on our cloud applications. You will design resilient APIs, build high-performance React frontends, and collaborate with product teams on high-impact scalable services.\n\nRequirements:\n- 5+ years of experience with React, TypeScript/JavaScript, and Node.js.\n- Strong understanding of REST APIs, database schemas, and microservices.\n- Experience with cloud infrastructure and CI/CD pipelines.\n- Passion for clean architecture, automated testing, and developer experience.',
       createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
       updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 7
@@ -60,6 +66,9 @@ const INITIAL_DATA = {
       experienceLevel: 'Lead / Principal',
       salaryRange: '$175,000 - $220,000 USD',
       status: 'open',
+      scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+      requiredSkills: ["foundation models", "Gemini API", "PyTorch", "Hugging Face", "LLM", "production", "software engineering", "distributed computing"],
+      nonRequiredSkills: ["RAG", "multimodal", "retrieval augmented generation"],
       description: 'Lead the next generation of AI-driven recruiting and enterprise productivity intelligence. In this role, you will architect multimodal LLM pipelines, implement retrieval-augmented generation (RAG) frameworks, and deploy secure enterprise AI workflows.\n\nRequirements:\n- Deep expertise in foundation models, Gemini API, PyTorch, or Hugging Face.\n- Experience deploying scalable LLM systems in production.\n- Proven background in software engineering and distributed computing.',
       createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
       updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5
@@ -73,6 +82,9 @@ const INITIAL_DATA = {
       experienceLevel: 'Mid-Senior (4+ years)',
       salaryRange: '$120,000 - $155,000 USD',
       status: 'open',
+      scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+      requiredSkills: ["Figma", "design systems", "design tokens", "component architecture", "accessibility", "user research"],
+      nonRequiredSkills: ["prototyping", "wireframing", "CSS", "HTML"],
       description: 'Join our design team to craft state-of-the-art user experiences for enterprise workflow products. You will maintain our design system, facilitate user research, and build interactive prototypes.\n\nRequirements:\n- Proven portfolio showcasing high-fidelity UI/UX design and design tokens.\n- Mastery of Figma, component architecture, and accessibility (WCAG AA).\n- Strong communication skills and cross-functional leadership.',
       createdAt: Date.now() - 1000 * 60 * 60 * 24 * 3,
       updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 3
@@ -173,11 +185,44 @@ class Store {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf8');
         const parsed = JSON.parse(raw);
+        const savedUsers = Array.isArray(parsed.users) ? parsed.users : [];
+
+        // Older demo db.json files may have persisted seed accounts without passwords.
+        // Restore only missing/null seed fields while preserving any saved custom fields.
+        const seedUsers = INITIAL_DATA.users.map(seed => {
+          const saved = savedUsers.find(u => u.id === seed.id);
+          if (!saved) return { ...seed };
+          const restored = { ...seed, ...saved };
+          for (const [key, value] of Object.entries(seed)) {
+            if (restored[key] == null) restored[key] = value;
+          }
+          return restored;
+        });
+
+        const seedIds = new Set(INITIAL_DATA.users.map(u => u.id));
+        const customUsers = savedUsers.filter(u => !seedIds.has(u.id)).map(u => ({ ...u, emailVerified: u.emailVerified !== false }));
+
         return {
-          users: parsed.users || INITIAL_DATA.users,
-          jobs: parsed.jobs || INITIAL_DATA.jobs,
+          users: [...seedUsers, ...customUsers],
+          jobs: (parsed.jobs || INITIAL_DATA.jobs).map(job => {
+            const seed = INITIAL_DATA.jobs.find(item => item.id === job.id) || {};
+            return {
+              ...seed,
+              ...job,
+              scoringWeights: job.scoringWeights || seed.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+              requiredSkills: Array.isArray(job.requiredSkills) ? job.requiredSkills : (seed.requiredSkills || []),
+              nonRequiredSkills: Array.isArray(job.nonRequiredSkills) ? job.nonRequiredSkills : (seed.nonRequiredSkills || [])
+            };
+          }),
           applications: parsed.applications || INITIAL_DATA.applications,
-          notifications: parsed.notifications || INITIAL_DATA.notifications
+          notifications: (parsed.notifications || INITIAL_DATA.notifications).map(notification => {
+            if (notification.recipientUserId) return notification;
+            const app = (parsed.applications || INITIAL_DATA.applications).find(item => item.id === notification.applicationId);
+            const user = app?.userId
+              ? [...seedUsers, ...customUsers].find(item => item.id === app.userId)
+              : [...seedUsers, ...customUsers].find(item => String(item.email || '').toLowerCase() === String(notification.recipientEmail || '').toLowerCase());
+            return user ? { ...notification, recipientUserId: user.id } : notification;
+          })
         };
       }
     } catch (err) {
@@ -219,10 +264,27 @@ class Store {
     );
   }
 
+  updateUser(id, updates) {
+    const index = this.data.users.findIndex(u => u.id === id);
+    if (index === -1) return null;
+    this.data.users[index] = { ...this.data.users[index], ...updates };
+    this.save();
+    return this.data.users[index];
+  }
+
+  deleteUser(id) {
+    const index = this.data.users.findIndex(u => u.id === id);
+    if (index === -1) return false;
+    this.data.users.splice(index, 1);
+    this.save();
+    return true;
+  }
+
   createUser(userData) {
     const newUser = {
       id: userData.id || `user-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
       createdAt: Date.now(),
+      emailVerified: userData.emailVerified ?? false,
       ...userData
     };
     this.data.users.push(newUser);
@@ -250,6 +312,9 @@ class Store {
       salaryRange: jobData.salaryRange || 'Competitive',
       status: jobData.status || 'open',
       description: jobData.description || '',
+      scoringWeights: jobData.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+      requiredSkills: Array.isArray(jobData.requiredSkills) ? jobData.requiredSkills : [],
+      nonRequiredSkills: Array.isArray(jobData.nonRequiredSkills) ? jobData.nonRequiredSkills : [],
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
@@ -313,6 +378,7 @@ class Store {
       resumeText: appData.resumeText || '',
       fileName: appData.fileName || '',
       fileSize: appData.fileSize || 0,
+      resumeFile: appData.resumeFile || null,
       stage: appData.stage || 'Application Submitted',
       geminiScore: appData.geminiScore ?? null,
       geminiRationale: appData.geminiRationale || null,
@@ -354,10 +420,23 @@ class Store {
     return [...this.data.notifications].sort((a, b) => (b.sentAt || 0) - (a.sentAt || 0));
   }
 
-  getNotificationsForUser(email) {
-    if (!email) return [];
+  getNotificationsForUser(userOrEmail) {
+    if (!userOrEmail) return [];
+    const userId = typeof userOrEmail === 'object' ? userOrEmail.id : null;
+    const email = typeof userOrEmail === 'object' ? userOrEmail.email : userOrEmail;
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
+    // Match by both account ID and email. This deliberately keeps the email
+    // fallback even when a notification has a stale/wrong recipientUserId,
+    // which can happen with applications created before account linking was fixed.
     return this.data.notifications
-      .filter(n => n.recipientEmail.toLowerCase() === email.toLowerCase())
+      .filter(n => {
+        const notificationEmail = String(n.recipientEmail || '').trim().toLowerCase();
+        return Boolean(
+          (userId && n.recipientUserId === userId) ||
+          (normalizedEmail && notificationEmail === normalizedEmail)
+        );
+      })
       .sort((a, b) => (b.sentAt || 0) - (a.sentAt || 0));
   }
 
@@ -365,12 +444,17 @@ class Store {
     const notif = {
       id: notifData.id || `notif-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
       applicationId: notifData.applicationId,
+      recipientUserId: notifData.recipientUserId || null,
       jobId: notifData.jobId,
       recipientEmail: notifData.recipientEmail,
       recipientName: notifData.recipientName,
       stage: notifData.stage,
       subject: notifData.subject,
       body: notifData.body,
+      deliveryStatus: notifData.deliveryStatus || 'sent',
+      deliveryError: notifData.deliveryError || null,
+      providerMessageId: notifData.providerMessageId || null,
+      emailType: notifData.emailType || 'notification',
       sentAt: Date.now(),
       read: false
     };

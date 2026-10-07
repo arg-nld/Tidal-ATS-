@@ -7,8 +7,13 @@ import { HrPortal } from './components/hr/HrPortal';
 import { ApplicantPortal } from './components/applicant/ApplicantPortal';
 
 function AtsApp() {
-  const { isHr, isAuthenticated, user } = useAuth();
+  const { isHr, isAuthenticated, authReady, user } = useAuth();
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
+
+  // Wait for persisted-session validation before deciding which portal to render.
+  if (!authReady) {
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-sm">Loading session...</div>;
+  }
 
   // Show auth screen if not signed in
   if (!isAuthenticated) {

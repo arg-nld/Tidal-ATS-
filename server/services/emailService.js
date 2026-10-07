@@ -1,12 +1,26 @@
 import { store } from './store.js';
 
-/**
- * Stage-specific email templates and notification generator
- */
+function requireEmailConfig() {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.EMAIL_FROM?.trim();
+  if (!apiKey || !from) {
+    throw new Error('Email delivery is not configured. Add RESEND_API_KEY and EMAIL_FROM to the backend .env.');
+  }
+  return { apiKey, from };
+}
+
+function textToHtml(text = '') {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
 export function generateEmailForStatusChange({ applicant, job, newStage, interviewDetails, customNote }) {
   const applicantName = applicant?.name || 'Applicant';
   const jobTitle = job?.title || 'Open Position';
-  const companyName = 'Tidal Nexus';
+  const companyName = process.env.COMPANY_NAME || 'Tidal Nexus';
 
   let subject = '';
   let body = '';
@@ -14,162 +28,151 @@ export function generateEmailForStatusChange({ applicant, job, newStage, intervi
   switch (newStage) {
     case 'Application Submitted':
       subject = `Application Received: ${jobTitle} at ${companyName}`;
-      body = `Dear ${applicantName},
-
-Thank you for your interest in joining ${companyName}! We have received your application for the ${jobTitle} role.
-
-Our talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.
-
-Best regards,
-The Talent Acquisition Team
-${companyName}`;
+      body = `Dear ${applicantName},\n\nThank you for your interest in joining ${companyName}. We have received your application for the ${jobTitle} role.\n\nOur talent acquisition team will review your qualifications and experience.\n\nBest regards,\nThe Talent Acquisition Team\n${companyName}`;
       break;
-
     case 'Initial Screening':
       subject = `Application Update: ${jobTitle} - Screening in Progress`;
-      body = `Dear ${applicantName},
-
-We are writing to let you know that your application for ${jobTitle} is now undergoing initial review and qualification screening by our recruiting team.
-
-We assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.
-
-Warm regards,
-${companyName} Recruiting`;
+      body = `Dear ${applicantName},\n\nYour application for ${jobTitle} is now undergoing initial review and qualification screening.\n\nWe will update you as soon as this phase concludes.\n\nWarm regards,\n${companyName} Recruiting`;
       break;
-
     case 'Shortlisted':
       subject = `Great News! You've been shortlisted for ${jobTitle}`;
-      body = `Dear ${applicantName},
-
-Congratulations! We are delighted to inform you that your profile has been shortlisted for the ${jobTitle} position at ${companyName}.
-
-Our team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.
-
-Sincerely,
-${companyName} Talent Team`;
+      body = `Dear ${applicantName},\n\nCongratulations! Your profile has been shortlisted for the ${jobTitle} position at ${companyName}.\n\nOur recruiting team will contact you shortly regarding next steps.\n\nSincerely,\n${companyName} Talent Team`;
       break;
-
-    case 'Interview Scheduled': {
-      const scheduledTime = interviewDetails?.scheduledAt 
-        ? new Date(interviewDetails.scheduledAt).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })
-        : 'Date & Time to be confirmed';
-      const interviewer = interviewDetails?.interviewer || 'Tidal Interview Panel';
-      const interviewType = interviewDetails?.type || 'Video Technical Interview';
-      const meetingLink = interviewDetails?.meetingLink || 'https://meet.google.com/ats-session';
-      const notes = interviewDetails?.notes ? `\n\nPreparation Notes:\n${interviewDetails.notes}` : '';
-
+    case 'Interview Scheduled':
       subject = `Interview Scheduled: ${jobTitle} with ${companyName}`;
-      body = `Dear ${applicantName},
-
-Your interview for the ${jobTitle} role has been scheduled!
-
-Here are the details for your upcoming discussion:
-• Round Type: ${interviewType}
-• Date & Time: ${scheduledTime}
-• Interviewer(s): ${interviewer}
-• Meeting Link: ${meetingLink}${notes}
-
-Please test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.
-
-Best of luck,
-${companyName} Hiring Team`;
+      body = `Dear ${applicantName},\n\nYour interview for ${jobTitle} has been scheduled.\n\nDate & Time: ${interviewDetails?.scheduledAt ? new Date(interviewDetails.scheduledAt).toLocaleString() : 'To be confirmed'}\nInterviewer(s): ${interviewDetails?.interviewer || 'Recruiting Team'}\nMeeting Link: ${interviewDetails?.meetingLink || 'To be confirmed'}\n\n${interviewDetails?.emailBody || interviewDetails?.notes || 'Please be ready a few minutes before the scheduled time.'}\n\nBest regards,\n${companyName} Hiring Team`;
       break;
-    }
-
     case 'Job Offer':
-      subject = `Job Offer: ${jobTitle} at ${companyName}!`;
-      body = `Dear ${applicantName},
-
-We are thrilled to extend a formal job offer for the position of ${jobTitle} at ${companyName}!
-
-Your exceptional skills, background, and cultural alignment stood out during our interview rounds, and our leadership team believes you will make a tremendous impact here.
-
-Please review your official offer documentation inside your candidate dashboard. Feel free to reply with any questions regarding compensation, benefits, or your anticipated start date.
-
-Warmest congratulations,
-Executive Talent Team
-${companyName}`;
+      subject = `Job Offer: ${jobTitle} at ${companyName}`;
+      body = `Dear ${applicantName},\n\nWe are pleased to extend a job offer for the position of ${jobTitle} at ${companyName}. Please review the offer documentation provided by the hiring team.\n\nWarm regards,\n${companyName} Talent Team`;
       break;
-
     case 'Hired':
       subject = `Official Welcome to ${companyName} - You're Hired!`;
-      body = `Dear ${applicantName},
-
-Welcome to the team! We are ecstatic to confirm that your hiring process for ${jobTitle} is complete and official.
-
-Our People Operations team will be reaching out soon with onboarding materials, equipment shipping details, and first-day orientation schedules.
-
-Welcome aboard!
-${companyName} People & Culture`;
+      body = `Dear ${applicantName},\n\nWelcome to the team! We are pleased to confirm that your hiring process for ${jobTitle} is complete.\n\nOur People Operations team will contact you with onboarding information.\n\nWelcome aboard!\n${companyName} People & Culture`;
       break;
-
     case 'Rejected':
       subject = `Update regarding your application for ${jobTitle}`;
-      body = `Dear ${applicantName},
-
-Thank you very much for taking the time to apply and interview for the ${jobTitle} position with ${companyName}.
-
-While your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.
-
-We sincerely appreciate your interest in ${companyName} and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.
-
-Respectfully,
-The Talent Acquisition Team
-${companyName}`;
+      body = `Dear ${applicantName},\n\nThank you for taking the time to apply for the ${jobTitle} position with ${companyName}. We have decided to move forward with another candidate whose background more closely matches our current needs.\n\nWe appreciate your interest and wish you the best in your career.\n\nRespectfully,\nThe Talent Acquisition Team\n${companyName}`;
       break;
-
     default:
       subject = `Status Update on your application for ${jobTitle}`;
-      body = `Dear ${applicantName},
-
-Your application for ${jobTitle} at ${companyName} has been updated to "${newStage}".${customNote ? `\n\nNote from recruiter:\n${customNote}` : ''}
-
-Log in to your Applicant Portal to view full details.
-
-Best regards,
-${companyName} Talent Team`;
+      body = `Dear ${applicantName},\n\nYour application for ${jobTitle} at ${companyName} has been updated to "${newStage}".${customNote ? `\n\nNote from recruiter:\n${customNote}` : ''}\n\nBest regards,\n${companyName} Talent Team`;
   }
 
   return { subject, body };
 }
 
-/**
- * Send automated email notification and record in store
- */
-export async function sendStatusChangeEmail({ applicant, job, newStage, interviewDetails, customNote }) {
-  if (!applicant || !applicant.email) {
-    console.warn('[EmailService] Cannot send email: applicant or email missing.');
+export async function sendEmail({
+  to,
+  subject,
+  body,
+  html,
+  attachments = [],
+  idempotencyKey
+}) {
+  const { apiKey, from } = requireEmailConfig();
+
+  const payload = {
+    from,
+    to: Array.isArray(to) ? to : [to],
+    subject: String(subject || '').trim(),
+    text: String(body || ''),
+    html: html || `<div style="font-family:Arial,sans-serif;line-height:1.6">${textToHtml(body || '')}</div>`
+  };
+
+  if (!payload.to[0] || !payload.subject) {
+    throw new Error('Email recipient and subject are required.');
+  }
+
+  if (attachments.length) {
+    payload.attachments = attachments.map(file => ({
+      filename: file.filename,
+      content: file.contentBase64 || file.content
+    }));
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {})
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const responseText = await response.text();
+  let result = null;
+  try { result = JSON.parse(responseText); } catch { /* non-JSON response */ }
+
+  if (!response.ok) {
+    throw new Error(result?.message || result?.error || `Email provider returned HTTP ${response.status}.`);
+  }
+
+  return result || { id: null };
+}
+
+export async function sendStatusChangeEmail({ applicant, job, newStage, interviewDetails, customNote, attachments = [] }) {
+  if (!applicant?.email) {
+    console.warn('[EmailService] Cannot send email: applicant email missing.');
     return null;
   }
 
-  const { subject, body } = generateEmailForStatusChange({
-    applicant,
-    job,
-    newStage,
-    interviewDetails,
-    customNote
-  });
+  const generated = generateEmailForStatusChange({ applicant, job, newStage, interviewDetails, customNote });
+  const subject = interviewDetails?.emailSubject || generated.subject;
+  const body = interviewDetails?.emailBody || generated.body;
+
+  let providerResult = null;
+  let deliveryStatus = 'failed';
+  let deliveryError = null;
+
+  try {
+    providerResult = await sendEmail({
+      to: applicant.email,
+      subject,
+      body,
+      attachments,
+      idempotencyKey: `application-stage/${applicant.id}/${newStage}/${interviewDetails?.createdAt || Date.now()}`
+    });
+    deliveryStatus = 'sent';
+  } catch (err) {
+    // Internal ATS notifications should still be created even when the external
+    // email provider rejects delivery (for example while Resend is in testing mode).
+    // This keeps the candidate portal useful and makes provider failures visible.
+    deliveryError = err?.message || 'External email delivery failed.';
+    console.error(`[EmailService] External email delivery failed for ${applicant.email}:`, deliveryError);
+  }
+
+  const matchedUser = applicant?.email ? store.getUserByEmail(applicant.email) : null;
+  const recipientUserId = matchedUser?.id || applicant.userId || null;
 
   const notification = store.createNotification({
     applicationId: applicant.id,
+    recipientUserId,
     jobId: applicant.jobId,
     recipientEmail: applicant.email,
     recipientName: applicant.name,
     stage: newStage,
     subject,
-    body
+    body,
+    deliveryStatus,
+    deliveryError,
+    providerMessageId: providerResult?.id || null,
+    emailType: 'transactional'
   });
 
-  // Simulated email dispatch log (can connect to SMTP/SendGrid/Postmark)
-  console.log(`\n======================================================`);
-  console.log(`✉️  [AUTOMATED EMAIL NOTIFICATION SENT]`);
-  console.log(`To: ${applicant.name} <${applicant.email}>`);
-  console.log(`Subject: ${subject}`);
-  console.log(`Stage: ${newStage}`);
-  console.log(`Timestamp: ${new Date(notification.sentAt).toISOString()}`);
-  console.log(`------------------------------------------------------`);
-  console.log(body);
-  console.log(`======================================================\n`);
-
   return notification;
+}
+
+export async function sendVerificationEmail({ user, token }) {
+  const appUrl = (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+  const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(token)}`;
+  const body = `Hi ${user.name || 'there'},\n\nThanks for creating a Tidal Nexus account. Please verify your email address by opening this link:\n\n${verifyUrl}\n\nThis verification link is for your account only.\n\nTidal Nexus`;
+
+  return sendEmail({
+    to: user.email,
+    subject: 'Verify your Tidal Nexus account',
+    body,
+    idempotencyKey: `verify/${user.id}/${token}`
+  });
 }

@@ -7,11 +7,13 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import { authenticate } from './middleware/authMiddleware.js';
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+fs.mkdirSync('server/data/uploads', { recursive: true });
 
 // Middleware
 app.use(cors({

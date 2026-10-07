@@ -12,17 +12,16 @@ export function getNotifications(req, res) {
     return res.status(401).json({ error: 'Please sign in to view notifications' });
   }
 
-  const notifs = store.getNotificationsForUser(req.user.email);
+  const notifs = store.getNotificationsForUser(req.user);
   return res.json({ notifications: notifs });
 }
 
 export function markAsRead(req, res) {
   const { id } = req.params;
-  const notif = store.markNotificationAsRead(id);
+  const owned = store.getNotificationsForUser(req.user).find(item => item.id === id);
+  if (!owned) return res.status(404).json({ error: 'Notification not found' });
 
-  if (!notif) {
-    return res.status(404).json({ error: 'Notification not found' });
-  }
+  const notif = store.markNotificationAsRead(id);
 
   return res.json({ notification: notif });
 }

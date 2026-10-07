@@ -14,3 +14,23 @@
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
   background-color: #475569;
 }
+
+/* Small, responsive motion for the HR interview time wheel.
+   The value slides in from the direction of the selected arrow. */
+@keyframes time-wheel-slide-up {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes time-wheel-slide-down {
+  0% { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.time-wheel-value--up {
+  animation: time-wheel-slide-up 180ms ease-out;
+}
+
+.time-wheel-value--down {
+  animation: time-wheel-slide-down 180ms ease-out;
+}

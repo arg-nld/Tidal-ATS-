@@ -182,3 +182,29 @@
     border-right-color: var(--border);
   }
 }
+
+/* Interview time picker */
+.time-wheel-column {
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.time-wheel-column:hover {
+  transform: translateY(-2px);
+}
+
+.time-wheel-arrow {
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+}
+
+.time-wheel-arrow:active {
+  transform: scale(0.92);
+}
+
+.time-wheel-value {
+  animation: time-wheel-pop 180ms ease-out;
+}
+
+@keyframes time-wheel-pop {
+  0% { opacity: 0.35; transform: translateY(-3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

@@ -4,17 +4,13 @@ import { StatusBadge } from '../common/Badge';
 
 export function JobBoard({ jobs, appliedJobIds, onApply }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDept, setSelectedDept] = useState('all');
   const [viewingJob, setViewingJob] = useState(null);
-
-  const departments = ['all', ...new Set(jobs.map(j => j.department).filter(Boolean))];
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesDept = selectedDept === 'all' || job.department === selectedDept;
-    return matchesSearch && matchesDept;
+    return matchesSearch;
   });
 
   return (
@@ -25,7 +21,7 @@ export function JobBoard({ jobs, appliedJobIds, onApply }) {
         <div className="max-w-2xl mb-6">
           <h2 className="text-2xl font-bold text-slate-100">Explore Open Opportunities</h2>
           <p className="text-sm text-slate-400 mt-1">
-            Discover roles that match your expertise and apply directly with AI-assisted resume screening.
+            Discover roles that match your expertise and apply directly and track your application status in one place.
           </p>
         </div>
 
@@ -41,17 +37,7 @@ export function JobBoard({ jobs, appliedJobIds, onApply }) {
             />
           </div>
 
-          <select
-            value={selectedDept}
-            onChange={(e) => setSelectedDept(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500"
-          >
-            {departments.map(dept => (
-              <option key={dept} value={dept}>
-                {dept === 'all' ? 'All Departments' : dept}
-              </option>
-            ))}
-          </select>
+
         </div>
       </div>
 
@@ -71,10 +57,7 @@ export function JobBoard({ jobs, appliedJobIds, onApply }) {
                 className="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all hover:shadow-xl hover:shadow-indigo-950/20 group"
               >
                 <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-full">
-                      {job.department || 'Engineering'}
-                    </span>
+                  <div className="flex items-start justify-end gap-2">
                     <StatusBadge status={job.status} />
                   </div>
 
@@ -139,7 +122,6 @@ export function JobBoard({ jobs, appliedJobIds, onApply }) {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-slate-800 flex justify-between items-start">
               <div>
-                <span className="text-xs text-indigo-400 font-semibold">{viewingJob.department}</span>
                 <h2 className="text-xl font-bold text-slate-100 mt-1">{viewingJob.title}</h2>
                 <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-400">
                   <span>{viewingJob.location}</span>

@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded applicant resumes
+server/data/uploads/*
+!server/data/uploads/.gitkeep

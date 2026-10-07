@@ -15,25 +15,54 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadPersistedUser);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
 
-  // Keep localStorage in sync
+  useEffect(() => {
+    let cancelled = false;
+    const hydrateSession = async () => {
+      const token = localStorage.getItem('ats_token');
+      if (!token) {
+        if (!cancelled) setAuthReady(true);
+        return;
+      }
+      try {
+        const res = await api.auth.getCurrentUser();
+        if (!cancelled && res.user) setUser(res.user);
+      } catch (err) {
+        if (!cancelled && err.status === 401) {
+          setUser(null);
+          localStorage.removeItem('ats_token');
+          localStorage.removeItem('ats_role');
+          localStorage.removeItem('ats_user');
+        }
+      } finally {
+        if (!cancelled) setAuthReady(true);
+      }
+    };
+    hydrateSession();
+    return () => { cancelled = true; };
+  }, []);
+
   useEffect(() => {
     if (user) {
       localStorage.setItem('ats_token', user.id);
       localStorage.setItem('ats_role', user.role);
       localStorage.setItem('ats_user', JSON.stringify(user));
-    } else {
+    } else if (authReady) {
       localStorage.removeItem('ats_token');
       localStorage.removeItem('ats_role');
       localStorage.removeItem('ats_user');
     }
-  }, [user]);
+  }, [user, authReady]);
 
   const login = useCallback(async ({ email, password }) => {
     setLoading(true);
     setAuthError(null);
     try {
       const res = await api.auth.login({ email, password });
+      localStorage.setItem('ats_token', res.token || res.user.id);
+      localStorage.setItem('ats_role', res.user.role);
+      localStorage.setItem('ats_user', JSON.stringify(res.user));
       setUser(res.user);
       return res.user;
     } catch (err) {
@@ -44,13 +73,17 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(async (userData) => {
+  const register = useCallback(async userData => {
     setLoading(true);
     setAuthError(null);
     try {
       const res = await api.auth.register(userData);
-      setUser(res.user);
-      return res.user;
+      // Registration now stops here until the email is verified.
+      setUser(null);
+      localStorage.removeItem('ats_token');
+      localStorage.removeItem('ats_role');
+      localStorage.removeItem('ats_user');
+      return res;
     } catch (err) {
       setAuthError(err.message || 'Registration failed.');
       throw err;
@@ -62,6 +95,9 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     setUser(null);
     setAuthError(null);
+    localStorage.removeItem('ats_token');
+    localStorage.removeItem('ats_role');
+    localStorage.removeItem('ats_user');
   }, []);
 
   const clearAuthError = useCallback(() => setAuthError(null), []);
@@ -78,7 +114,8 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
-      clearAuthError
+      clearAuthError,
+      authReady
     }}>
       {children}
     </AuthContext.Provider>

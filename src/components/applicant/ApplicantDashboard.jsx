@@ -89,7 +89,6 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-                        {app.job?.department || 'Engineering'}
                       </span>
                       <span className="text-xs text-slate-500">• Applied {new Date(app.createdAt).toLocaleDateString()}</span>
                     </div>

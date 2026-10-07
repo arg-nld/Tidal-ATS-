@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react';
-import { 
-  Users, Plus, BrainCircuit, Calendar, FileText, 
-  Trash2, GripVertical, Sparkles, MessageSquare, ChevronRight, CheckCircle2 
+import { useEffect, useRef, useState } from 'react';
+import {
+  BrainCircuit, Calendar, Trash2, GripVertical, MessageSquare, ChevronRight
 } from 'lucide-react';
-import { PIPELINE_STAGES } from './CandidateProfileModal';
+import { PIPELINE_STAGES } from '../../constants/pipeline';
 import { Spinner } from '../common/Spinner';
+
+const AUTO_PAN_EDGE = 90;
+const AUTO_PAN_SPEED = 14;
 
 export function HrKanbanView({
   jobs,
@@ -12,7 +14,7 @@ export function HrKanbanView({
   selectedJobId,
   onSelectJobId,
   onViewCandidate,
-  onUpdateStage,
+  onRequestStageChange,
   onScreenCandidate,
   onDeleteCandidate
 }) {
@@ -20,15 +22,56 @@ export function HrKanbanView({
     ? applications
     : applications.filter(a => a.jobId === selectedJobId);
 
+  const boardRef = useRef(null);
+  const autoPanTimerRef = useRef(null);
+  const autoPanDirectionRef = useRef(0);
+  const draggedCandidateRef = useRef(null);
+
+  const stopAutoPan = () => {
+    if (autoPanTimerRef.current) {
+      window.clearInterval(autoPanTimerRef.current);
+      autoPanTimerRef.current = null;
+    }
+  };
+
+  const updateAutoPan = (clientX) => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const rect = board.getBoundingClientRect();
+    let direction = 0;
+
+    if (clientX < rect.left + AUTO_PAN_EDGE) direction = -1;
+    if (clientX > rect.right - AUTO_PAN_EDGE) direction = 1;
+
+    if (!direction) {
+      stopAutoPan();
+      return;
+    }
+
+    // Keep the latest drag direction so the pan can reverse immediately while
+    // the same drag operation remains active.
+    autoPanDirectionRef.current = direction;
+
+    if (!autoPanTimerRef.current) {
+      autoPanTimerRef.current = window.setInterval(() => {
+        if (boardRef.current && autoPanDirectionRef.current) {
+          boardRef.current.scrollLeft += autoPanDirectionRef.current * AUTO_PAN_SPEED;
+        }
+      }, 16);
+    }
+  };
+
+  useEffect(() => () => stopAutoPan(), []);
+
   return (
-    <div className="h-full flex flex-col space-y-4" onDragOver={(e) => e.preventDefault()} onDrop={(e) => e.preventDefault()}>
-      
+    <div className="h-full flex flex-col space-y-4">
       {/* Top Controls & Job Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
         <div>
           <h2 className="text-2xl font-bold text-slate-100">Candidate Pipeline Board</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Drag candidates across lifecycle stages to advance their status and trigger automated email updates.
+            Drag candidates across lifecycle stages. The move is confirmed before the status and applicant notification are updated.
           </p>
         </div>
 
@@ -37,7 +80,7 @@ export function HrKanbanView({
           <select
             value={selectedJobId}
             onChange={(e) => onSelectJobId(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[280px]"
           >
             <option value="all">All Jobs ({applications.length} candidates)</option>
             {jobs.map(j => {
@@ -49,7 +92,16 @@ export function HrKanbanView({
       </div>
 
       {/* Horizontal Scrollable Kanban Columns */}
-      <div className="flex-1 overflow-x-auto pb-4 custom-scrollbar">
+      <div
+        ref={boardRef}
+        className="flex-1 overflow-x-auto pb-4 custom-scrollbar overscroll-x-contain"
+        onDragOver={(e) => {
+          e.preventDefault();
+          updateAutoPan(e.clientX);
+        }}
+        onDrop={stopAutoPan}
+        onDragEnd={stopAutoPan}
+      >
         <div className="flex gap-4 min-w-max h-[calc(100vh-250px)] px-1">
           {PIPELINE_STAGES.map((stage, stageIdx) => {
             const stageCandidates = filteredApps.filter(a => a.stage === stage);
@@ -63,7 +115,8 @@ export function HrKanbanView({
                 nextStage={nextStage}
                 candidates={stageCandidates}
                 jobs={jobs}
-                onUpdateStage={onUpdateStage}
+                onRequestStageChange={onRequestStageChange}
+                draggedCandidateRef={draggedCandidateRef}
                 onViewCandidate={onViewCandidate}
                 onScreenCandidate={onScreenCandidate}
                 onDeleteCandidate={onDeleteCandidate}
@@ -83,7 +136,8 @@ function KanbanColumn({
   nextStage,
   candidates,
   jobs,
-  onUpdateStage,
+  onRequestStageChange,
+  draggedCandidateRef,
   onViewCandidate,
   onScreenCandidate,
   onDeleteCandidate
@@ -92,7 +146,6 @@ function KanbanColumn({
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsOver(true);
   };
 
@@ -106,9 +159,13 @@ function KanbanColumn({
     e.stopPropagation();
     setIsOver(false);
     const candidateId = e.dataTransfer.getData('candidateId');
-    if (candidateId) {
-      onUpdateStage(candidateId, stage);
+    const candidate = candidates.find(c => c.id === candidateId)
+      || draggedCandidateRef.current;
+
+    if (candidate && candidate.stage !== stage) {
+      onRequestStageChange(candidate, stage);
     }
+    draggedCandidateRef.current = null;
   };
 
   return (
@@ -150,7 +207,8 @@ function KanbanColumn({
               nextStage={nextStage}
               job={jobs.find(j => j.id === candidate.jobId)}
               onViewCandidate={onViewCandidate}
-              onUpdateStage={onUpdateStage}
+              onRequestStageChange={onRequestStageChange}
+              draggedCandidateRef={draggedCandidateRef}
               onScreenCandidate={onScreenCandidate}
               onDeleteCandidate={onDeleteCandidate}
             />
@@ -166,18 +224,27 @@ function KanbanCard({
   nextStage,
   job,
   onViewCandidate,
-  onUpdateStage,
+  onRequestStageChange,
+  draggedCandidateRef,
   onScreenCandidate,
   onDeleteCandidate
 }) {
   const handleDragStart = (e) => {
+    e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('candidateId', candidate.id);
+    // Keep the full candidate object available for a drop across columns.
+    draggedCandidateRef.current = candidate;
+  };
+
+  const handleDragEnd = () => {
+    draggedCandidateRef.current = null;
   };
 
   return (
     <div
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onClick={() => onViewCandidate(candidate)}
       className="bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:shadow-indigo-950/20 group space-y-2.5"
     >
@@ -194,6 +261,7 @@ function KanbanCard({
 
         <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
           <button
+            type="button"
             onClick={() => onDeleteCandidate(candidate)}
             className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 p-1 rounded hover:bg-rose-500/10 transition-all"
             title="Delete Candidate"
@@ -260,6 +328,7 @@ function KanbanCard({
           </div>
         ) : (
           <button
+            type="button"
             onClick={() => onScreenCandidate(candidate)}
             disabled={candidate.isScreening}
             className="w-full py-1.5 text-[10px] font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-300 rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
@@ -283,7 +352,8 @@ function KanbanCard({
       {nextStage && (
         <div className="pt-1.5 border-t border-slate-900 flex justify-end" onClick={(e) => e.stopPropagation()}>
           <button
-            onClick={() => onUpdateStage(candidate.id, nextStage)}
+            type="button"
+            onClick={() => onRequestStageChange(candidate, nextStage)}
             className="text-[10px] font-semibold text-slate-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
             title={`Advance to ${nextStage} and send automatic email`}
           >

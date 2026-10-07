@@ -11,7 +11,6 @@ export function HrJobsView({ jobs, applications, onAddJob, onEditJob, onDeleteJo
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -44,7 +43,7 @@ export function HrJobsView({ jobs, applications, onAddJob, onEditJob, onDeleteJo
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
-            placeholder="Search by role title, department, or location..."
+            placeholder="Search by role title or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
@@ -79,9 +78,6 @@ export function HrJobsView({ jobs, applications, onAddJob, onEditJob, onDeleteJo
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-                      {job.department}
-                    </span>
                     <StatusBadge status={job.status} />
                   </div>
 

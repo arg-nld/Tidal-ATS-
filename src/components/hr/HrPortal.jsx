@@ -4,17 +4,22 @@ import { api } from '../../services/api';
 import { HrDashboardView } from './HrDashboardView';
 import { HrJobsView } from './HrJobsView';
 import { HrKanbanView } from './HrKanbanView';
+import { HrCalendarView } from './HrCalendarView';
 import { CandidateProfileModal } from './CandidateProfileModal';
 import { JobModal } from './JobModal';
 import { 
-  LayoutDashboard, Briefcase, Users, AlertCircle, 
-  Trash2, X 
+  LayoutDashboard, Briefcase, Users, CalendarDays, AlertCircle,
+  Trash2, ArrowRight 
 } from 'lucide-react';
 import { Spinner } from '../common/Spinner';
 
 export function HrPortal() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'jobs' | 'kanban'
+  const activeTabStorageKey = user?.id ? `ats_hr_active_tab_${user.id}` : null;
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === 'undefined') return 'dashboard';
+    return window.sessionStorage.getItem(user?.id ? `ats_hr_active_tab_${user.id}` : '') || 'dashboard';
+  }); // 'dashboard' | 'jobs' | 'kanban' | 'calendar'
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +32,13 @@ export function HrPortal() {
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
   const [viewingCandidateId, setViewingCandidateId] = useState(null);
+
+  const [stageMoveModal, setStageMoveModal] = useState({
+    isOpen: false,
+    candidate: null,
+    targetStage: null,
+    isMoving: false
+  });
 
   // Deletion modal
   const [deleteModal, setDeleteModal] = useState({
@@ -56,9 +68,13 @@ export function HrPortal() {
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [user?.id]);
 
-
+  useEffect(() => {
+    if (activeTabStorageKey) {
+      window.sessionStorage.setItem(activeTabStorageKey, activeTab);
+    }
+  }, [activeTab, activeTabStorageKey]);
 
   // Derived current candidate being viewed
   const viewingCandidate = viewingCandidateId
@@ -115,8 +131,33 @@ export function HrPortal() {
     try {
       const res = await api.applications.updateStage(candidateId, { stage: newStage });
       handleUpdateCandidateInState(res.application);
+      return res.application;
     } catch (err) {
       alert("Failed to update candidate stage: " + err.message);
+      return null;
+    }
+  };
+
+  const requestStageChange = (candidate, targetStage) => {
+    if (!candidate || !targetStage || candidate.stage === targetStage) return;
+    setStageMoveModal({
+      isOpen: true,
+      candidate,
+      targetStage,
+      isMoving: false
+    });
+  };
+
+  const confirmStageChange = async () => {
+    if (!stageMoveModal.candidate || !stageMoveModal.targetStage) return;
+
+    setStageMoveModal(prev => ({ ...prev, isMoving: true }));
+    const updated = await handleUpdateStage(stageMoveModal.candidate.id, stageMoveModal.targetStage);
+
+    if (updated) {
+      setStageMoveModal({ isOpen: false, candidate: null, targetStage: null, isMoving: false });
+    } else {
+      setStageMoveModal(prev => ({ ...prev, isMoving: false }));
     }
   };
 
@@ -191,6 +232,23 @@ export function HrPortal() {
               {applications.length}
             </span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'calendar'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <CalendarDays size={16} />
+              <span>Recruiting Calendar</span>
+            </div>
+            <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded-full">
+              {applications.filter(a => a.interview?.scheduledAt).length}
+            </span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500">
@@ -226,6 +284,14 @@ export function HrPortal() {
             }`}
           >
             Pipeline ({applications.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+              activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'text-slate-400'
+            }`}
+          >
+            Calendar
           </button>
         </div>
 
@@ -298,7 +364,7 @@ export function HrPortal() {
                   selectedJobId={selectedJobId}
                   onSelectJobId={setSelectedJobId}
                   onViewCandidate={(c) => setViewingCandidateId(c.id)}
-                  onUpdateStage={handleUpdateStage}
+                  onRequestStageChange={requestStageChange}
                   onScreenCandidate={handleScreenCandidate}
                   onDeleteCandidate={(c) => {
                     setDeleteModal({
@@ -308,6 +374,15 @@ export function HrPortal() {
                       isDeleting: false
                     });
                   }}
+                />
+              )}
+
+              {activeTab === 'calendar' && (
+                <HrCalendarView
+                  jobs={jobs}
+                  applications={applications}
+                  selectedJobId={selectedJobId}
+                  onSelectJobId={setSelectedJobId}
                 />
               )}
             </>
@@ -320,6 +395,7 @@ export function HrPortal() {
         <CandidateProfileModal
           candidate={viewingCandidate}
           job={jobs.find(j => j.id === viewingCandidate.jobId)}
+          applications={applications}
           onClose={() => setViewingCandidateId(null)}
           onUpdateCandidate={handleUpdateCandidateInState}
           onDelete={(c) => {
@@ -351,6 +427,52 @@ export function HrPortal() {
             });
           }}
         />
+      )}
+
+      {/* Pipeline Move Confirmation Modal */}
+      {stageMoveModal.isOpen && (
+        <div className="fixed inset-0 z-[65] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+                <ArrowRight size={20} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-100">Confirm Pipeline Move</h3>
+                <p className="text-xs text-slate-400">The candidate will be moved and the applicant will be notified.</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Move <strong className="text-white">{stageMoveModal.candidate?.name}</strong> from
+                <span className="text-slate-400"> {stageMoveModal.candidate?.stage}</span>
+                <span className="mx-2 text-slate-600">→</span>
+                <strong className="text-indigo-300">{stageMoveModal.targetStage}</strong>?
+              </p>
+              <p className="text-[10px] text-slate-500 mt-2">Moving the candidate also triggers the normal applicant status notification.</p>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setStageMoveModal({ isOpen: false, candidate: null, targetStage: null, isMoving: false })}
+                disabled={stageMoveModal.isMoving}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmStageChange}
+                disabled={stageMoveModal.isMoving}
+                className="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {stageMoveModal.isMoving ? 'Moving...' : 'Confirm Move'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Deletion Confirmation Modal */}
