@@ -1,11 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'node:crypto';
+import { hashPassword, isPasswordHash, verifyPassword } from './passwordService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, '../data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+const MAX_BACKUPS = Math.max(3, Number(process.env.DB_MAX_BACKUPS || 10));
+const BACKUP_INTERVAL_MS = Math.max(30_000, Number(process.env.DB_BACKUP_INTERVAL_MS || 5 * 60 * 1000));
 
 const INITIAL_DATA = {
   users: [
@@ -13,7 +18,7 @@ const INITIAL_DATA = {
       id: 'user-hr-01',
       name: 'Sarah Lin',
       email: 'hr@tidalats.com',
-      password: 'password123',
+      passwordHash: 'scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07',
       role: 'hr',
       title: 'Head of Talent Acquisition',
       company: 'Tidal Technologies',
@@ -23,7 +28,7 @@ const INITIAL_DATA = {
       id: 'user-app-01',
       name: 'Jordan Hayes',
       email: 'jordan.hayes@example.com',
-      password: 'password123',
+      passwordHash: 'scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07',
       role: 'applicant',
       title: 'Senior Software Engineer',
       phone: '+1 (555) 234-5678',
@@ -33,7 +38,7 @@ const INITIAL_DATA = {
       id: 'user-app-02',
       name: 'Elena Rostova',
       email: 'elena.rostova@example.com',
-      password: 'password123',
+      passwordHash: 'scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07',
       role: 'applicant',
       title: 'Product Designer',
       phone: '+1 (555) 876-5432',
@@ -165,85 +170,251 @@ const INITIAL_DATA = {
       sentAt: Date.now() - 1000 * 60 * 60 * 12,
       read: false
     }
-  ]
+  ],
+  sessions: []
 };
 
 class Store {
-  constructor() {
+  constructor(options = {}) {
+    this.dataDir = options.dataDir || DATA_DIR;
+    this.dbFile = options.dbFile || path.join(this.dataDir, 'db.json');
+    this.backupDir = options.backupDir || path.join(this.dataDir, 'backups');
+    this.maxBackups = Math.max(3, Number(options.maxBackups || MAX_BACKUPS));
+    this.backupIntervalMs = Math.max(30_000, Number(options.backupIntervalMs || BACKUP_INTERVAL_MS));
+    this.lastBackupAt = 0;
     this._ensureDir();
     this.data = this._loadData();
   }
 
   _ensureDir() {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.mkdirSync(this.dataDir, { recursive: true });
+    fs.mkdirSync(this.backupDir, { recursive: true });
+  }
+
+  _backupFiles() {
+    if (!fs.existsSync(this.backupDir)) return [];
+    return fs.readdirSync(this.backupDir)
+      .filter(name => /^db-\d{8}-\d{6}[-.]\d{3}\.(?:json|bak)$/.test(name))
+      .map(name => ({ name, path: path.join(this.backupDir, name) }))
+      .filter(item => { try { return fs.statSync(item.path).isFile(); } catch { return false; } })
+      .sort((a, b) => b.name.localeCompare(a.name));
+  }
+
+  _pruneBackups() {
+    const files = this._backupFiles();
+    for (const item of files.slice(this.maxBackups)) {
+      try { fs.unlinkSync(item.path); } catch (err) { console.warn('[Store] Failed to prune backup:', err.message); }
+    }
+  }
+
+  _createBackup(reason = 'scheduled') {
+    if (!fs.existsSync(this.dbFile)) return null;
+    this._ensureDir();
+    const now = new Date();
+    const stamp = now.toISOString().replace(/[-:]/g, '').replace('T', '-').replace('Z', '');
+    const filePath = path.join(this.backupDir, `db-${stamp}.json`);
+    fs.copyFileSync(this.dbFile, filePath);
+    this.lastBackupAt = Date.now();
+    this._pruneBackups();
+    return { filePath, reason, createdAt: this.lastBackupAt };
+  }
+
+  createBackup(reason = 'manual') {
+    return this._createBackup(reason);
+  }
+
+  getPersistenceStatus() {
+    const backup = this._backupFiles()[0] || null;
+    return {
+      dbFile: this.dbFile,
+      databaseExists: fs.existsSync(this.dbFile),
+      latestBackupAt: backup ? fs.statSync(backup.path).mtimeMs : null,
+      backupCount: this._backupFiles().length
+    };
+  }
+
+  _loadLatestValidBackup() {
+    for (const item of this._backupFiles()) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(item.path, 'utf8'));
+        if (!parsed || typeof parsed !== 'object') continue;
+        console.warn(`[Store] Recovering database from backup: ${item.name}`);
+        this._writeAtomic(parsed);
+        this.lastBackupAt = Date.now();
+        return parsed;
+      } catch (err) {
+        console.warn(`[Store] Ignoring invalid backup ${item.name}:`, err.message);
+      }
+    }
+    return null;
+  }
+
+  _writeAtomic(dataToSave) {
+    this._ensureDir();
+    const tempFile = `${this.dbFile}.${process.pid}.${Date.now()}.tmp`;
+    const json = JSON.stringify(dataToSave, null, 2);
+    fs.writeFileSync(tempFile, json, { encoding: 'utf8', mode: 0o600 });
+    try {
+      fs.renameSync(tempFile, this.dbFile);
+    } catch (err) {
+      // Windows cannot rename over an existing file. Keep the temp/write step
+      // and replace the target as a fallback.
+      if (err.code !== 'EEXIST' && err.code !== 'EPERM') throw err;
+      try { fs.rmSync(this.dbFile, { force: true }); } catch {}
+      fs.renameSync(tempFile, this.dbFile);
+    } finally {
+      try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch {}
     }
   }
 
   _loadData() {
-    try {
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, 'utf8');
-        const parsed = JSON.parse(raw);
-        const savedUsers = Array.isArray(parsed.users) ? parsed.users : [];
+    const normalizeData = (parsed) => {
+      const savedUsers = Array.isArray(parsed.users) ? parsed.users : [];
+      let needsMigrationSave = false;
 
-        // Older demo db.json files may have persisted seed accounts without passwords.
-        // Restore only missing/null seed fields while preserving any saved custom fields.
-        const seedUsers = INITIAL_DATA.users.map(seed => {
-          const saved = savedUsers.find(u => u.id === seed.id);
-          if (!saved) return { ...seed };
-          const restored = { ...seed, ...saved };
-          for (const [key, value] of Object.entries(seed)) {
-            if (restored[key] == null) restored[key] = value;
-          }
-          return restored;
-        });
+      const seedUsers = INITIAL_DATA.users.map(seed => {
+        const saved = savedUsers.find(u => u.id === seed.id);
+        if (!saved) return { ...seed };
+        const restored = { ...seed, ...saved };
+        for (const [key, value] of Object.entries(seed)) {
+          if (restored[key] == null) restored[key] = value;
+        }
+        return restored;
+      });
 
-        const seedIds = new Set(INITIAL_DATA.users.map(u => u.id));
-        const customUsers = savedUsers.filter(u => !seedIds.has(u.id)).map(u => ({ ...u, emailVerified: u.emailVerified !== false }));
+      const seedIds = new Set(INITIAL_DATA.users.map(u => u.id));
+      const customUsers = savedUsers
+        .filter(u => !seedIds.has(u.id))
+        .map(u => ({ ...u, emailVerified: u.emailVerified !== false }));
 
-        return {
-          users: [...seedUsers, ...customUsers],
-          jobs: (parsed.jobs || INITIAL_DATA.jobs).map(job => {
-            const seed = INITIAL_DATA.jobs.find(item => item.id === job.id) || {};
-            return {
-              ...seed,
-              ...job,
-              scoringWeights: job.scoringWeights || seed.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
-              requiredSkills: Array.isArray(job.requiredSkills) ? job.requiredSkills : (seed.requiredSkills || []),
-              nonRequiredSkills: Array.isArray(job.nonRequiredSkills) ? job.nonRequiredSkills : (seed.nonRequiredSkills || [])
-            };
-          }),
-          applications: parsed.applications || INITIAL_DATA.applications,
-          notifications: (parsed.notifications || INITIAL_DATA.notifications).map(notification => {
-            if (notification.recipientUserId) return notification;
-            const app = (parsed.applications || INITIAL_DATA.applications).find(item => item.id === notification.applicationId);
-            const user = app?.userId
-              ? [...seedUsers, ...customUsers].find(item => item.id === app.userId)
-              : [...seedUsers, ...customUsers].find(item => String(item.email || '').toLowerCase() === String(notification.recipientEmail || '').toLowerCase());
-            return user ? { ...notification, recipientUserId: user.id } : notification;
-          })
-        };
+      const users = [...seedUsers, ...customUsers].map(user => {
+        const migrated = { ...user };
+        if (!isPasswordHash(migrated.passwordHash) && migrated.password) {
+          migrated.passwordHash = hashPassword(migrated.password);
+          delete migrated.password;
+          needsMigrationSave = true;
+        }
+        if (Object.prototype.hasOwnProperty.call(migrated, 'password')) {
+          delete migrated.password;
+          needsMigrationSave = true;
+        }
+        return migrated;
+      });
+
+      const applications = Array.isArray(parsed.applications) ? parsed.applications : INITIAL_DATA.applications;
+      const notifications = (Array.isArray(parsed.notifications) ? parsed.notifications : INITIAL_DATA.notifications).map(notification => {
+        if (notification.recipientUserId) return notification;
+        const app = applications.find(item => item.id === notification.applicationId);
+        const user = app?.userId
+          ? users.find(item => item.id === app.userId)
+          : users.find(item => String(item.email || '').toLowerCase() === String(notification.recipientEmail || '').toLowerCase());
+        if (user) needsMigrationSave = true;
+        return user ? { ...notification, recipientUserId: user.id } : notification;
+      });
+
+      // Phase 4 notification migration: existing applications were historically
+      // recorded only against the applicant. Give each HR account its own
+      // in-app application notification so the HR portal has useful history
+      // without sharing notification ownership between accounts.
+      const hrUsers = users.filter(user => user.role === 'hr');
+      for (const application of applications) {
+        const job = (Array.isArray(parsed.jobs) ? parsed.jobs : INITIAL_DATA.jobs).find(item => item.id === application.jobId);
+        for (const hr of hrUsers) {
+          const alreadyExists = notifications.some(notification =>
+            notification.emailType === 'hr-internal' &&
+            notification.applicationId === application.id &&
+            notification.recipientUserId === hr.id
+          );
+          if (alreadyExists) continue;
+
+          notifications.push({
+            id: `notif-hr-${application.id}-${hr.id}`,
+            applicationId: application.id,
+            recipientUserId: hr.id,
+            jobId: application.jobId,
+            recipientEmail: hr.email,
+            recipientName: hr.name,
+            stage: application.stage || 'Application Submitted',
+            subject: `Application activity: ${job?.title || application.role || 'Job Application'}`,
+            body: `Candidate: ${application.name || 'Candidate'}\nPosition: ${job?.title || application.role || 'Position'}\nCurrent stage: ${application.stage || 'Application Submitted'}\n\nReview this application in the HR portal.`,
+            deliveryStatus: 'internal',
+            deliveryError: null,
+            providerMessageId: null,
+            emailType: 'hr-internal',
+            sentAt: application.updatedAt || application.createdAt || Date.now(),
+            read: false
+          });
+          needsMigrationSave = true;
+        }
       }
-    } catch (err) {
-      console.warn('[Store] Failed to read db.json, falling back to initial data:', err);
+
+      const data = {
+        users,
+        jobs: (Array.isArray(parsed.jobs) ? parsed.jobs : INITIAL_DATA.jobs).map(job => {
+          const seed = INITIAL_DATA.jobs.find(item => item.id === job.id) || {};
+          return {
+            ...seed,
+            ...job,
+            scoringWeights: job.scoringWeights || seed.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
+            requiredSkills: Array.isArray(job.requiredSkills) ? job.requiredSkills : (seed.requiredSkills || []),
+            nonRequiredSkills: Array.isArray(job.nonRequiredSkills) ? job.nonRequiredSkills : (seed.nonRequiredSkills || [])
+          };
+        }),
+        applications,
+        notifications,
+        sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+        emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : []
+      };
+      return { data, needsMigrationSave };
+    };
+
+    const tryRead = (filePath) => {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      return normalizeData(parsed);
+    };
+
+    if (fs.existsSync(this.dbFile)) {
+      try {
+        const { data, needsMigrationSave } = tryRead(this.dbFile);
+        if (needsMigrationSave) this._saveData(data);
+        return data;
+      } catch (err) {
+        console.warn('[Store] db.json is unreadable or invalid:', err.message);
+      }
     }
-    this._saveData(INITIAL_DATA);
-    return JSON.parse(JSON.stringify(INITIAL_DATA));
+
+    const recovered = this._loadLatestValidBackup();
+    if (recovered) {
+      const { data, needsMigrationSave } = normalizeData(recovered);
+      if (needsMigrationSave) this._saveData(data);
+      return data;
+    }
+
+    console.warn('[Store] No valid database or backup was available. Creating initial data.');
+    const fresh = JSON.parse(JSON.stringify(INITIAL_DATA));
+    this._saveData(fresh, { skipBackup: true });
+    return fresh;
   }
 
-  _saveData(dataToSave) {
+  _saveData(dataToSave, { skipBackup = false } = {}) {
+    const data = dataToSave || this.data;
     try {
       this._ensureDir();
-      fs.writeFileSync(DB_FILE, JSON.stringify(dataToSave || this.data, null, 2), 'utf8');
+      if (!skipBackup && fs.existsSync(this.dbFile) && Date.now() - this.lastBackupAt >= this.backupIntervalMs) {
+        try { this._createBackup('pre-write'); } catch (backupErr) { console.warn('[Store] Backup before write failed:', backupErr.message); }
+      }
+      this._writeAtomic(data);
     } catch (err) {
-      console.error('[Store] Failed to persist data to db.json:', err);
+      console.error('[Store] Failed to persist database:', err);
+      throw err;
     }
   }
 
   save() {
     this._saveData(this.data);
   }
+
 
   // --- Users ---
   getUsers() {
@@ -255,19 +426,77 @@ class Store {
   }
 
   getUserByEmail(email) {
-    return this.data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    return this.data.users.find(u => String(u.email || '').toLowerCase() === normalizedEmail);
   }
 
   getUserByEmailAndPassword(email, password) {
-    return this.data.users.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
+    const user = this.getUserByEmail(email);
+    return user && verifyPassword(password, user.passwordHash) ? user : null;
+  }
+
+  createSession(userId, ttlMs = 12 * 60 * 60 * 1000) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const now = Date.now();
+    this.data.sessions = (this.data.sessions || []).filter(session => session.expiresAt > now);
+    this.data.sessions.push({
+      id: crypto.randomBytes(16).toString('hex'),
+      userId,
+      tokenHash,
+      createdAt: now,
+      expiresAt: now + ttlMs
+    });
+    this.save();
+    return token;
+  }
+
+  getUserBySessionToken(token) {
+    if (!token) return null;
+    const now = Date.now();
+    const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+    const sessions = Array.isArray(this.data.sessions) ? this.data.sessions : [];
+    const activeSessions = sessions.filter(session => session.expiresAt > now);
+
+    if (activeSessions.length !== sessions.length) {
+      this.data.sessions = activeSessions;
+      this.save();
+    }
+
+    const session = activeSessions.find(item => item.tokenHash === tokenHash);
+    return session ? this.getUserById(session.userId) : null;
+  }
+
+  deleteSession(token) {
+    if (!token || !Array.isArray(this.data.sessions)) return false;
+    const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+    const before = this.data.sessions.length;
+    this.data.sessions = this.data.sessions.filter(session => session.tokenHash !== tokenHash);
+    if (this.data.sessions.length !== before) this.save();
+    return this.data.sessions.length !== before;
+  }
+
+  deleteSessionsForUser(userId) {
+    if (!userId || !Array.isArray(this.data.sessions)) return 0;
+    const before = this.data.sessions.length;
+    this.data.sessions = this.data.sessions.filter(session => session.userId !== userId);
+    if (this.data.sessions.length !== before) this.save();
+    return before - this.data.sessions.length;
   }
 
   updateUser(id, updates) {
     const index = this.data.users.findIndex(u => u.id === id);
     if (index === -1) return null;
-    this.data.users[index] = { ...this.data.users[index], ...updates };
+    const sanitizedUpdates = { ...updates };
+    if (Object.prototype.hasOwnProperty.call(sanitizedUpdates, 'password')) {
+      sanitizedUpdates.passwordHash = hashPassword(sanitizedUpdates.password);
+      delete sanitizedUpdates.password;
+    }
+    if (Object.prototype.hasOwnProperty.call(sanitizedUpdates, 'passwordHash') && !isPasswordHash(sanitizedUpdates.passwordHash)) {
+      sanitizedUpdates.passwordHash = hashPassword(sanitizedUpdates.passwordHash);
+    }
+    this.data.users[index] = { ...this.data.users[index], ...sanitizedUpdates };
+    delete this.data.users[index].password;
     this.save();
     return this.data.users[index];
   }
@@ -276,6 +505,7 @@ class Store {
     const index = this.data.users.findIndex(u => u.id === id);
     if (index === -1) return false;
     this.data.users.splice(index, 1);
+    this.deleteSessionsForUser(id);
     this.save();
     return true;
   }
@@ -287,6 +517,13 @@ class Store {
       emailVerified: userData.emailVerified ?? false,
       ...userData
     };
+    if (newUser.password) {
+      newUser.passwordHash = hashPassword(newUser.password);
+      delete newUser.password;
+    } else if (newUser.passwordHash && !isPasswordHash(newUser.passwordHash)) {
+      newUser.passwordHash = hashPassword(newUser.passwordHash);
+    }
+    delete newUser.password;
     this.data.users.push(newUser);
     this.save();
     return newUser;
@@ -407,6 +644,32 @@ class Store {
     return this.data.applications[index];
   }
 
+  scheduleInterviewIfAvailable(id, interviewData, conflictWindowMs = 30 * 60 * 1000) {
+    const index = this.data.applications.findIndex(a => a.id === id);
+    if (index === -1) return { ok: false, reason: 'not_found', application: null };
+
+    const requestedMs = new Date(interviewData?.scheduledAt).getTime();
+    if (Number.isNaN(requestedMs)) return { ok: false, reason: 'invalid_time', application: null };
+
+    const conflict = this.data.applications.some(existing => {
+      if (existing.id === id || !existing.interview?.scheduledAt) return false;
+      const existingMs = new Date(existing.interview.scheduledAt).getTime();
+      if (Number.isNaN(existingMs)) return false;
+      return Math.abs(existingMs - requestedMs) < conflictWindowMs;
+    });
+
+    if (conflict) return { ok: false, reason: 'conflict', application: null };
+
+    this.data.applications[index] = {
+      ...this.data.applications[index],
+      interview: interviewData,
+      stage: 'Interview Scheduled',
+      updatedAt: Date.now()
+    };
+    this.save();
+    return { ok: true, reason: null, application: this.data.applications[index] };
+  }
+
   deleteApplication(id) {
     const index = this.data.applications.findIndex(a => a.id === id);
     if (index === -1) return false;
@@ -415,29 +678,57 @@ class Store {
     return true;
   }
 
+  // --- Email delivery logs ---
+  getEmailLogs() {
+    return [...(this.data.emailLogs || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+
+  createEmailLog(logData) {
+    const log = {
+      id: logData.id || `email-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`,
+      idempotencyKey: logData.idempotencyKey || null,
+      to: Array.isArray(logData.to) ? logData.to : [logData.to].filter(Boolean),
+      subject: String(logData.subject || '').slice(0, 200),
+      type: logData.type || 'transactional',
+      status: logData.status || 'pending',
+      attempts: Number(logData.attempts || 0),
+      providerMessageId: logData.providerMessageId || null,
+      error: logData.error || null,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    this.data.emailLogs = Array.isArray(this.data.emailLogs) ? this.data.emailLogs : [];
+    this.data.emailLogs.unshift(log);
+    if (this.data.emailLogs.length > 1000) this.data.emailLogs.length = 1000;
+    this.save();
+    return log;
+  }
+
+  updateEmailLog(id, updates) {
+    const logs = this.data.emailLogs || [];
+    const index = logs.findIndex(log => log.id === id);
+    if (index === -1) return null;
+    logs[index] = { ...logs[index], ...updates, updatedAt: Date.now() };
+    this.save();
+    return logs[index];
+  }
+
   // --- Notifications ---
   getNotifications() {
     return [...this.data.notifications].sort((a, b) => (b.sentAt || 0) - (a.sentAt || 0));
   }
 
-  getNotificationsForUser(userOrEmail) {
-    if (!userOrEmail) return [];
-    const userId = typeof userOrEmail === 'object' ? userOrEmail.id : null;
-    const email = typeof userOrEmail === 'object' ? userOrEmail.email : userOrEmail;
-    const normalizedEmail = String(email || '').trim().toLowerCase();
+  getNotificationsForUser(user) {
+    const userId = typeof user === 'object' ? user?.id : user;
+    if (!userId) return [];
 
-    // Match by both account ID and email. This deliberately keeps the email
-    // fallback even when a notification has a stale/wrong recipientUserId,
-    // which can happen with applications created before account linking was fixed.
     return this.data.notifications
-      .filter(n => {
-        const notificationEmail = String(n.recipientEmail || '').trim().toLowerCase();
-        return Boolean(
-          (userId && n.recipientUserId === userId) ||
-          (normalizedEmail && notificationEmail === normalizedEmail)
-        );
-      })
+      .filter(n => n.recipientUserId === userId)
       .sort((a, b) => (b.sentAt || 0) - (a.sentAt || 0));
+  }
+
+  getUsersByRole(role) {
+    return this.data.users.filter(user => user.role === role);
   }
 
   createNotification(notifData) {
@@ -463,14 +754,52 @@ class Store {
     return notif;
   }
 
+  updateNotification(id, updates) {
+    const index = this.data.notifications.findIndex(n => n.id === id);
+    if (index === -1) return null;
+    this.data.notifications[index] = { ...this.data.notifications[index], ...updates };
+    this.save();
+    return this.data.notifications[index];
+  }
+
   markNotificationAsRead(id) {
     const notif = this.data.notifications.find(n => n.id === id);
-    if (notif) {
+    if (notif && !notif.read) {
       notif.read = true;
       this.save();
     }
     return notif;
   }
+
+  deleteNotificationForUser(id, user) {
+    const userId = typeof user === 'object' ? user?.id : user;
+    if (!userId) return null;
+
+    const index = this.data.notifications.findIndex(
+      notification => notification.id === id && notification.recipientUserId === userId
+    );
+
+    if (index === -1) return null;
+
+    const [deleted] = this.data.notifications.splice(index, 1);
+    this.save();
+    return deleted;
+  }
+
+  clearNotificationsForUser(user) {
+    const userId = typeof user === 'object' ? user?.id : user;
+    if (!userId) return 0;
+
+    const before = this.data.notifications.length;
+    this.data.notifications = this.data.notifications.filter(
+      notification => notification.recipientUserId !== userId
+    );
+
+    const deletedCount = before - this.data.notifications.length;
+    if (deletedCount > 0) this.save();
+    return deletedCount;
+  }
 }
 
+export { Store };
 export const store = new Store();

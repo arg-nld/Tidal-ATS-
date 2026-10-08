@@ -1,4 +1,24 @@
 import { store } from './store.js';
+import { validEmail, cleanString } from '../middleware/inputValidation.js';
+
+const EMAIL_MAX_RETRIES = Math.max(1, Math.min(5, Number(process.env.EMAIL_MAX_RETRIES || 3)));
+const EMAIL_RETRY_BASE_MS = Math.max(250, Number(process.env.EMAIL_RETRY_BASE_MS || 750));
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getEmailType(idempotencyKey = '') {
+  const key = String(idempotencyKey);
+  if (key.startsWith('verify/')) return 'verification';
+  if (key.startsWith('application-stage/')) return 'application-stage';
+  return 'transactional';
+}
+
+function shouldRetryEmail(err) {
+  const status = Number(err?.status || 0);
+  return !status || status === 408 || status === 409 || status === 429 || status >= 500;
+}
 
 function requireEmailConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -72,44 +92,90 @@ export async function sendEmail({
 }) {
   const { apiKey, from } = requireEmailConfig();
 
+  const recipients = (Array.isArray(to) ? to : [to]).map(recipient => validEmail(recipient));
+  const safeSubject = cleanString(subject, { field: 'Email subject', max: 200, min: 1, allowEmpty: false, singleLine: true });
+  const safeBody = cleanString(body, { field: 'Email body', max: 20000, allowEmpty: true });
+
   const payload = {
     from,
-    to: Array.isArray(to) ? to : [to],
-    subject: String(subject || '').trim(),
-    text: String(body || ''),
-    html: html || `<div style="font-family:Arial,sans-serif;line-height:1.6">${textToHtml(body || '')}</div>`
+    to: recipients,
+    subject: safeSubject,
+    text: safeBody,
+    html: html || `<div style="font-family:Arial,sans-serif;line-height:1.6">${textToHtml(safeBody)}</div>`
   };
 
-  if (!payload.to[0] || !payload.subject) {
-    throw new Error('Email recipient and subject are required.');
-  }
-
   if (attachments.length) {
+    if (attachments.length > 5) throw new Error('A maximum of 5 email attachments is allowed.');
+    const totalBytes = attachments.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    if (totalBytes > 20 * 1024 * 1024) throw new Error('Combined email attachments cannot exceed 20 MB.');
     payload.attachments = attachments.map(file => ({
-      filename: file.filename,
+      filename: String(file.filename || 'attachment').replace(/[^a-zA-Z0-9._ -]/g, '_').slice(0, 180),
       content: file.contentBase64 || file.content
     }));
   }
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {})
-    },
-    body: JSON.stringify(payload)
+  const log = store.createEmailLog({
+    to: recipients,
+    subject: safeSubject,
+    type: getEmailType(idempotencyKey),
+    idempotencyKey,
+    status: 'sending',
+    attempts: 0
   });
 
-  const responseText = await response.text();
-  let result = null;
-  try { result = JSON.parse(responseText); } catch { /* non-JSON response */ }
+  let lastError = null;
 
-  if (!response.ok) {
-    throw new Error(result?.message || result?.error || `Email provider returned HTTP ${response.status}.`);
+  for (let attempt = 1; attempt <= EMAIL_MAX_RETRIES; attempt += 1) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      let response;
+      try {
+        response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+            ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {})
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+
+      const responseText = await response.text();
+      let result = null;
+      try { result = JSON.parse(responseText); } catch { /* non-JSON response */ }
+
+      if (!response.ok) {
+        const error = new Error(result?.message || result?.error || `Email provider returned HTTP ${response.status}.`);
+        error.status = response.status;
+        throw error;
+      }
+
+      store.updateEmailLog(log.id, {
+        status: 'sent',
+        attempts: attempt,
+        providerMessageId: result?.id || null,
+        error: null
+      });
+      return result || { id: null };
+    } catch (err) {
+      lastError = err;
+      store.updateEmailLog(log.id, {
+        status: attempt < EMAIL_MAX_RETRIES && shouldRetryEmail(err) ? 'retrying' : 'failed',
+        attempts: attempt,
+        error: err?.message || 'Email delivery failed.'
+      });
+
+      if (attempt >= EMAIL_MAX_RETRIES || !shouldRetryEmail(err)) break;
+      await sleep(EMAIL_RETRY_BASE_MS * (2 ** (attempt - 1)));
+    }
   }
 
-  return result || { id: null };
+  throw lastError || new Error('Email delivery failed.');
 }
 
 export async function sendStatusChangeEmail({ applicant, job, newStage, interviewDetails, customNote, attachments = [] }) {
@@ -162,6 +228,25 @@ export async function sendStatusChangeEmail({ applicant, job, newStage, intervie
   });
 
   return notification;
+}
+
+export function createHrApplicationNotification({ applicant, job, notificationStore = store }) {
+  const hrUsers = notificationStore.getUsersByRole('hr');
+  const subject = `New application: ${job?.title || applicant?.role || 'Job Application'}`;
+  const body = `A new application has been submitted.\n\nCandidate: ${applicant?.name || 'Candidate'}\nEmail: ${applicant?.email || 'Not provided'}\nPosition: ${job?.title || applicant?.role || 'Position'}\n\nOpen the HR portal to review the application and resume.`;
+
+  return hrUsers.map(hr => notificationStore.createNotification({
+    applicationId: applicant.id,
+    recipientUserId: hr.id,
+    jobId: applicant.jobId,
+    recipientEmail: hr.email,
+    recipientName: hr.name,
+    stage: 'Application Submitted',
+    subject,
+    body,
+    deliveryStatus: 'internal',
+    emailType: 'hr-internal'
+  }));
 }
 
 export async function sendVerificationEmail({ user, token }) {

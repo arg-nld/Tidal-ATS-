@@ -2,11 +2,8 @@ const BASE_URL = '/api';
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('ats_token');
-  const role = localStorage.getItem('ats_role');
-
   const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(role ? { 'X-User-Role': role } : {}),
     ...(options.headers || {})
   };
 
@@ -30,7 +27,7 @@ export const api = {
     register: userData => request('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
     verifyEmail: token => request(`/auth/verify-email/${encodeURIComponent(token)}`),
     getCurrentUser: () => request('/auth/me'),
-    getUsers: () => request('/auth/users')
+    logout: () => request('/auth/logout', { method: 'POST' })
   },
   jobs: {
     getAll: (params = {}) => {
@@ -56,11 +53,9 @@ export const api = {
     getAvailability: (date, excludeApplicationId = '') => request(`/applications/availability?${new URLSearchParams({ date, ...(excludeApplicationId ? { excludeApplicationId } : {}) }).toString()}`),
     getResumeBlob: async id => {
       const token = localStorage.getItem('ats_token');
-      const role = localStorage.getItem('ats_role');
       const response = await fetch(`${BASE_URL}/applications/${id}/resume`, {
         headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(role ? { 'X-User-Role': role } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         }
       });
       if (!response.ok) {
@@ -81,6 +76,9 @@ export const api = {
   },
   notifications: {
     getAll: () => request('/notifications'),
-    markAsRead: id => request(`/notifications/${id}/read`, { method: 'PATCH' })
+    markAsRead: id => request(`/notifications/${id}/read`, { method: 'PATCH' }),
+    remove: id => request(`/notifications/${id}`, { method: 'DELETE' }),
+    clearAll: () => request('/notifications', { method: 'DELETE' }),
+    retryEmail: id => request(`/notifications/${id}/retry-email`, { method: 'POST' })
   }
 };

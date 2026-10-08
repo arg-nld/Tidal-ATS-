@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'node:crypto';
+import { validateUploadedFile } from '../middleware/uploadSecurity.js';
 import { store } from '../services/store.js';
-import { sendStatusChangeEmail, sendEmail } from '../services/emailService.js';
+import { sendStatusChangeEmail, sendEmail, createHrApplicationNotification } from '../services/emailService.js';
 import { calculateCandidateScore, buildDeterministicRationale } from '../services/scoringService.js';
 
 export const PIPELINE_STAGES = [
@@ -13,6 +15,39 @@ export const PIPELINE_STAGES = [
   'Hired',
   'Rejected'
 ];
+
+const UPLOADS_ROOT = path.resolve('server/data/uploads');
+
+function sanitizeOriginalFileName(name) {
+  return String(name || 'resume')
+    .replace(/[^a-zA-Z0-9._ -]/g, '_')
+    .replace(/\s+/g, ' ')
+    .slice(0, 180) || 'resume';
+}
+
+async function persistValidatedResume(file) {
+  if (!file) return null;
+  const validation = validateUploadedFile(file, { kind: 'resume' });
+  if (!validation.ok) {
+    const error = new Error(validation.error);
+    error.status = 400;
+    throw error;
+  }
+
+  await fs.promises.mkdir(UPLOADS_ROOT, { recursive: true });
+  const extension = path.extname(file.originalname || '').toLowerCase();
+  const storedName = `${crypto.randomUUID()}${extension}`;
+  const target = path.join(UPLOADS_ROOT, storedName);
+  await fs.promises.writeFile(target, file.buffer, { flag: 'wx' });
+
+  return {
+    originalName: sanitizeOriginalFileName(file.originalname),
+    storedName,
+    mimeType: file.mimetype,
+    size: file.size,
+    uploadedAt: Date.now()
+  };
+}
 
 export function getApplications(req, res) {
   const isHr = req.user && req.user.role === 'hr';
@@ -54,11 +89,22 @@ export function getResumeFile(req, res) {
   if (!isHr && (!req.user || app.userId !== req.user.id)) return res.status(403).json({ error: 'Access denied' });
   if (!app.resumeFile?.storedName) return res.status(404).json({ error: 'Original resume file is not available for this application.' });
 
-  const filePath = path.resolve('server/data/uploads', app.resumeFile.storedName);
+  const storedName = path.basename(String(app.resumeFile.storedName || ''));
+  if (!storedName || storedName !== String(app.resumeFile.storedName)) {
+    return res.status(400).json({ error: 'Stored resume reference is invalid.' });
+  }
+
+  const filePath = path.resolve(UPLOADS_ROOT, storedName);
+  if (!filePath.startsWith(`${UPLOADS_ROOT}${path.sep}`)) {
+    return res.status(400).json({ error: 'Stored resume reference is invalid.' });
+  }
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Resume file no longer exists on the server.' });
 
-  res.setHeader('Content-Type', app.resumeFile.mimeType || 'application/octet-stream');
-  res.setHeader('Content-Disposition', `inline; filename="${String(app.resumeFile.originalName || 'resume').replace(/"/g, '')}"`);
+  const mimeType = String(app.resumeFile.mimeType || 'application/octet-stream').toLowerCase();
+  const safeName = sanitizeOriginalFileName(app.resumeFile.originalName);
+  res.setHeader('Content-Type', mimeType);
+  res.setHeader('Content-Disposition', `inline; filename="${safeName.replace(/"/g, '_')}"`);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   return res.sendFile(filePath);
 }
 
@@ -90,39 +136,39 @@ export async function createApplication(req, res) {
   const job = store.getJobById(jobId);
   if (!job) return res.status(404).json({ error: 'Target job opening was not found.' });
 
-  let userId = req.user ? req.user.id : null;
-  if (!userId) {
-    let existingUser = store.getUserByEmail(email);
-    if (!existingUser) {
-      existingUser = store.createUser({
-        name,
-        firstName: String(name).trim().split(/\s+/)[0],
-        lastName: String(name).trim().split(/\s+/).slice(-1)[0],
-        email: email.trim().toLowerCase(),
-        phone: phone || '',
-        role: 'applicant',
-        title: role || 'Candidate',
-        emailVerified: true
-      });
-    }
-    userId = existingUser.id;
+  if (req.user?.role !== 'applicant') {
+    return res.status(403).json({ error: 'Only applicant accounts can submit applications.' });
   }
 
-  const resumeFile = req.file ? {
-    originalName: req.file.originalname,
-    storedName: req.file.filename,
-    mimeType: req.file.mimetype,
-    size: req.file.size,
-    uploadedAt: Date.now()
-  } : null;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (normalizedEmail !== String(req.user.email || '').trim().toLowerCase()) {
+    return res.status(403).json({ error: 'Application email must match the signed-in applicant account.' });
+  }
 
-  const newApp = store.createApplication({
+  const userId = req.user.id;
+
+  const existingApplication = store.getApplicationsByUserId(userId).find(item => item.jobId === jobId);
+  if (existingApplication) {
+    return res.status(409).json({
+      error: 'You have already submitted an application for this job.',
+      applicationId: existingApplication.id
+    });
+  }
+
+  let resumeFile = null;
+  if (req.file) {
+    resumeFile = await persistValidatedResume(req.file);
+  }
+
+  let newApp;
+  try {
+    newApp = store.createApplication({
     jobId,
     userId,
-    name,
-    email: email.trim().toLowerCase(),
-    phone: phone || '',
-    role: role || job.title,
+    name: String(name).trim(),
+    email: String(email).trim().toLowerCase(),
+    phone: String(phone || '').trim(),
+    role: String(role || job.title).trim(),
     skills: Array.isArray(skills)
       ? skills
       : (typeof skills === 'string'
@@ -135,19 +181,34 @@ export async function createApplication(req, res) {
             }
           })()
         : []),
-    experienceSummary: experienceSummary || '',
-    resumeText: resumeText || '',
-    fileName: fileName || req.file?.originalname || '',
+    experienceSummary: String(experienceSummary || '').trim(),
+    resumeText: String(resumeText || '').trim(),
+    fileName: String(fileName || req.file?.originalname || '').trim().slice(0, 255),
     fileSize: Number(fileSize || req.file?.size || 0),
     resumeFile,
     stage: 'Application Submitted'
   });
+  } catch (err) {
+    if (resumeFile?.storedName) {
+      const filePath = path.resolve(UPLOADS_ROOT, resumeFile.storedName);
+      try { if (filePath.startsWith(`${UPLOADS_ROOT}${path.sep}`) && fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (cleanupErr) { console.warn('[ApplicationController] Resume cleanup failed:', cleanupErr.message); }
+    }
+    throw err;
+  }
 
   let notification = null;
   try {
     notification = await sendStatusChangeEmail({ applicant: newApp, job, newStage: 'Application Submitted' });
   } catch (err) {
     console.error('[ApplicationController] Application email not sent:', err.message);
+  }
+
+  // Create an in-app notification for each HR account. These are separate
+  // notification records so ownership checks remain strict per HR user.
+  try {
+    createHrApplicationNotification({ applicant: newApp, job });
+  } catch (err) {
+    console.error('[ApplicationController] HR notification creation failed:', err.message);
   }
 
   if (newApp.resumeText && job) {
@@ -204,19 +265,21 @@ export async function updateStage(req, res) {
     }
   }
 
+  const emailSent = notification?.deliveryStatus === 'sent';
   return res.json({
     application: updated,
     notification,
-    message: notification
+    emailSent,
+    message: emailSent
       ? `Application advanced to "${stage}" and applicant was emailed.`
-      : `Application advanced to "${stage}". Email delivery is not configured.`
+      : `Application advanced to "${stage}". The status was saved, but the external email was not delivered.`
   });
 }
 
 export function updateRecruiterNotes(req, res) {
   const app = store.getApplicationById(req.params.id);
   if (!app) return res.status(404).json({ error: 'Application not found' });
-  const updated = store.updateApplication(app.id, { recruiterNotes: req.body.notes ?? '' });
+  const updated = store.updateApplication(app.id, { recruiterNotes: String(req.body.notes ?? '').trim() });
   return res.json({ application: updated, message: 'Recruiter notes saved successfully' });
 }
 
@@ -232,17 +295,9 @@ export async function scheduleInterview(req, res) {
   if (Number.isNaN(requestedMs)) return res.status(400).json({ error: 'Invalid interview date/time.' });
 
   const conflictWindowMs = 30 * 60 * 1000;
-  const conflict = store.getApplications().some(existing => {
-    if (existing.id === id || !existing.interview?.scheduledAt) return false;
-    const existingMs = new Date(existing.interview.scheduledAt).getTime();
-    if (Number.isNaN(existingMs)) return false;
-    return Math.abs(existingMs - requestedMs) < conflictWindowMs;
-  });
-
-  if (conflict) return res.status(409).json({ error: 'That interview time is already booked. Please choose another available slot.' });
 
   const attachments = Array.isArray(req.files) ? req.files.map(file => ({
-    filename: file.originalname,
+    filename: sanitizeOriginalFileName(file.originalname),
     contentBase64: file.buffer.toString('base64'),
     size: file.size,
     mimeType: file.mimetype
@@ -253,7 +308,7 @@ export async function scheduleInterview(req, res) {
     interviewer,
     type: 'Interview',
     meetingLink: meetingLink || '',
-    notes: notes || '',
+    notes: String(notes || '').trim(),
     emailSubject: String(emailSubject || '').trim(),
     emailBody: String(emailBody || '').trim(),
     attachments: attachments.map(file => ({ filename: file.filename, size: file.size, mimeType: file.mimeType })),
@@ -261,7 +316,14 @@ export async function scheduleInterview(req, res) {
     createdAt: Date.now()
   };
 
-  const updated = store.updateApplication(id, { interview: interviewData, stage: 'Interview Scheduled' });
+  const scheduled = store.scheduleInterviewIfAvailable(id, interviewData, conflictWindowMs);
+  if (!scheduled.ok) {
+    if (scheduled.reason === 'conflict') return res.status(409).json({ error: 'That interview time is already booked. Please choose another available slot.' });
+    if (scheduled.reason === 'invalid_time') return res.status(400).json({ error: 'Invalid interview date/time.' });
+    return res.status(404).json({ error: 'Application not found' });
+  }
+
+  const updated = scheduled.application;
   const job = store.getJobById(app.jobId);
   let notification = null;
 
@@ -275,22 +337,26 @@ export async function scheduleInterview(req, res) {
     });
   } catch (err) {
     console.error('[ApplicationController] Interview email not sent:', err.message);
-    return res.status(503).json({
-      error: `Interview was saved, but the email could not be sent: ${err.message}`,
-      application: updated
-    });
   }
 
-  return res.json({ application: updated, notification, message: 'Interview scheduled and the email was sent to the applicant.' });
+  const emailSent = notification?.deliveryStatus === 'sent';
+  return res.json({
+    application: updated,
+    notification,
+    emailSent,
+    message: emailSent
+      ? 'Interview scheduled and the email was sent to the applicant.'
+      : 'Interview scheduled successfully, but the applicant email could not be delivered. The failure was recorded for follow-up.'
+  });
 }
 
 export function recordEvaluation(req, res) {
   const app = store.getApplicationById(req.params.id);
   if (!app) return res.status(404).json({ error: 'Application not found' });
   const evaluationData = {
-    rating: Number(req.body.rating) || 3,
-    recommendation: req.body.recommendation || 'Consider',
-    comments: req.body.comments || '',
+    rating: Number(req.body.rating),
+    recommendation: String(req.body.recommendation || 'Consider').trim(),
+    comments: String(req.body.comments || '').trim(),
     evaluatedBy: req.user?.name || 'Hiring Team',
     evaluatedAt: Date.now()
   };
@@ -303,8 +369,11 @@ export function deleteApplication(req, res) {
   if (!app) return res.status(404).json({ error: 'Application not found' });
 
   if (app.resumeFile?.storedName) {
-    const filePath = path.resolve('server/data/uploads', app.resumeFile.storedName);
-    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (err) { console.warn('[ApplicationController] Failed to delete resume file:', err.message); }
+    const storedName = path.basename(String(app.resumeFile.storedName));
+    const filePath = path.resolve(UPLOADS_ROOT, storedName);
+    if (storedName === String(app.resumeFile.storedName) && filePath.startsWith(`${UPLOADS_ROOT}${path.sep}`)) {
+      try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (err) { console.warn('[ApplicationController] Failed to delete resume file:', err.message); }
+    }
   }
 
   store.deleteApplication(app.id);

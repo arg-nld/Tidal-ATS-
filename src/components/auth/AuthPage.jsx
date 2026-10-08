@@ -1,22 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
-  Briefcase, ShieldCheck, Eye, EyeOff, ArrowRight,
-  Mail, Lock, User, AlertCircle, Sparkles, CheckCircle2,
-  ChevronRight
+  Briefcase, Eye, EyeOff, ArrowRight,
+  Mail, Lock, User, AlertCircle, Sparkles, CheckCircle2
 } from 'lucide-react';
 import { api } from '../../services/api';
 
-const DEMO_ACCOUNTS = [
-  { label: 'HR Demo', email: 'hr@tidalats.com', password: 'password123', role: 'hr' },
-  { label: 'Applicant Demo', email: 'jordan.hayes@example.com', password: 'password123', role: 'applicant' },
-];
 
 export function AuthPage() {
   const { login, register, loading, authError, clearAuthError } = useAuth();
   const [mode, setMode] = useState(window.location.pathname === '/verify-email' ? 'verify' : 'signin');
-  const [selectedRole, setSelectedRole] = useState('applicant');
   const [showPass, setShowPass] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [verificationMessage, setVerificationMessage] = useState(null);
   const [verificationLoading, setVerificationLoading] = useState(false);
@@ -61,23 +57,19 @@ export function AuthPage() {
       setLocalError('Passwords do not match.');
       return;
     }
-    if (signUpForm.password.length < 6) {
-      setLocalError('Password must be at least 6 characters.');
+    if (signUpForm.password.length < 8) {
+      setLocalError('Password must be at least 8 characters.');
       return;
     }
     try {
-      const result = await register({ ...signUpForm, role: selectedRole });
+      const result = await register({ ...signUpForm, role: 'applicant' });
       setMode('verificationSent');
       setLocalError(null);
       setVerificationMessage(result.message || `Verification email sent to ${signUpForm.email}.`);
     } catch { /* handled in context */ }
   };
 
-  const fillDemo = demo => {
-    setMode('signin');
-    setSignInForm({ email: demo.email, password: demo.password });
-    setLocalError(null);
-  };
+
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -135,36 +127,14 @@ export function AuthPage() {
                 <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm flex items-center justify-center gap-2">
                   {loading ? 'Signing in...' : <>Sign In <ArrowRight size={16} /></>}
                 </button>
-                <div className="pt-4 border-t border-slate-800">
-                  <p className="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-2.5">Quick Demo Access</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {DEMO_ACCOUNTS.map(demo => (
-                      <button key={demo.email} type="button" onClick={() => fillDemo(demo)} className="group flex items-center gap-2 p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/40 text-left">
-                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${demo.role === 'hr' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                          {demo.role === 'hr' ? <ShieldCheck size={14} /> : <Briefcase size={14} />}
-                        </div>
-                        <div className="min-w-0"><div className="text-[11px] font-semibold text-slate-300">{demo.label}</div><div className="text-[10px] text-slate-500 truncate">{demo.email}</div></div>
-                        <ChevronRight size={12} className="ml-auto text-slate-600 shrink-0" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
                 <p className="text-center text-xs text-slate-500">Don&apos;t have an account? <button type="button" onClick={() => setMode('signup')} className="text-indigo-400 font-semibold">Create one</button></p>
               </form>
             )}
 
             {mode === 'signup' && (
               <form onSubmit={handleSignUp} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-2">I am joining as...</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[{ id: 'applicant', label: 'Job Applicant', icon: Briefcase }, { id: 'hr', label: 'HR / Recruiter', icon: ShieldCheck }].map(r => (
-                      <button key={r.id} type="button" onClick={() => setSelectedRole(r.id)} className={`p-3 rounded-xl border text-left ${selectedRole === r.id ? 'bg-indigo-600/10 border-indigo-500/60' : 'bg-slate-950 border-slate-800'}`}>
-                        <r.icon size={16} className={selectedRole === r.id ? 'text-indigo-400 mb-1' : 'text-slate-500 mb-1'} />
-                        <div className="text-xs font-bold text-slate-100">{r.label}</div>
-                      </button>
-                    ))}
-                  </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400">
+                  Public registration is for job applicants. HR and recruiter accounts are created through an administrator invitation.
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -176,13 +146,55 @@ export function AuthPage() {
 
                 <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Email Address *</label><div className="relative"><Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" /><input type="email" required autoComplete="email" value={signUpForm.email} onChange={e => setSignUpForm({ ...signUpForm, email: e.target.value })} placeholder="you@example.com" className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100" /></div></div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Password *</label><input type={showPass ? 'text' : 'password'} required value={signUpForm.password} onChange={e => setSignUpForm({ ...signUpForm, password: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Confirm Password *</label><input type={showPass ? 'text' : 'password'} required value={signUpForm.confirm} onChange={e => setSignUpForm({ ...signUpForm, confirm: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showSignUpPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="new-password"
+                        value={signUpForm.password}
+                        onChange={e => setSignUpForm({ ...signUpForm, password: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 pr-10 py-2.5 text-sm text-slate-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignUpPassword(value => !value)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200"
+                        aria-label={showSignUpPassword ? 'Hide password' : 'Show password'}
+                        title={showSignUpPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showSignUpPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Confirm Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="new-password"
+                        value={signUpForm.confirm}
+                        onChange={e => setSignUpForm({ ...signUpForm, confirm: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 pr-10 py-2.5 text-sm text-slate-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(value => !value)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200"
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                        title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <button type="button" onClick={() => setShowPass(!showPass)} className="text-[11px] text-slate-500">{showPass ? 'Hide passwords' : 'Show passwords'}</button>
                 <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm flex items-center justify-center gap-2">
-                  {loading ? 'Creating account...' : <>Create {selectedRole === 'hr' ? 'HR' : 'Applicant'} Account <ArrowRight size={16} /></>}
+                  {loading ? 'Creating account...' : <>Create Applicant Account <ArrowRight size={16} /></>}
                 </button>
                 <p className="text-[11px] text-slate-500 text-center">You will need to verify your email before you can sign in.</p>
                 <p className="text-center text-xs text-slate-500">Already have an account? <button type="button" onClick={() => setMode('signin')} className="text-indigo-400 font-semibold">Sign in</button></p>

@@ -2,6 +2,7 @@ import { store } from '../services/store.js';
 import mammoth from 'mammoth';
 import { parseResumeTextWithAI, parseResumeBinaryWithAI } from '../services/geminiService.js';
 import { calculateCandidateScore, buildDeterministicRationale } from '../services/scoringService.js';
+import { validateParsedResume } from '../services/aiValidation.js';
 
 export async function screenCandidate(req, res) {
   const { id } = req.params;
@@ -71,9 +72,14 @@ export async function parseResume(req, res) {
       return res.status(400).json({ error: 'No resume content or file provided' });
     }
 
-    return res.json({ parsed });
+    const validated = validateParsedResume(parsed);
+    return res.json({ parsed: validated });
   } catch (err) {
     console.error('[AIController] Parse error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to parse resume with AI' });
+    const status = Number(err.status) || 503;
+    const clientError = status >= 500
+      ? 'Resume parsing is temporarily unavailable. Please try again later.'
+      : (err.message || 'Failed to parse resume with AI');
+    return res.status(status).json({ error: clientError });
   }
 }

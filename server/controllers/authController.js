@@ -4,7 +4,7 @@ import { sendVerificationEmail } from '../services/emailService.js';
 
 function sanitizeUser(user) {
   if (!user) return null;
-  const { password, emailVerificationToken, ...safe } = user;
+  const { password, passwordHash, emailVerificationToken, ...safe } = user;
   return safe;
 }
 
@@ -25,7 +25,11 @@ export function login(req, res) {
     });
   }
 
-  return res.json({ user: sanitizeUser(user), token: user.id });
+  const sessionHours = Number(process.env.SESSION_TTL_HOURS || 12);
+  const ttlMs = (Number.isFinite(sessionHours) && sessionHours > 0 ? sessionHours : 12) * 60 * 60 * 1000;
+  const token = store.createSession(user.id, ttlMs);
+
+  return res.json({ user: sanitizeUser(user), token });
 }
 
 export async function register(req, res) {
@@ -56,14 +60,20 @@ export async function register(req, res) {
 
   const fullName = derivedName || String(name || '').trim();
 
-  if (!fullName || !email || !password || !role) {
-    return res.status(400).json({ error: 'First name, last name, email, password, and role are required.' });
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: 'First name, last name, email, and password are required.' });
   }
-  if (!['hr', 'applicant'].includes(role)) {
-    return res.status(400).json({ error: 'Role must be "hr" or "applicant".' });
+
+  const requestedRole = String(role || 'applicant').trim().toLowerCase();
+  if (requestedRole !== 'applicant') {
+    return res.status(403).json({ error: 'HR accounts are invitation-only and cannot be created through public registration.' });
   }
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
+  if (password.length > 128) {
+    return res.status(400).json({ error: 'Password must be 128 characters or fewer.' });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -80,12 +90,12 @@ export async function register(req, res) {
     suffix: normalizedSuffix,
     email: normalizedEmail,
     password,
-    role,
+    role: requestedRole,
     emailVerified: false,
     emailVerificationToken,
     emailVerificationCreatedAt: Date.now(),
-    title: title || (role === 'hr' ? 'HR Recruiter' : 'Candidate'),
-    company: company || (role === 'hr' ? 'Tidal Technologies' : undefined),
+    title: title || 'Candidate',
+    company: company || undefined,
     phone: phone || undefined
   });
 
@@ -138,11 +148,12 @@ export function verifyEmail(req, res) {
   });
 }
 
+export function logout(req, res) {
+  if (req.authToken) store.deleteSession(req.authToken);
+  return res.json({ message: 'Signed out successfully.' });
+}
+
 export function getCurrentUser(req, res) {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
   return res.json({ user: sanitizeUser(req.user) });
-}
-
-export function getUsers(req, res) {
-  return res.json({ users: store.getUsers().map(sanitizeUser) });
 }

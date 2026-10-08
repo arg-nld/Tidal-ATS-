@@ -1,40 +1,33 @@
 import { store } from '../services/store.js';
 
 /**
- * Middleware to extract and verify user from headers
- * Accepts Authorization: Bearer <userId> or X-User-Id / X-User-Role
+ * Extracts the Bearer session token and resolves it against the server-side
+ * session store. The client no longer controls user IDs or roles through
+ * custom headers.
  */
 export function authenticate(req, res, next) {
-  let userId = null;
+  const authHeader = String(req.headers.authorization || '');
 
-  const authHeader = req.headers['authorization'];
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    userId = authHeader.substring(7).trim();
+  if (!authHeader.toLowerCase().startsWith('bearer ')) {
+    return next();
   }
 
-  if (!userId) {
-    userId = req.headers['x-user-id'];
+  const token = authHeader.slice(7).trim();
+  if (!token || token.length < 40) {
+    return next();
   }
 
-  if (userId) {
-    const user = store.getUserById(userId);
-    if (user) {
-      req.user = user;
-    }
-  }
-
-  // Fallback for demo convenience if header passes role
-  if (!req.user && req.headers['x-user-role']) {
-    const role = req.headers['x-user-role'];
-    const users = store.getUsers();
-    req.user = users.find(u => u.role === role) || null;
+  const user = store.getUserBySessionToken(token);
+  if (user) {
+    req.user = user;
+    req.authToken = token;
   }
 
   next();
 }
 
 /**
- * Require any authenticated user
+ * Require any authenticated user.
  */
 export function requireAuth(req, res, next) {
   if (!req.user) {
@@ -46,7 +39,7 @@ export function requireAuth(req, res, next) {
 }
 
 /**
- * Require specific role(s) ('hr', 'applicant')
+ * Require one of the supplied server-side roles.
  */
 export function requireRole(...allowedRoles) {
   return (req, res, next) => {
@@ -58,7 +51,7 @@ export function requireRole(...allowedRoles) {
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
-        error: `Access denied. Requires one of [${allowedRoles.join(', ')}] role. Current role: ${req.user.role}`
+        error: 'Access denied for this account.'
       });
     }
 

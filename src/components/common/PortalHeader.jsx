@@ -5,16 +5,15 @@ import {
   Briefcase, Bell, ShieldCheck, Sparkles, LogOut
 } from 'lucide-react';
 
-export function PortalHeader({ onOpenNotifications }) {
+export function PortalHeader({ onOpenNotifications, notificationCount = 0, onNotificationCountChange }) {
   const { user, isHr, logout } = useAuth();
-  const [unreadCount, setUnreadCount] = useState(0);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const fetchUnread = async () => {
     try {
       const res = await api.notifications.getAll();
       const unread = (res.notifications || []).filter(n => !n.read).length;
-      setUnreadCount(unread);
+      onNotificationCountChange?.(unread);
     } catch {
       // Ignore
     }
@@ -61,9 +60,9 @@ export function PortalHeader({ onOpenNotifications }) {
           title="Automated Email Notification Log"
         >
           <Bell size={16} />
-          {unreadCount > 0 && (
+          {notificationCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-indigo-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-              {unreadCount}
+              {notificationCount}
             </span>
           )}
         </button>

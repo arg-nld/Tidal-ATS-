@@ -9,6 +9,7 @@ import { ApplicantPortal } from './components/applicant/ApplicantPortal';
 function AtsApp() {
   const { isHr, isAuthenticated, authReady, user } = useAuth();
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   // Wait for persisted-session validation before deciding which portal to render.
   if (!authReady) {
@@ -23,7 +24,11 @@ function AtsApp() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500/30">
       {/* Universal Top Header */}
-      <PortalHeader onOpenNotifications={() => setIsNotifDrawerOpen(true)} />
+      <PortalHeader
+        onOpenNotifications={() => setIsNotifDrawerOpen(true)}
+        notificationCount={notificationCount}
+        onNotificationCountChange={setNotificationCount}
+      />
 
       {/* Role-Based Portal View */}
       <div className="flex-1 overflow-hidden" key={user?.id}>
@@ -38,6 +43,7 @@ function AtsApp() {
       <NotificationDrawer
         isOpen={isNotifDrawerOpen}
         onClose={() => setIsNotifDrawerOpen(false)}
+        onRefreshCount={setNotificationCount}
       />
     </div>
   );

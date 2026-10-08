@@ -74,13 +74,20 @@ export function updateJob(req, res) {
   const existing = store.getJobById(id);
   if (!existing) return res.status(404).json({ error: 'Job not found' });
 
-  const updates = { ...req.body };
+  // Explicit allow-list prevents mass-assignment of internal fields.
+  const allowedFields = [
+    'title', 'location', 'type', 'experienceLevel', 'salaryRange',
+    'status', 'description', 'requiredSkills', 'nonRequiredSkills', 'scoringWeights'
+  ];
+  const updates = {};
+  for (const field of allowedFields) {
+    if (Object.prototype.hasOwnProperty.call(req.body, field)) updates[field] = req.body[field];
+  }
+
   if (updates.scoringWeights) {
     const validation = validateWeights(updates.scoringWeights);
     if (validation.error) return res.status(400).json({ error: validation.error });
     updates.scoringWeights = validation.weights;
-  } else {
-    updates.scoringWeights = existing.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 };
   }
   if ('requiredSkills' in updates) updates.requiredSkills = normalizeSkillList(updates.requiredSkills);
   if ('nonRequiredSkills' in updates) updates.nonRequiredSkills = normalizeSkillList(updates.nonRequiredSkills);

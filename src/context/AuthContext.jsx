@@ -3,16 +3,10 @@ import { api } from '../services/api';
 
 const AuthContext = createContext(null);
 
-function loadPersistedUser() {
-  try {
-    const saved = localStorage.getItem('ats_user');
-    if (saved) return JSON.parse(saved);
-  } catch { /* ignore */ }
-  return null;
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(loadPersistedUser);
+  // The cached profile is display-only and is never trusted for authentication.
+  // The server must validate the session token before a user is considered signed in.
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [authReady, setAuthReady] = useState(false);
@@ -22,18 +16,24 @@ export function AuthProvider({ children }) {
     const hydrateSession = async () => {
       const token = localStorage.getItem('ats_token');
       if (!token) {
-        if (!cancelled) setAuthReady(true);
+        if (!cancelled) {
+          setUser(null);
+          localStorage.removeItem('ats_role');
+          localStorage.removeItem('ats_user');
+          setAuthReady(true);
+        }
         return;
       }
       try {
         const res = await api.auth.getCurrentUser();
         if (!cancelled && res.user) setUser(res.user);
       } catch (err) {
-        if (!cancelled && err.status === 401) {
+        if (!cancelled) {
           setUser(null);
           localStorage.removeItem('ats_token');
           localStorage.removeItem('ats_role');
           localStorage.removeItem('ats_user');
+          if (err.status !== 401) setAuthError('Unable to validate the current session. Please sign in again.');
         }
       } finally {
         if (!cancelled) setAuthReady(true);
@@ -45,8 +45,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('ats_token', user.id);
-      localStorage.setItem('ats_role', user.role);
       localStorage.setItem('ats_user', JSON.stringify(user));
     } else if (authReady) {
       localStorage.removeItem('ats_token');
@@ -60,8 +58,7 @@ export function AuthProvider({ children }) {
     setAuthError(null);
     try {
       const res = await api.auth.login({ email, password });
-      localStorage.setItem('ats_token', res.token || res.user.id);
-      localStorage.setItem('ats_role', res.user.role);
+      localStorage.setItem('ats_token', res.token);
       localStorage.setItem('ats_user', JSON.stringify(res.user));
       setUser(res.user);
       return res.user;
@@ -92,12 +89,18 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setAuthError(null);
-    localStorage.removeItem('ats_token');
-    localStorage.removeItem('ats_role');
-    localStorage.removeItem('ats_user');
+  const logout = useCallback(async () => {
+    try {
+      if (localStorage.getItem('ats_token')) await api.auth.logout();
+    } catch {
+      // Local sign-out still completes if the server is unreachable.
+    } finally {
+      setUser(null);
+      setAuthError(null);
+      localStorage.removeItem('ats_token');
+      localStorage.removeItem('ats_role');
+      localStorage.removeItem('ats_user');
+    }
   }, []);
 
   const clearAuthError = useCallback(() => setAuthError(null), []);
