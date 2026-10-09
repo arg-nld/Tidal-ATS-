@@ -1,19 +1,21 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import authRoutes from './routes/authRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 import { authenticate } from './middleware/authMiddleware.js';
 import { globalRateLimiter } from './middleware/rateLimit.js';
 import { securityHeaders } from './middleware/securityHeaders.js';
 import multer from 'multer';
 import fs from 'fs';
+import crypto from 'node:crypto';
 import { store } from './services/store.js';
+import { logger, requestLogger } from './services/logger.js';
 
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +30,8 @@ const allowedOrigins = String(process.env.CORS_ORIGINS || 'http://localhost:5173
 app.disable('x-powered-by');
 app.set('trust proxy', String(process.env.TRUST_PROXY || '').toLowerCase() === 'true' ? 1 : false);
 app.use(securityHeaders);
+app.use((req, _res, next) => { req.requestId = crypto.randomUUID(); next(); });
+app.use(requestLogger);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -56,21 +60,22 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'Tidal ATS Backend API',
     version: '3.0.0',
-    persistence: store.getPersistenceStatus()
+    persistence: await store.getPersistenceStatus()
   });
 });
 
 // Centralized error handler
 app.use((err, req, res, next) => {
-  console.error('[Server Error]', err.stack || err);
+  logger.error('http.error', { requestId: req.requestId, error: err });
 
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
@@ -88,14 +93,25 @@ app.use((err, req, res, next) => {
   });
 });
 
+await store.ready?.();
+
 const httpServer = app.listen(PORT, () => {
-  console.log(`\n🚀 Tidal ATS Backend Server listening at http://localhost:${PORT}`);
-  console.log(`📡 Health Check: http://localhost:${PORT}/api/health\n`);
+  logger.info('server.started', { port: PORT, persistence: process.env.DATABASE_URL ? 'postgresql' : 'json' });
+  
 });
 
-function shutdown(signal) {
-  console.log(`[Server] ${signal} received. Saving data before shutdown...`);
-  try { store.save(); } catch (err) { console.error('[Server] Final database save failed:', err.message); }
+async function shutdown(signal) {
+  logger.info('server.shutdown', { signal });
+  try {
+    await store.save?.();
+  } catch (err) {
+    logger.error('server.shutdown.save_failed', { error: err });
+  }
+  try {
+    await store.close?.();
+  } catch (err) {
+    logger.error('server.shutdown.close_failed', { error: err });
+  }
   httpServer.close(() => process.exit(0));
   setTimeout(() => process.exit(1), 5000).unref();
 }

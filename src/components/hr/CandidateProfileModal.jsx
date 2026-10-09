@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../services/api';
-import { X, Trash2, FileText, BrainCircuit, RefreshCw, Calendar, Video, Check, CheckCircle2, Sparkles, MessageSquare, ExternalLink, ChevronRight, Paperclip, Send, Download, AlertCircle } from 'lucide-react';
+import { X, Trash2, FileText, BrainCircuit, RefreshCw, Calendar, Video, Check, CheckCircle2, Sparkles, MessageSquare, ExternalLink, ChevronRight, Paperclip, Send, Download, AlertCircle, GitMerge, Award, Clock, FileCheck } from 'lucide-react';
 import { StageBadge } from '../common/Badge';
 import { Spinner } from '../common/Spinner';
+import { ConfirmationModal } from '../common/ConfirmationModal';
+import { ScorecardTab } from './ScorecardTab';
+import { CandidateTimelineTab } from './CandidateTimelineTab';
+import { OfferManagementTab } from './OfferManagementTab';
+import { DuplicateDetectionModal } from './DuplicateDetectionModal';
 import { PIPELINE_STAGES } from '../../constants/pipeline';
 export { PIPELINE_STAGES };
 
@@ -30,6 +35,17 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
   const [notesSaved, setNotesSaved] = useState(false);
   const [isScreening, setIsScreening] = useState(false);
   const [screeningError, setScreeningError] = useState(null);
+
+  // Confirmation Modals State
+  const [showStageConfirmModal, setShowStageConfirmModal] = useState(false);
+  const [showNotesConfirmModal, setShowNotesConfirmModal] = useState(false);
+  const [showScreeningConfirmModal, setShowScreeningConfirmModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+
+  // ATS duplicate detection & merge modal state
+  const [duplicates, setDuplicates] = useState([]);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
 
   const existingInterview = candidate.interview;
   const initialDate = existingInterview?.scheduledAt ? new Date(existingInterview.scheduledAt) : new Date();
@@ -107,28 +123,71 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
     }
   }, [candidate.id]);
 
-  const handleUpdateStage = async () => {
+  useEffect(() => {
+    if (!candidate?.id) return;
+    setCheckingDuplicates(true);
+    api.applications.getDuplicates(candidate.id)
+      .then(res => setDuplicates(res.duplicates || []))
+      .catch(err => {
+        console.warn('Duplicate detection check failed:', err);
+        setDuplicates([]);
+      })
+      .finally(() => setCheckingDuplicates(false));
+  }, [candidate.id]);
+
+  const handleUpdateStage = () => {
     if (targetStage === candidate.stage) return;
+    setShowStageConfirmModal(true);
+  };
+
+  const handleExecuteUpdateStage = async () => {
     setIsUpdatingStage(true);
     try {
       const res = await api.applications.updateStage(candidate.id, { stage: targetStage, customNote: stageNote });
       onUpdateCandidate(res.application);
-    } catch (err) { alert(`Failed to update stage: ${err.message}`); } finally { setIsUpdatingStage(false); }
+      setShowStageConfirmModal(false);
+    } catch (err) {
+      alert(`Failed to update stage: ${err.message}`);
+    } finally {
+      setIsUpdatingStage(false);
+    }
   };
 
-  const handleSaveNotes = async () => {
+  const handleSaveNotes = () => {
+    setShowNotesConfirmModal(true);
+  };
+
+  const handleExecuteSaveNotes = async () => {
     setIsSavingNotes(true);
     try {
       const res = await api.applications.updateNotes(candidate.id, notes);
-      onUpdateCandidate(res.application); setNotesSaved(true); setTimeout(() => setNotesSaved(false), 2500);
-    } catch (err) { alert(`Failed to save notes: ${err.message}`); } finally { setIsSavingNotes(false); }
+      onUpdateCandidate(res.application);
+      setNotesSaved(true);
+      setTimeout(() => setNotesSaved(false), 2500);
+      setShowNotesConfirmModal(false);
+    } catch (err) {
+      alert(`Failed to save notes: ${err.message}`);
+    } finally {
+      setIsSavingNotes(false);
+    }
   };
 
-  const handleScreenCandidate = async () => {
-    setIsScreening(true); setScreeningError(null);
-    try { const res = await api.ai.screen(candidate.id); onUpdateCandidate(res.application); }
-    catch (err) { setScreeningError(err.message || 'Screening failed'); }
-    finally { setIsScreening(false); }
+  const handleScreenCandidate = () => {
+    setShowScreeningConfirmModal(true);
+  };
+
+  const handleExecuteScreenCandidate = async () => {
+    setIsScreening(true);
+    setScreeningError(null);
+    try {
+      const res = await api.ai.screen(candidate.id);
+      onUpdateCandidate(res.application);
+      setShowScreeningConfirmModal(false);
+    } catch (err) {
+      setScreeningError(err.message || 'Screening failed');
+    } finally {
+      setIsScreening(false);
+    }
   };
 
   const validateInterviewSchedule = () => {
@@ -253,9 +312,65 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0"><div className="flex items-center gap-3"><div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-bold text-lg flex items-center justify-center">{candidate.name?.charAt(0).toUpperCase() || 'C'}</div><div><div className="flex items-center gap-2"><h2 className="text-lg font-bold text-slate-100">{candidate.name}</h2><StageBadge stage={candidate.stage} size="sm" /></div><p className="text-xs text-slate-400">Applied for <span className="text-slate-200 font-semibold">{job?.title || candidate.role}</span></p></div></div><div className="flex items-center gap-2"><button onClick={() => onDelete(candidate)} className="text-xs text-rose-400 px-3 py-1.5 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 font-semibold flex items-center gap-1.5"><Trash2 size={13}/> Delete</button><button onClick={onClose} className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800"><X size={20}/></button></div></div>
+        <div className="px-6 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0"><div className="flex items-center gap-3"><div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-bold text-lg flex items-center justify-center">{candidate.name?.charAt(0).toUpperCase() || 'C'}</div><div><div className="flex items-center gap-2"><h2 className="text-lg font-bold text-slate-100">{candidate.name}</h2><StageBadge stage={candidate.stage} size="sm" /></div><p className="text-xs text-slate-400">Applied for <span className="text-slate-200 font-semibold">{job?.title || candidate.role}</span></p></div></div><div className="flex items-center gap-2"><button onClick={() => setShowDeleteConfirmModal(true)} className="text-xs text-rose-400 px-3 py-1.5 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 font-semibold flex items-center gap-1.5"><Trash2 size={13}/> Delete</button><button onClick={onClose} className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800"><X size={20}/></button></div></div>
 
-        <div className="flex border-b border-slate-800 bg-slate-950/40 px-6 gap-2 shrink-0">{[{id:'overview',label:'Overview & Status'},{id:'interview',label:'Interview Scheduling',badge:candidate.interview?'Scheduled':null},{id:'resume',label:'Original Resume'}].map(tab => <button key={tab.id} onClick={() => { if (tab.id === 'resume') handleViewResume(); else setActiveTab(tab.id); }} className={`py-3 px-3 text-xs font-semibold border-b-2 flex items-center gap-2 ${activeTab===tab.id?'border-indigo-500 text-indigo-300':'border-transparent text-slate-400 hover:text-slate-200'}`}><span>{tab.label}</span>{tab.badge&&<span className="text-[10px] bg-indigo-500/15 text-indigo-400 px-1.5 rounded-full border border-indigo-500/30">{tab.badge}</span>}</button>)}</div>
+        {/* Duplicate Candidate Detection Alert Banner */}
+        {duplicates.length > 0 && (
+          <div className="mx-6 mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between gap-3 text-amber-200 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle size={18} className="text-amber-400 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-amber-200">
+                  Potential Duplicate Candidate Detected ({duplicates.length} match{duplicates.length > 1 ? 'es' : ''})
+                </p>
+                <p className="text-[11px] text-amber-300/80">
+                  Matches found based on candidate profile similarity. Review details and merge to unify history.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowDuplicateModal(true)}
+              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1.5 shrink-0 transition shadow cursor-pointer"
+            >
+              <GitMerge size={14} /> Review & Merge
+            </button>
+          </div>
+        )}
+
+        <div className="flex border-b border-slate-800 bg-slate-950/40 px-6 gap-2 shrink-0 overflow-x-auto">
+          {[
+            { id: 'overview', label: 'Overview & Status', icon: FileText },
+            { id: 'scorecards', label: 'Scorecards', icon: Award, badge: candidate.scorecards?.length ? `${candidate.scorecards.length}` : null },
+            { id: 'timeline', label: 'Timeline', icon: Clock, badge: candidate.timeline?.length ? `${candidate.timeline.length}` : null },
+            { id: 'offer', label: 'Offer', icon: FileCheck, badge: candidate.offer?.status ? candidate.offer.status.toUpperCase() : null },
+            { id: 'interview', label: 'Interview Scheduling', icon: Calendar, badge: candidate.interview ? 'Scheduled' : null },
+            { id: 'resume', label: 'Original Resume', icon: Paperclip },
+          ].map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (tab.id === 'resume') handleViewResume();
+                  else setActiveTab(tab.id);
+                }}
+                className={`py-3 px-3 text-xs font-semibold border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-indigo-500 text-indigo-300'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {Icon && <Icon size={14} />}
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="text-[10px] bg-indigo-500/15 text-indigo-400 px-1.5 py-0.5 rounded-full border border-indigo-500/30 font-mono">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
           {activeTab === 'overview' && <div className="space-y-6">
@@ -290,7 +405,112 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
 
             <div className="flex items-center justify-between">{interviewSuccess?<span className="text-xs text-emerald-400 flex items-center gap-1.5"><CheckCircle2 size={15}/> Interview scheduled and email sent.</span>:<span/>}<button type="submit" disabled={isScheduling||bookedSlotSet.has(selectedTime)} className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white disabled:opacity-40 flex items-center gap-2">{isScheduling?<Spinner className="w-3.5 h-3.5"/>:<Send size={14}/>} {isScheduling?'Preparing...':'Review & Schedule'}</button></div></form>}
 
-          {activeTab === 'resume'  && <div className="space-y-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-bold text-slate-100 flex items-center gap-2"><FileText size={16} className="text-indigo-400"/> Original Resume</h3><p className="text-[11px] text-slate-500">{candidate.resumeFile?.originalName || candidate.fileName || 'No file attached'}</p></div>{candidate.resumeFile?.originalName&&<button onClick={async()=>{try{const {blob}=await api.applications.getResumeBlob(candidate.id);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=candidate.resumeFile.originalName;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(err){setResumeError(err.message);}}} className="px-3 py-2 rounded-xl bg-slate-800 text-xs text-slate-200 flex items-center gap-2"><Download size={13}/> Download</button>}</div>{resumeError&&<div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex gap-2"><AlertCircle size={14}/>{resumeError}</div>}{resumeUrl&&candidate.resumeFile?.mimeType==='application/pdf'?<iframe title={`${candidate.name} original resume`} src={resumeUrl} className="w-full h-[650px] rounded-xl border border-slate-800 bg-white"/>:<div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center space-y-3"><FileText size={30} className="mx-auto text-slate-600"/><p className="text-sm text-slate-300">{candidate.resumeFile ? 'The original file is stored. PDFs can be previewed here; DOCX/TXT files can be downloaded.' : 'This older demo application has extracted resume text but no original upload. New applications will retain the original file.'}</p>{candidate.resumeText&&<details className="text-left"><summary className="cursor-pointer text-xs text-indigo-300">Show extracted text for cross-reference</summary><div className="mt-3 p-4 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed max-h-[450px] overflow-y-auto">{candidate.resumeText}</div></details>}</div>}</div>}
+          {activeTab === 'resume' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <FileText size={16} className="text-indigo-400"/> Original Resume
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {candidate.resumeFile?.originalName || candidate.fileName || 'No file attached'}
+                  </p>
+                </div>
+                {candidate.resumeFile && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const { blob } = await api.applications.getResumeBlob(candidate.id);
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = candidate.resumeFile.originalName || candidate.fileName || `${candidate.name.replace(/\s+/g, '_')}_resume.pdf`;
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                      } catch (err) {
+                        setResumeError(err.message);
+                      }
+                    }}
+                    className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 flex items-center gap-2 transition-colors"
+                  >
+                    <Download size={13}/> Download File
+                  </button>
+                )}
+              </div>
+
+              {resumeError && (
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex gap-2">
+                  <AlertCircle size={14} className="shrink-0 mt-0.5"/>
+                  <span>{resumeError}</span>
+                </div>
+              )}
+
+              {resumeLoading ? (
+                <div className="py-24 text-center bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <Spinner className="w-8 h-8 text-indigo-400 mx-auto" />
+                  <p className="text-xs text-slate-400 font-medium">Fetching original document...</p>
+                </div>
+              ) : resumeUrl && (
+                candidate.resumeFile?.mimeType?.toLowerCase() === 'application/pdf' ||
+                candidate.resumeFile?.originalName?.toLowerCase()?.endsWith('.pdf') ||
+                candidate.fileName?.toLowerCase()?.endsWith('.pdf')
+              ) ? (
+                <iframe
+                  title={`${candidate.name} original resume`}
+                  src={resumeUrl}
+                  className="w-full h-[650px] rounded-xl border border-slate-800 bg-white shadow-inner"
+                />
+              ) : (
+                <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center space-y-3">
+                  <FileText size={32} className="mx-auto text-slate-600"/>
+                  <p className="text-sm text-slate-300">
+                    {candidate.resumeFile
+                      ? 'The original file is stored. PDFs can be previewed directly in this viewer; DOCX/TXT documents can be downloaded above.'
+                      : 'This older demo application has extracted resume text but no original upload. New applications will retain the original file.'}
+                  </p>
+                  {candidate.resumeText && (
+                    <details className="text-left mt-2">
+                      <summary className="cursor-pointer text-xs text-indigo-300 hover:text-indigo-200 select-none">
+                        Show extracted text for cross-reference
+                      </summary>
+                      <div className="mt-3 p-4 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed max-h-[450px] overflow-y-auto border border-slate-800">
+                        {candidate.resumeText}
+                      </div>
+                    </details>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'scorecards' && (
+            <ScorecardTab
+              candidate={candidate}
+              application={candidate}
+              job={job}
+              onUpdateCandidate={onUpdateCandidate}
+              onUpdateApplication={onUpdateCandidate}
+            />
+          )}
+
+          {activeTab === 'timeline' && (
+            <CandidateTimelineTab
+              candidate={candidate}
+              application={candidate}
+              onUpdateCandidate={onUpdateCandidate}
+              onUpdateApplication={onUpdateCandidate}
+            />
+          )}
+
+          {activeTab === 'offer' && (
+            <OfferManagementTab
+              candidate={candidate}
+              application={candidate}
+              job={job}
+              onUpdateCandidate={onUpdateCandidate}
+              onUpdateApplication={onUpdateCandidate}
+            />
+          )}
 
 
         {showScheduleConfirmation && (
@@ -386,6 +606,88 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
         )}
         </div>
       </div>
+
+      {/* Confirmation Modal for Stage Progression (PATCH /applications/:id/stage) */}
+      <ConfirmationModal
+        isOpen={showStageConfirmModal}
+        onClose={() => setShowStageConfirmModal(false)}
+        onConfirm={handleExecuteUpdateStage}
+        isLoading={isUpdatingStage}
+        title="Confirm Pipeline Stage Progression"
+        message={`Are you sure you want to advance ${candidate.name} to "${targetStage}"?`}
+        details={{
+          'Candidate': candidate.name,
+          'Current Stage': candidate.stage,
+          'Target Stage': targetStage,
+          'Optional Status Note': stageNote || 'None provided'
+        }}
+        confirmText="Apply Stage Move"
+        variant="primary"
+      />
+
+      {/* Confirmation Modal for Saving Recruiter Notes (PATCH /applications/:id/notes) */}
+      <ConfirmationModal
+        isOpen={showNotesConfirmModal}
+        onClose={() => setShowNotesConfirmModal(false)}
+        onConfirm={handleExecuteSaveNotes}
+        isLoading={isSavingNotes}
+        title="Save Recruiter Evaluation Notes"
+        message={`Save the updated internal evaluation notes for ${candidate.name}?`}
+        confirmText="Save Notes"
+        variant="primary"
+      />
+
+      {/* Confirmation Modal for ATS Screening (POST /ai/screen) */}
+      <ConfirmationModal
+        isOpen={showScreeningConfirmModal}
+        onClose={() => setShowScreeningConfirmModal(false)}
+        onConfirm={handleExecuteScreenCandidate}
+        isLoading={isScreening}
+        title="Run ATS Scoring Calculation"
+        message={`Calculate the deterministic ATS matching score for ${candidate.name} against the target job requirements?`}
+        details={{
+          'Candidate': candidate.name,
+          'Role': job?.title || candidate.role,
+          'Identified Skills': candidate.skills?.length > 0 ? candidate.skills.join(', ') : 'None extracted'
+        }}
+        confirmText="Calculate Score"
+        variant="primary"
+      />
+
+      {/* Confirmation Modal for Deleting Candidate Record (DELETE /applications/:id) */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmModal}
+        onClose={() => setShowDeleteConfirmModal(false)}
+        onConfirm={() => {
+          setShowDeleteConfirmModal(false);
+          onDelete(candidate);
+        }}
+        title="Delete Candidate Record"
+        message={`Are you sure you want to delete the application record for ${candidate.name}? This action cannot be undone.`}
+        details={{
+          'Candidate': candidate.name,
+          'Email': candidate.email,
+          'Position': job?.title || candidate.role
+        }}
+        confirmText="Delete Candidate"
+        variant="danger"
+        icon={Trash2}
+      />
+
+      {/* Duplicate Candidate Detection & Merge Modal */}
+      {showDuplicateModal && (
+        <DuplicateDetectionModal
+          primaryCandidate={candidate}
+          duplicateMatches={duplicates}
+          isOpen={showDuplicateModal}
+          onClose={() => setShowDuplicateModal(false)}
+          onMerged={(updatedCandidate) => {
+            setShowDuplicateModal(false);
+            onUpdateCandidate(updatedCandidate);
+            setDuplicates([]);
+          }}
+        />
+      )}
     </div>
   );
 }

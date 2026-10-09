@@ -50,6 +50,29 @@ export const api = {
     updateNotes: (id, notes) => request(`/applications/${id}/notes`, { method: 'PATCH', body: JSON.stringify({ notes }) }),
     scheduleInterview: (id, interviewData) => request(`/applications/${id}/interview`, { method: 'POST', body: interviewData instanceof FormData ? interviewData : JSON.stringify(interviewData) }),
     recordEvaluation: (id, evaluationData) => request(`/applications/${id}/evaluation`, { method: 'POST', body: JSON.stringify(evaluationData) }),
+
+    // A. Interview Scorecards
+    recordScorecard: (id, scorecardData) => request(`/applications/${id}/scorecards`, { method: 'POST', body: JSON.stringify(scorecardData) }),
+    getScorecards: id => request(`/applications/${id}/scorecards`),
+
+    // B. Activity Timeline
+    getTimeline: id => request(`/applications/${id}/timeline`),
+
+    // C. Duplicate Detection & Merge
+    getDuplicates: id => request(`/applications/${id}/duplicates`),
+    getAllDuplicates: () => request('/applications/duplicates/all'),
+    mergeCandidates: (primaryApplicationId, duplicateApplicationIds) => request('/applications/merge', {
+      method: 'POST',
+      body: JSON.stringify({ primaryApplicationId, duplicateApplicationIds })
+    }),
+
+    // D. Offer Management
+    createOrUpdateOffer: (id, offerData) => request(`/applications/${id}/offer`, { method: 'POST', body: JSON.stringify(offerData) }),
+    approveOffer: (id, notes = '') => request(`/applications/${id}/offer/approve`, { method: 'POST', body: JSON.stringify({ notes }) }),
+    sendOffer: id => request(`/applications/${id}/offer/send`, { method: 'POST' }),
+    respondToOffer: (id, responseData) => request(`/applications/${id}/offer/respond`, { method: 'POST', body: JSON.stringify(responseData) }),
+    withdrawOffer: (id, reason = '') => request(`/applications/${id}/offer/withdraw`, { method: 'POST', body: JSON.stringify({ reason }) }),
+
     getAvailability: (date, excludeApplicationId = '') => request(`/applications/availability?${new URLSearchParams({ date, ...(excludeApplicationId ? { excludeApplicationId } : {}) }).toString()}`),
     getResumeBlob: async id => {
       const token = localStorage.getItem('ats_token');
@@ -68,6 +91,16 @@ export const api = {
       };
     },
     delete: id => request(`/applications/${id}`, { method: 'DELETE' })
+  },
+  analytics: {
+    get: (params = {}) => {
+      const query = new URLSearchParams(params).toString();
+      return request(`/analytics${query ? `?${query}` : ''}`);
+    },
+    downloadCsvUrl: (params = {}) => {
+      const query = new URLSearchParams(params).toString();
+      return `${BASE_URL}/analytics/csv${query ? `?${query}` : ''}`;
+    }
   },
   ai: {
     screen: candidateId => request(`/ai/screen/${candidateId}`, { method: 'POST' }),

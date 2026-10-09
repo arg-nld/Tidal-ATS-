@@ -1,4 +1,5 @@
 import { store } from '../services/store.js';
+import { parsePagination, paginateArray } from '../middleware/pagination.js';
 
 function normalizeSkillList(value) {
   if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
@@ -21,40 +22,42 @@ function validateWeights(scoringWeights) {
   return { weights };
 }
 
-export function getJobs(req, res) {
+export async function getJobs(req, res) {
   const isHr = req.user && req.user.role === 'hr';
-  let jobs = store.getJobs();
+  let jobs = await store.getJobs();
   if (!isHr && req.query.status !== 'all') jobs = jobs.filter(j => j.status === 'open');
 
   if (isHr) {
-    const apps = store.getApplications();
+    const apps = await store.getApplications();
     jobs = jobs.map(j => ({ ...j, applicantCount: apps.filter(a => a.jobId === j.id).length }));
   }
-  return res.json({ jobs });
+
+  const page = paginateArray(jobs, parsePagination(req.query, { defaultLimit: 50, maxLimit: 200 }));
+  return res.json({ jobs: page.items, ...(page.meta ? { pagination: page.meta } : {}) });
 }
 
-export function getJobById(req, res) {
+export async function getJobById(req, res) {
   const { id } = req.params;
-  const job = store.getJobById(id);
+  const job = await store.getJobById(id);
   if (!job) return res.status(404).json({ error: 'Job opening not found' });
 
   if (req.user?.role === 'applicant' && job.status === 'closed') {
-    const existing = store.getApplicationsByUserId(req.user.id).find(a => a.jobId === id);
+    const existing = (await store.getApplicationsByUserId(req.user.id)).find(a => a.jobId === id);
     if (!existing) return res.status(403).json({ error: 'This job posting is closed' });
   }
   return res.json({ job });
 }
 
-export function createJob(req, res) {
+export async function createJob(req, res) {
   const { title, department, location, type, experienceLevel, salaryRange, status, description, scoringWeights } = req.body;
   if (!title || !description) return res.status(400).json({ error: 'Job title and description are required' });
 
   const validation = validateWeights(scoringWeights);
   if (validation.error) return res.status(400).json({ error: validation.error });
 
-  const job = store.createJob({
+  const job = await store.createJob({
     title,
-    department: '',
+    department: department || 'Engineering',
     location: location || 'Remote',
     type: type || 'Full-time',
     experienceLevel: experienceLevel || '',
@@ -63,21 +66,25 @@ export function createJob(req, res) {
     description,
     scoringWeights: validation.weights,
     requiredSkills: normalizeSkillList(req.body.requiredSkills),
-    nonRequiredSkills: normalizeSkillList(req.body.nonRequiredSkills)
+    nonRequiredSkills: normalizeSkillList(req.body.nonRequiredSkills),
+    scorecardCriteria: Array.isArray(req.body.scorecardCriteria) ? req.body.scorecardCriteria : undefined,
+    ratingScale: req.body.ratingScale ? Number(req.body.ratingScale) : 5,
+    sourcingCost: req.body.sourcingCost ? Number(req.body.sourcingCost) : 0
   });
 
   return res.status(201).json({ job, message: 'Job posting published successfully' });
 }
 
-export function updateJob(req, res) {
+export async function updateJob(req, res) {
   const { id } = req.params;
-  const existing = store.getJobById(id);
+  const existing = await store.getJobById(id);
   if (!existing) return res.status(404).json({ error: 'Job not found' });
 
   // Explicit allow-list prevents mass-assignment of internal fields.
   const allowedFields = [
-    'title', 'location', 'type', 'experienceLevel', 'salaryRange',
-    'status', 'description', 'requiredSkills', 'nonRequiredSkills', 'scoringWeights'
+    'title', 'department', 'location', 'type', 'experienceLevel', 'salaryRange',
+    'status', 'description', 'requiredSkills', 'nonRequiredSkills', 'scoringWeights',
+    'scorecardCriteria', 'ratingScale', 'sourcingCost'
   ];
   const updates = {};
   for (const field of allowedFields) {
@@ -92,12 +99,12 @@ export function updateJob(req, res) {
   if ('requiredSkills' in updates) updates.requiredSkills = normalizeSkillList(updates.requiredSkills);
   if ('nonRequiredSkills' in updates) updates.nonRequiredSkills = normalizeSkillList(updates.nonRequiredSkills);
 
-  const updated = store.updateJob(id, updates);
+  const updated = await store.updateJob(id, updates);
   return res.json({ job: updated, message: 'Job updated successfully' });
 }
 
-export function deleteJob(req, res) {
-  const success = store.deleteJob(req.params.id);
+export async function deleteJob(req, res) {
+  const success = await store.deleteJob(req.params.id);
   if (!success) return res.status(404).json({ error: 'Job not found' });
   return res.json({ message: 'Job deleted successfully' });
 }

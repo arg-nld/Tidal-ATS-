@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { api } from '../../services/api';
 import { 
   Briefcase, Calendar, Clock, Video, CheckCircle, 
-  ExternalLink, Mail, AlertCircle, Sparkles, RefreshCw, ChevronRight 
+  ExternalLink, Mail, AlertCircle, Sparkles, RefreshCw, ChevronRight,
+  FileCheck, CheckCircle2, XCircle, DollarSign, X, Send
 } from 'lucide-react';
 import { StageBadge } from '../common/Badge';
+import { Spinner } from '../common/Spinner';
 import { PIPELINE_STAGES } from '../../constants/pipeline';
 
 // Visual Pipeline Steps for the applicant
@@ -18,6 +21,29 @@ const TRACKER_STAGES = [
 
 export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
   const [selectedAppEmails, setSelectedAppEmails] = useState(null);
+  const [offerModal, setOfferModal] = useState({
+    isOpen: false,
+    app: null,
+    action: null, // 'accepted' | 'declined'
+    comment: '',
+    isSubmitting: false
+  });
+
+  const handleOfferResponse = async () => {
+    if (!offerModal.app || !offerModal.action) return;
+    setOfferModal(prev => ({ ...prev, isSubmitting: true }));
+    try {
+      await api.applications.respondToOffer(offerModal.app.id, {
+        response: offerModal.action,
+        comment: offerModal.comment
+      });
+      setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false });
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(`Failed to submit offer response: ${err.message}`);
+      setOfferModal(prev => ({ ...prev, isSubmitting: false }));
+    }
+  };
 
   const getStageIndex = (stage) => {
     if (stage === 'Rejected') return -1;
@@ -221,16 +247,113 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                   </div>
                 )}
 
-                {/* Conditional Job Offer Card */}
-                {app.stage === 'Job Offer' && (
-                  <div className="bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-transparent border border-teal-500/30 rounded-2xl p-5 space-y-2">
-                    <div className="flex items-center gap-2 text-teal-300 font-bold text-sm">
-                      <Sparkles size={18} />
-                      <span>Formal Job Offer Extended!</span>
+                {/* Formal Job Offer Card */}
+                {(app.offer || app.stage === 'Job Offer' || app.stage === 'Hired') && (
+                  <div className={`rounded-2xl p-5 space-y-4 border ${
+                    app.offer?.status === 'accepted' || app.stage === 'Hired'
+                      ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
+                      : app.offer?.status === 'declined'
+                      ? 'bg-rose-950/20 border-rose-500/20 text-rose-200'
+                      : 'bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-transparent border-teal-500/40 text-slate-200'
+                  }`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <FileCheck size={20} className={
+                          app.offer?.status === 'accepted' || app.stage === 'Hired'
+                            ? 'text-emerald-400'
+                            : app.offer?.status === 'declined'
+                            ? 'text-rose-400'
+                            : 'text-teal-400'
+                        } />
+                        <h4 className="text-sm font-bold text-white">
+                          {app.offer?.status === 'accepted' || app.stage === 'Hired'
+                            ? 'Official Job Offer — Accepted 🎉'
+                            : app.offer?.status === 'declined'
+                            ? 'Official Job Offer — Declined'
+                            : app.offer?.status === 'sent'
+                            ? 'Official Job Offer Received — Action Required'
+                            : 'Formal Job Offer Extended!'}
+                        </h4>
+                      </div>
+
+                      {app.offer?.status && (
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border font-mono uppercase tracking-wider ${
+                          app.offer.status === 'accepted' || app.stage === 'Hired'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            : app.offer.status === 'declined'
+                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                            : 'bg-teal-500/20 text-teal-300 border-teal-500/40 animate-pulse'
+                        }`}>
+                          {app.offer.status}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      Congratulations! Tidal Nexus has officially extended a conditional job offer for this position. Our talent acquisition lead will contact you to discuss compensation and welcome you to the team.
-                    </p>
+
+                    {app.offer?.compensation ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-xs">
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Proposed Compensation</span>
+                          <span className="text-base font-extrabold text-emerald-400 mt-0.5 block">
+                            {app.offer.compensation.currency || '₱'}{Number(app.offer.compensation.amount || 0).toLocaleString()} <span className="text-xs text-slate-400 font-normal">{app.offer.compensation.period || '/ month'}</span>
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Target Start Date</span>
+                          <span className="text-xs font-semibold text-slate-200 mt-1 block">
+                            {app.offer.proposedStartDate ? new Date(app.offer.proposedStartDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Flexible'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Offer Expiry</span>
+                          <span className="text-xs font-semibold text-slate-200 mt-1 block">
+                            {app.offer.expiryDate ? new Date(app.offer.expiryDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Open'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Congratulations! Tidal Nexus has officially extended a conditional job offer for this position. Our talent acquisition lead will contact you to discuss compensation and welcome you to the team.
+                      </p>
+                    )}
+
+                    {app.offer?.notes && (
+                      <div className="text-xs text-slate-300 bg-slate-900/40 p-3 rounded-xl border border-slate-800/60 leading-relaxed">
+                        <strong className="text-slate-200 block mb-0.5">Offer Summary & Terms:</strong>
+                        {app.offer.notes}
+                      </div>
+                    )}
+
+                    {/* Action buttons if offer status is 'sent' */}
+                    {app.offer?.status === 'sent' && (
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5 border-t border-teal-500/20">
+                        <button
+                          type="button"
+                          onClick={() => setOfferModal({
+                            isOpen: true,
+                            app,
+                            action: 'declined',
+                            comment: '',
+                            isSubmitting: false
+                          })}
+                          className="w-full sm:w-auto px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl transition cursor-pointer"
+                        >
+                          Decline Offer
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOfferModal({
+                            isOpen: true,
+                            app,
+                            action: 'accepted',
+                            comment: '',
+                            isSubmitting: false
+                          })}
+                          className="w-full sm:w-auto px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <CheckCircle2 size={14} /> Accept Job Offer
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -255,6 +378,72 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Candidate Offer Response Modal */}
+      {offerModal.isOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                {offerModal.action === 'accepted' ? (
+                  <><CheckCircle2 size={18} className="text-emerald-400" /> Accept Job Offer</>
+                ) : (
+                  <><XCircle size={18} className="text-rose-400" /> Decline Job Offer</>
+                )}
+              </h3>
+              <button
+                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false })}
+                className="text-slate-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {offerModal.action === 'accepted'
+                ? `You are about to formally accept the job offer for ${offerModal.app?.job?.title || offerModal.app?.role}. This will notify the HR talent team and transition your application to Hired!`
+                : `Are you sure you wish to decline the offer for ${offerModal.app?.job?.title || offerModal.app?.role}? This decision cannot be reversed without contacting HR directly.`}
+            </p>
+
+            <div>
+              <label className="block text-[11px] text-slate-400 mb-1">
+                Optional note to hiring team:
+              </label>
+              <textarea
+                rows={3}
+                value={offerModal.comment}
+                onChange={e => setOfferModal(p => ({ ...p, comment: e.target.value }))}
+                placeholder={offerModal.action === 'accepted' ? "Excited to join the team!" : "Reason for declining (optional)"}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false })}
+                disabled={offerModal.isSubmitting}
+                className="px-3.5 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-800 rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleOfferResponse}
+                disabled={offerModal.isSubmitting}
+                className={`px-4 py-2 text-xs font-bold text-white rounded-xl flex items-center gap-1.5 cursor-pointer ${
+                  offerModal.action === 'accepted'
+                    ? 'bg-emerald-600 hover:bg-emerald-500'
+                    : 'bg-rose-600 hover:bg-rose-500'
+                }`}
+              >
+                {offerModal.isSubmitting ? <Spinner className="w-3.5 h-3.5" /> : <Send size={13} />}
+                {offerModal.isSubmitting ? 'Submitting...' : offerModal.action === 'accepted' ? 'Confirm Acceptance' : 'Confirm Decline'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

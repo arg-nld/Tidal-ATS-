@@ -83,7 +83,7 @@ try {
     throw new Error('Please enter a valid email address.');
   }
 
-  if (store.getUserByEmail(email)) {
+  if (await store.getUserByEmail(email)) {
     throw new Error('An account with this email already exists.');
   }
 
@@ -110,7 +110,7 @@ try {
     suffix
   ].filter(Boolean).join(' ');
 
-  const user = store.createUser({
+  const user = await store.createUser({
     name,
     firstName,
     lastName,

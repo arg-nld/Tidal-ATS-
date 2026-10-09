@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'node:crypto';
 import { hashPassword, isPasswordHash, verifyPassword } from './passwordService.js';
+import { DEFAULT_SCORECARD_CRITERIA, ensureApplicationTimeline } from './atsHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,10 +51,10 @@ const INITIAL_DATA = {
       id: 'job-01',
       title: 'Senior Full Stack Engineer (React & Node.js)',
       department: 'Engineering',
-      location: 'Remote / San Francisco, CA',
+      location: 'Bonifacio Global City (BGC), Taguig',
       type: 'Full-time',
       experienceLevel: 'Senior (5+ years)',
-      salaryRange: '$145,000 - $185,000 USD',
+      salaryRange: '₱120,000 - ₱175,000 / mo',
       status: 'open',
       scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
       requiredSkills: ["React", "TypeScript", "JavaScript", "Node.js", "REST APIs", "database", "microservices", "cloud", "CI/CD"],
@@ -66,10 +67,10 @@ const INITIAL_DATA = {
       id: 'job-02',
       title: 'Lead AI / ML Solutions Architect',
       department: 'AI & Data Science',
-      location: 'Hybrid / New York, NY',
+      location: 'Makati City, Metro Manila',
       type: 'Full-time',
       experienceLevel: 'Lead / Principal',
-      salaryRange: '$175,000 - $220,000 USD',
+      salaryRange: '₱150,000 - ₱220,000 / mo',
       status: 'open',
       scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
       requiredSkills: ["foundation models", "Gemini API", "PyTorch", "Hugging Face", "LLM", "production", "software engineering", "distributed computing"],
@@ -82,10 +83,10 @@ const INITIAL_DATA = {
       id: 'job-03',
       title: 'Senior Product Designer (Design Systems)',
       department: 'Product & Design',
-      location: 'Remote / Worldwide',
+      location: 'Cebu IT Park, Cebu City (Remote / Hybrid)',
       type: 'Full-time',
       experienceLevel: 'Mid-Senior (4+ years)',
-      salaryRange: '$120,000 - $155,000 USD',
+      salaryRange: '₱85,000 - ₱130,000 / mo',
       status: 'open',
       scoringWeights: { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
       requiredSkills: ["Figma", "design systems", "design tokens", "component architecture", "accessibility", "user research"],
@@ -171,7 +172,9 @@ const INITIAL_DATA = {
       read: false
     }
   ],
-  sessions: []
+  sessions: [],
+  emailLogs: [],
+  emailQueue: []
 };
 
 class Store {
@@ -363,7 +366,9 @@ class Store {
         applications,
         notifications,
         sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
-        emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : []
+        emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : [],
+        // Queue state must survive restarts when the JSON adapter is used.
+        emailQueue: Array.isArray(parsed.emailQueue) ? parsed.emailQueue : []
       };
       return { data, needsMigrationSave };
     };
@@ -552,6 +557,9 @@ class Store {
       scoringWeights: jobData.scoringWeights || { requiredSkills: 70, nonRequiredSkills: 20, experience: 10 },
       requiredSkills: Array.isArray(jobData.requiredSkills) ? jobData.requiredSkills : [],
       nonRequiredSkills: Array.isArray(jobData.nonRequiredSkills) ? jobData.nonRequiredSkills : [],
+      scorecardCriteria: Array.isArray(jobData.scorecardCriteria) ? jobData.scorecardCriteria : DEFAULT_SCORECARD_CRITERIA,
+      ratingScale: Number(jobData.ratingScale || 5),
+      sourcingCost: Number(jobData.sourcingCost || 0),
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
@@ -580,25 +588,43 @@ class Store {
     return true;
   }
 
+  _enrichApplication(app) {
+    if (!app) return null;
+    return {
+      ...app,
+      source: app.source || 'Direct Application',
+      scorecards: Array.isArray(app.scorecards) ? app.scorecards : [],
+      timeline: ensureApplicationTimeline(app),
+      offer: app.offer || null,
+      mergedInto: app.mergedInto || null,
+      mergedApplications: Array.isArray(app.mergedApplications) ? app.mergedApplications : []
+    };
+  }
+
   // --- Applications ---
   getApplications() {
-    return [...this.data.applications].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return [...this.data.applications]
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .map(a => this._enrichApplication(a));
   }
 
   getApplicationById(id) {
-    return this.data.applications.find(a => a.id === id);
+    const app = this.data.applications.find(a => a.id === id);
+    return app ? this._enrichApplication(app) : null;
   }
 
   getApplicationsByUserId(userId) {
     return this.data.applications
       .filter(a => a.userId === userId)
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .map(a => this._enrichApplication(a));
   }
 
   getApplicationsByJobId(jobId) {
     return this.data.applications
       .filter(a => a.jobId === jobId)
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .map(a => this._enrichApplication(a));
   }
 
   createApplication(appData) {
@@ -617,6 +643,12 @@ class Store {
       fileSize: appData.fileSize || 0,
       resumeFile: appData.resumeFile || null,
       stage: appData.stage || 'Application Submitted',
+      source: appData.source || 'Direct Application',
+      scorecards: Array.isArray(appData.scorecards) ? appData.scorecards : [],
+      timeline: Array.isArray(appData.timeline) && appData.timeline.length ? appData.timeline : ensureApplicationTimeline(appData),
+      offer: appData.offer || null,
+      mergedInto: appData.mergedInto || null,
+      mergedApplications: Array.isArray(appData.mergedApplications) ? appData.mergedApplications : [],
       geminiScore: appData.geminiScore ?? null,
       geminiRationale: appData.geminiRationale || null,
       isScreening: false,
@@ -629,7 +661,7 @@ class Store {
     };
     this.data.applications.unshift(newApp);
     this.save();
-    return newApp;
+    return this._enrichApplication(newApp);
   }
 
   updateApplication(id, updates) {
@@ -641,7 +673,85 @@ class Store {
       updatedAt: Date.now()
     };
     this.save();
-    return this.data.applications[index];
+    return this._enrichApplication(this.data.applications[index]);
+  }
+
+  mergeApplications(primaryId, duplicateIds = [], mergedBy = 'HR Recruiter') {
+    const primary = this.getApplicationById(primaryId);
+    if (!primary) return null;
+
+    const actorName = typeof mergedBy === 'object' && mergedBy?.name ? mergedBy.name : String(mergedBy || 'HR Recruiter');
+    const dupList = Array.isArray(duplicateIds) ? duplicateIds : [duplicateIds];
+    const duplicates = [];
+    for (const dupId of dupList) {
+      if (dupId && dupId !== primaryId) {
+        const dup = this.getApplicationById(dupId);
+        if (dup) duplicates.push(dup);
+      }
+    }
+
+    if (duplicates.length === 0) return primary;
+
+    const combinedNotes = [
+      primary.recruiterNotes,
+      ...duplicates.map(d => `[Merged from ${d.name} (${d.email})]: ${d.recruiterNotes || 'No notes'}`)
+    ].filter(Boolean).join('\n\n');
+
+    const allScorecards = [
+      ...(primary.scorecards || []),
+      ...duplicates.flatMap(d => d.scorecards || [])
+    ];
+
+    const allTimeline = [
+      ...(primary.timeline || []),
+      ...duplicates.flatMap(d => d.timeline || [])
+    ];
+
+    const mergedAppIds = Array.from(new Set([
+      ...(primary.mergedApplications || []),
+      ...duplicates.map(d => d.id)
+    ]));
+
+    allTimeline.push({
+      id: `tle-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      type: 'candidate_merged',
+      title: 'Candidate Profile Merged',
+      description: `Merged profiles for: ${duplicates.map(d => `${d.name} (${d.email})`).join(', ')}`,
+      performedBy: mergedBy,
+      performedByRole: 'hr',
+      timestamp: Date.now(),
+      metadata: { mergedApplicationIds: duplicates.map(d => d.id) }
+    });
+
+    const updatedPrimary = this.updateApplication(primaryId, {
+      recruiterNotes: combinedNotes,
+      scorecards: allScorecards,
+      timeline: allTimeline.sort((a, b) => a.timestamp - b.timestamp),
+      mergedApplications: mergedAppIds
+    });
+
+    for (const dup of duplicates) {
+      this.updateApplication(dup.id, {
+        stage: 'Archived (Duplicate Merged)',
+        mergedInto: primaryId,
+        recruiterNotes: `[MERGED INTO ${primary.name} (${primary.id})]\n${dup.recruiterNotes || ''}`,
+        timeline: [
+          ...(dup.timeline || []),
+          {
+            id: `tle-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            type: 'candidate_merged',
+            title: 'Merged into Primary Record',
+            description: `Merged into primary candidate profile: ${primary.name} (${primary.email})`,
+            performedBy: actorName,
+            performedByRole: 'hr',
+            timestamp: Date.now(),
+            metadata: { primaryId }
+          }
+        ]
+      });
+    }
+
+    return updatedPrimary;
   }
 
   scheduleInterviewIfAvailable(id, interviewData, conflictWindowMs = 30 * 60 * 1000) {
@@ -684,9 +794,15 @@ class Store {
   }
 
   createEmailLog(logData) {
+    this.data.emailLogs = Array.isArray(this.data.emailLogs) ? this.data.emailLogs : [];
+    const idempotencyKey = logData.idempotencyKey || null;
+    if (idempotencyKey) {
+      const existing = this.data.emailLogs.find(log => log.idempotencyKey === idempotencyKey);
+      if (existing) return existing;
+    }
     const log = {
       id: logData.id || `email-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`,
-      idempotencyKey: logData.idempotencyKey || null,
+      idempotencyKey,
       to: Array.isArray(logData.to) ? logData.to : [logData.to].filter(Boolean),
       subject: String(logData.subject || '').slice(0, 200),
       type: logData.type || 'transactional',
@@ -730,6 +846,89 @@ class Store {
   getUsersByRole(role) {
     return this.data.users.filter(user => user.role === role);
   }
+
+  async enqueueEmail(d) {
+    this.data.emailQueue = Array.isArray(this.data.emailQueue) ? this.data.emailQueue : [];
+    if (d.emailLogId) {
+      const existing = this.data.emailQueue.find(item => item.emailLogId === d.emailLogId);
+      if (existing) {
+        if (existing.status === 'failed') {
+          existing.payload = d.payload;
+          existing.status = 'pending';
+          existing.attempts = 0;
+          existing.availableAt = Date.now();
+          existing.lockedAt = null;
+          existing.lastError = null;
+          this.save();
+        }
+        return { id: existing.id, deduplicated: true };
+      }
+    }
+    const item = {
+      id: d.id || `queue-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      emailLogId: d.emailLogId,
+      payload: d.payload,
+      status: 'pending',
+      attempts: 0,
+      availableAt: Date.now(),
+      createdAt: Date.now()
+    };
+    this.data.emailQueue.push(item);
+    this.save();
+    return { id: item.id };
+  }
+
+  async claimEmailJobs(limit = 10) {
+    this.data.emailQueue = Array.isArray(this.data.emailQueue) ? this.data.emailQueue : [];
+    const now = Date.now();
+    const leaseMs = Math.max(60_000, Number(process.env.EMAIL_WORKER_LEASE_MS || 5 * 60 * 1000));
+    const maxRetries = Math.max(1, Number(process.env.EMAIL_MAX_RETRIES || 3));
+    let changed = false;
+
+    // Requeue work abandoned by a worker that crashed while a job was processing.
+    for (const job of this.data.emailQueue) {
+      if (job.status !== 'processing' || !job.lockedAt || Number(job.lockedAt) >= now - leaseMs) continue;
+      job.attempts = Number(job.attempts || 0) + 1;
+      job.lastError = job.lastError || 'Email worker lease expired; job was reclaimed.';
+      job.status = job.attempts >= maxRetries ? 'failed' : 'pending';
+      job.availableAt = now;
+      job.lockedAt = null;
+      if (job.emailLogId) {
+        this.updateEmailLog(job.emailLogId, {
+          status: job.status === 'failed' ? 'failed' : 'retrying',
+          attempts: job.attempts,
+          error: job.lastError
+        });
+      }
+      changed = true;
+    }
+
+    const jobs = this.data.emailQueue
+      .filter(job => job.status === 'pending' && job.availableAt <= now)
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .slice(0, limit);
+    jobs.forEach(job => { job.status = 'processing'; job.lockedAt = now; });
+    if (jobs.length) changed = true;
+    if (changed) this.save();
+    return jobs;
+  }
+
+  async completeEmailJob(id, { ok, error, nextAttemptAt } = {}) {
+    this.data.emailQueue = Array.isArray(this.data.emailQueue) ? this.data.emailQueue : [];
+    const index = this.data.emailQueue.findIndex(job => job.id === id);
+    if (index === -1) return;
+    if (ok) this.data.emailQueue.splice(index, 1);
+    else {
+      const job = this.data.emailQueue[index];
+      job.attempts += 1;
+      job.lastError = error || null;
+      job.status = job.attempts >= Number(process.env.EMAIL_MAX_RETRIES || 3) ? 'failed' : 'pending';
+      job.availableAt = nextAttemptAt || Date.now();
+      job.lockedAt = null;
+    }
+    this.save();
+  }
+
 
   createNotification(notifData) {
     const notif = {
@@ -802,4 +1001,14 @@ class Store {
 }
 
 export { Store };
-export const store = new Store();
+
+// PostgreSQL is selected when DATABASE_URL is configured. JSON remains available
+// for local development and the existing reliability test suite.
+let store;
+if (process.env.DATABASE_URL) {
+  const { PostgresStore } = await import('./postgresStore.js');
+  store = new PostgresStore();
+} else {
+  store = new Store();
+}
+export { store };

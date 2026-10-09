@@ -14,7 +14,9 @@
     "backup:data": "node server/scripts/backupData.js",
     "test:reliability": "node --test server/tests/scoring.test.js server/tests/storeReliability.test.js",
     "test:all": "node --test server/tests/*.test.js",
-    "create:hr": "node server/scripts/createHr.js"
+    "create:hr": "node server/scripts/createHr.js",
+    "worker:email": "node server/workers/emailWorker.js",
+    "migrate:postgres": "node server/scripts/migrateToPostgres.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -27,7 +29,9 @@
     "multer": "^2.4.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "pg": "^8.16.3",
+    "@aws-sdk/client-s3": "^3.879.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

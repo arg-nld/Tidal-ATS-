@@ -43,6 +43,54 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
+  // Keep the displayed portal and the bearer token in sync when another tab signs in,
+  // signs out, or switches accounts. Without this, the UI can show HR while requests
+  // are sent with an applicant token (or vice versa), producing confusing 403 responses.
+  useEffect(() => {
+    let latestSync = 0;
+    let disposed = false;
+
+    const handleStorage = async event => {
+      if (event.key !== 'ats_token' && event.key !== null) return;
+      const syncId = ++latestSync;
+      setAuthReady(false);
+      const token = localStorage.getItem('ats_token');
+
+      if (!token) {
+        if (!disposed && syncId === latestSync) {
+          setUser(null);
+          setAuthError(null);
+          setAuthReady(true);
+        }
+        return;
+      }
+
+      try {
+        const res = await api.auth.getCurrentUser();
+        if (!disposed && syncId === latestSync) {
+          setUser(res.user || null);
+          setAuthError(null);
+        }
+      } catch (err) {
+        if (!disposed && syncId === latestSync) {
+          setUser(null);
+          localStorage.removeItem('ats_token');
+          localStorage.removeItem('ats_role');
+          localStorage.removeItem('ats_user');
+          setAuthError(err.status === 401 ? null : 'Unable to validate the current session. Please sign in again.');
+        }
+      } finally {
+        if (!disposed && syncId === latestSync) setAuthReady(true);
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      disposed = true;
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
   useEffect(() => {
     if (user) {
       localStorage.setItem('ats_user', JSON.stringify(user));

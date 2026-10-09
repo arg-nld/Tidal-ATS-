@@ -130,11 +130,26 @@ export function HrCalendarView({ jobs, applications, selectedJobId, onSelectJobI
               <h3 className="text-base font-bold text-slate-100">{monthLabel}</h3>
               <p className="text-[11px] text-slate-500 mt-0.5">{events.length} scheduled interview{events.length === 1 ? '' : 's'}</p>
             </div>
-            <div className="flex items-center gap-1">
-              <button type="button" onClick={() => goToMonth(-1)} className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+            <div className="flex items-center gap-2">
+              <label className="sr-only" htmlFor="recruiting-calendar-month">Jump to month</label>
+              <input
+                id="recruiting-calendar-month"
+                type="month"
+                value={`${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, '0')}`}
+                onChange={(e) => {
+                  if (!e.target.value) return;
+                  const [year, month] = e.target.value.split('-').map(Number);
+                  const nextMonth = new Date(year, month - 1, 1);
+                  setVisibleMonth(nextMonth);
+                  setSelectedDate(nextMonth);
+                }}
+                aria-label="Choose calendar month and year"
+                className="min-w-0 w-[145px] rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 [color-scheme:dark]"
+              />
+              <button type="button" onClick={() => goToMonth(-1)} aria-label="Previous month" className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
                 <ChevronLeft size={16} />
               </button>
-              <button type="button" onClick={() => goToMonth(1)} className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+              <button type="button" onClick={() => goToMonth(1)} aria-label="Next month" className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
                 <ChevronRight size={16} />
               </button>
             </div>

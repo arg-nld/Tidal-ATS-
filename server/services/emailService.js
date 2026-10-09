@@ -82,13 +82,15 @@ export function generateEmailForStatusChange({ applicant, job, newStage, intervi
   return { subject, body };
 }
 
-export async function sendEmail({
+async function deliverEmailNow({
   to,
   subject,
   body,
   html,
   attachments = [],
-  idempotencyKey
+  idempotencyKey,
+  _skipLog = false,
+  maxAttempts = EMAIL_MAX_RETRIES
 }) {
   const { apiKey, from } = requireEmailConfig();
 
@@ -114,7 +116,7 @@ export async function sendEmail({
     }));
   }
 
-  const log = store.createEmailLog({
+  const log = _skipLog ? null : await store.createEmailLog({
     to: recipients,
     subject: safeSubject,
     type: getEmailType(idempotencyKey),
@@ -123,9 +125,26 @@ export async function sendEmail({
     attempts: 0
   });
 
+  // The store may return an existing log for an idempotency key. Avoid sending
+  // a second message when that key already completed successfully.
+  if (log?.status === 'sent') {
+    return {
+      id: log.providerMessageId || log.provider_message_id || log.id,
+      alreadySent: true
+    };
+  }
+  if (log && ['failed', 'retrying', 'queued'].includes(log.status)) {
+    await store.updateEmailLog(log.id, {
+      status: 'sending',
+      attempts: 0,
+      error: null
+    });
+  }
+
   let lastError = null;
 
-  for (let attempt = 1; attempt <= EMAIL_MAX_RETRIES; attempt += 1) {
+  const attemptLimit = Math.max(1, Number(maxAttempts) || 1);
+  for (let attempt = 1; attempt <= attemptLimit; attempt += 1) {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
@@ -155,7 +174,7 @@ export async function sendEmail({
         throw error;
       }
 
-      store.updateEmailLog(log.id, {
+      if (log) await store.updateEmailLog(log.id, {
         status: 'sent',
         attempts: attempt,
         providerMessageId: result?.id || null,
@@ -164,18 +183,95 @@ export async function sendEmail({
       return result || { id: null };
     } catch (err) {
       lastError = err;
-      store.updateEmailLog(log.id, {
-        status: attempt < EMAIL_MAX_RETRIES && shouldRetryEmail(err) ? 'retrying' : 'failed',
+      if (log) await store.updateEmailLog(log.id, {
+        status: attempt < attemptLimit && shouldRetryEmail(err) ? 'retrying' : 'failed',
         attempts: attempt,
         error: err?.message || 'Email delivery failed.'
       });
 
-      if (attempt >= EMAIL_MAX_RETRIES || !shouldRetryEmail(err)) break;
+      if (attempt >= attemptLimit || !shouldRetryEmail(err)) break;
       await sleep(EMAIL_RETRY_BASE_MS * (2 ** (attempt - 1)));
     }
   }
 
   throw lastError || new Error('Email delivery failed.');
+}
+
+export async function sendEmail({
+  to,
+  subject,
+  body,
+  html,
+  attachments = [],
+  idempotencyKey
+}) {
+  const recipients = (Array.isArray(to) ? to : [to]).map(recipient => validEmail(recipient));
+  const safeSubject = cleanString(subject, { field: 'Email subject', max: 200, min: 1, allowEmpty: false, singleLine: true });
+  const safeBody = cleanString(body, { field: 'Email body', max: 20000, allowEmpty: true });
+
+  if (String(process.env.EMAIL_DELIVERY_MODE || 'direct').toLowerCase() === 'queue') {
+    if (!process.env.DATABASE_URL || typeof store.enqueueEmail !== 'function' || typeof store.claimEmailJobs !== 'function') {
+      throw new Error('EMAIL_DELIVERY_MODE=queue requires PostgreSQL storage. Configure DATABASE_URL or switch EMAIL_DELIVERY_MODE to direct.');
+    }
+
+    const log = await store.createEmailLog({
+      to: recipients,
+      subject: safeSubject,
+      type: getEmailType(idempotencyKey),
+      idempotencyKey,
+      status: 'queued',
+      attempts: 0
+    });
+
+    // Repeated idempotency keys must not re-enqueue an email that was already sent.
+    if (log.status === 'sent') {
+      return { id: log.provider_message_id || log.id, queued: false, alreadySent: true };
+    }
+    if (['failed', 'retrying'].includes(log.status)) {
+      await store.updateEmailLog(log.id, { status: 'queued', attempts: 0, error: null });
+    }
+
+    await store.enqueueEmail({
+      emailLogId: log.id,
+      payload: { to: recipients, subject: safeSubject, body: safeBody, html, attachments, idempotencyKey }
+    });
+    return { id: log.provider_message_id || log.id, queued: true };
+  }
+
+  return deliverEmailNow({ to: recipients, subject: safeSubject, body: safeBody, html, attachments, idempotencyKey });
+}
+
+export async function processEmailQueueOnce(limit = 10) {
+  const jobs = await store.claimEmailJobs(limit);
+  let processed = 0;
+  for (const job of jobs) {
+    try {
+      const result = await deliverEmailNow({ ...job.payload, _skipLog: true, maxAttempts: 1 });
+      await store.updateEmailLog(job.emailLogId, {
+        status: 'sent',
+        attempts: Number(job.attempts || 0) + 1,
+        providerMessageId: result?.id || null,
+        error: null
+      });
+      await store.completeEmailJob(job.id, { ok: true });
+      processed += 1;
+    } catch (err) {
+      const attempts = Number(job.attempts || 0) + 1;
+      const retry = attempts < Number(process.env.EMAIL_MAX_RETRIES || 3) && shouldRetryEmail(err);
+      await store.updateEmailLog(job.emailLogId, {
+        status: retry ? 'retrying' : 'failed',
+        attempts,
+        error: err?.message || 'Email delivery failed.'
+      });
+      await store.completeEmailJob(job.id, {
+        ok: false,
+        error: err?.message || 'Email delivery failed.',
+        nextAttemptAt: Date.now() + (retry ? EMAIL_RETRY_BASE_MS * (2 ** Math.max(0, attempts - 1)) : 365 * 24 * 60 * 60 * 1000)
+      });
+      processed += 1;
+    }
+  }
+  return { processed, claimed: jobs.length };
 }
 
 export async function sendStatusChangeEmail({ applicant, job, newStage, interviewDetails, customNote, attachments = [] }) {
@@ -200,7 +296,7 @@ export async function sendStatusChangeEmail({ applicant, job, newStage, intervie
       attachments,
       idempotencyKey: `application-stage/${applicant.id}/${newStage}/${interviewDetails?.createdAt || Date.now()}`
     });
-    deliveryStatus = 'sent';
+    deliveryStatus = providerResult?.queued ? 'queued' : 'sent';
   } catch (err) {
     // Internal ATS notifications should still be created even when the external
     // email provider rejects delivery (for example while Resend is in testing mode).
@@ -209,10 +305,31 @@ export async function sendStatusChangeEmail({ applicant, job, newStage, intervie
     console.error(`[EmailService] External email delivery failed for ${applicant.email}:`, deliveryError);
   }
 
-  const matchedUser = applicant?.email ? store.getUserByEmail(applicant.email) : null;
-  const recipientUserId = matchedUser?.id || applicant.userId || null;
+  const matchedUser = applicant?.email ? await store.getUserByEmail(applicant.email) : null;
+  const linkedUser = !matchedUser && applicant?.userId
+    ? await store.getUserById?.(applicant.userId)
+    : null;
+  const recipientUserId = matchedUser?.id || linkedUser?.id || null;
 
-  const notification = store.createNotification({
+  // An application can outlive its portal account. External email delivery should
+  // still be recorded, but a private in-app notification requires a real recipient.
+  if (!recipientUserId) {
+    return {
+      applicationId: applicant.id,
+      recipientEmail: applicant.email,
+      recipientName: applicant.name,
+      stage: newStage,
+      subject,
+      body,
+      deliveryStatus,
+      deliveryError,
+      providerMessageId: providerResult?.id || null,
+      emailType: 'transactional',
+      noInAppNotification: true
+    };
+  }
+
+  return store.createNotification({
     applicationId: applicant.id,
     recipientUserId,
     jobId: applicant.jobId,
@@ -226,16 +343,13 @@ export async function sendStatusChangeEmail({ applicant, job, newStage, intervie
     providerMessageId: providerResult?.id || null,
     emailType: 'transactional'
   });
-
-  return notification;
 }
 
 export function createHrApplicationNotification({ applicant, job, notificationStore = store }) {
-  const hrUsers = notificationStore.getUsersByRole('hr');
   const subject = `New application: ${job?.title || applicant?.role || 'Job Application'}`;
   const body = `A new application has been submitted.\n\nCandidate: ${applicant?.name || 'Candidate'}\nEmail: ${applicant?.email || 'Not provided'}\nPosition: ${job?.title || applicant?.role || 'Position'}\n\nOpen the HR portal to review the application and resume.`;
 
-  return hrUsers.map(hr => notificationStore.createNotification({
+  const createFor = hrUsers => hrUsers.map(hr => notificationStore.createNotification({
     applicationId: applicant.id,
     recipientUserId: hr.id,
     jobId: applicant.jobId,
@@ -247,6 +361,12 @@ export function createHrApplicationNotification({ applicant, job, notificationSt
     deliveryStatus: 'internal',
     emailType: 'hr-internal'
   }));
+
+  const usersResult = notificationStore.getUsersByRole('hr');
+  if (usersResult && typeof usersResult.then === 'function') {
+    return usersResult.then(async hrUsers => Promise.all(createFor(hrUsers)));
+  }
+  return createFor(usersResult);
 }
 
 export async function sendVerificationEmail({ user, token }) {

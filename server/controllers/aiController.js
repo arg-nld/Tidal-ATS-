@@ -6,20 +6,20 @@ import { validateParsedResume } from '../services/aiValidation.js';
 
 export async function screenCandidate(req, res) {
   const { id } = req.params;
-  const app = store.getApplicationById(id);
+  const app = await store.getApplicationById(id);
   if (!app) return res.status(404).json({ error: 'Application not found' });
 
-  const job = store.getJobById(app.jobId);
+  const job = await store.getJobById(app.jobId);
   if (!job) return res.status(404).json({ error: 'Associated job not found' });
   if (!app.resumeText) return res.status(400).json({ error: 'Candidate has no extracted resume text to evaluate' });
 
-  store.updateApplication(id, { isScreening: true, geminiError: null });
+  await store.updateApplication(id, { isScreening: true, geminiError: null });
 
   try {
     const result = calculateCandidateScore(app, job);
     const rationale = buildDeterministicRationale(result);
 
-    const updated = store.updateApplication(id, {
+    const updated = await store.updateApplication(id, {
       geminiScore: result.score,
       geminiRationale: rationale,
       screeningBreakdown: result.breakdown,
@@ -44,7 +44,7 @@ export async function screenCandidate(req, res) {
     });
   } catch (err) {
     console.error('[AIController] Screening error:', err);
-    store.updateApplication(id, { isScreening: false, geminiError: err.message || 'Failed to complete screening' });
+    await store.updateApplication(id, { isScreening: false, geminiError: err.message || 'Failed to complete screening' });
     return res.status(400).json({ error: err.message || 'Failed to evaluate candidate' });
   }
 }

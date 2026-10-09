@@ -5,7 +5,7 @@ import { store } from '../services/store.js';
  * session store. The client no longer controls user IDs or roles through
  * custom headers.
  */
-export function authenticate(req, res, next) {
+export async function authenticate(req, res, next) {
   const authHeader = String(req.headers.authorization || '');
 
   if (!authHeader.toLowerCase().startsWith('bearer ')) {
@@ -17,7 +17,7 @@ export function authenticate(req, res, next) {
     return next();
   }
 
-  const user = store.getUserBySessionToken(token);
+  const user = await store.getUserBySessionToken(token);
   if (user) {
     req.user = user;
     req.authToken = token;
@@ -58,3 +58,5 @@ export function requireRole(...allowedRoles) {
     next();
   };
 }
+
+export const requireHr = requireRole('hr');

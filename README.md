@@ -10,7 +10,7 @@ Copy `.env.example` to `.env` and set your own credentials:
 
 ```env
 GEMINI_API_KEY=your_google_ai_studio_api_key
-GEMINI_MODEL=gemini-3.8-flash
+GEMINI_MODEL=gemini-2.5-flash
 PORT=5000
 APP_URL=http://localhost:5173
 COMPANY_NAME=Tidal Nexus
@@ -31,6 +31,9 @@ npm run dev
 - Real email verification flow: registration sends a verification email; the account cannot log in until the link is opened.
 - Notifications are now linked to the applicant account by `userId`, with email matching retained only for legacy records.
 - Candidate notifications now appear for the correct signed-in candidate.
+- Application submission uses the signed-in applicant account email even when the uploaded resume contains a different email address.
+- The active portal synchronizes with sign-in/sign-out changes made in another browser tab to prevent stale roles and tokens from becoming mismatched.
+- The HR recruiting calendar includes a month/year picker for direct navigation.
 - Notification drawer opening is protected from accidental backdrop/event bubbling; clicking `View email` opens the message instead of closing the drawer.
 - Notifications are server-scoped to the signed-in user; unread state, individual removal, and `Clear all` are persisted by the backend.
 - Notification list scroll position is restored after opening/closing a notification.
@@ -110,3 +113,34 @@ The full Phase 4 scope now includes the following production scalability work:
 ```
 
 These are architecture/production upgrades and are not represented as completed merely by this Phase 4 package. See `PHASE4_CHANGES.md` for the implementation requirements and recommended order.
+
+
+## Phase 4 — Scalability
+
+The project now includes the production scalability foundation:
+
+- PostgreSQL adapter with relational tables, foreign keys, connection pooling, and indexes.
+- `npm run migrate:postgres` to migrate the existing `server/data/db.json`.
+- S3-compatible object storage adapter for resumes via `OBJECT_STORAGE_PROVIDER=s3`.
+- Database-backed email queue and separate worker: `npm run worker:email`.
+- Optional API pagination for jobs, applications, and notifications using `page` and `limit`.
+- Structured JSON request/server/error/worker logs with request IDs.
+- Existing JSON storage remains available when `DATABASE_URL` is not configured so the Phase 1–3 regression suite continues to work.
+
+See `PHASE4_SCALABILITY.md` and `.env.example` for configuration and rollout steps.
+
+### PostgreSQL rollout
+
+```bash
+npm install
+npm run migrate:postgres
+npm run dev
+```
+
+For asynchronous email delivery, run the worker separately:
+
+```bash
+npm run worker:email
+```
+
+Do not commit `.env`, PostgreSQL credentials, S3 credentials, Resend keys, session tokens, or other secrets.

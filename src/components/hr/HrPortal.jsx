@@ -5,11 +5,12 @@ import { HrDashboardView } from './HrDashboardView';
 import { HrJobsView } from './HrJobsView';
 import { HrKanbanView } from './HrKanbanView';
 import { HrCalendarView } from './HrCalendarView';
+import { HrAnalyticsView } from './HrAnalyticsView';
 import { CandidateProfileModal } from './CandidateProfileModal';
 import { JobModal } from './JobModal';
 import { 
   LayoutDashboard, Briefcase, Users, CalendarDays, AlertCircle,
-  Trash2, ArrowRight 
+  Trash2, ArrowRight, BarChart3 
 } from 'lucide-react';
 import { Spinner } from '../common/Spinner';
 
@@ -249,6 +250,23 @@ export function HrPortal() {
               {applications.filter(a => a.interview?.scheduledAt).length}
             </span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'analytics'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <BarChart3 size={16} />
+              <span>Analytics & Reports</span>
+            </div>
+            <span className="text-[10px] uppercase tracking-wider font-bold bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full border border-indigo-500/30">
+              Live
+            </span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500">
@@ -260,10 +278,10 @@ export function HrPortal() {
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         
         {/* Mobile Subheader Tabs */}
-        <div className="md:hidden flex border-b border-slate-800 bg-slate-900 px-4 py-2 gap-2">
+        <div className="md:hidden flex border-b border-slate-800 bg-slate-900 px-4 py-2 gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
               activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-slate-400'
             }`}
           >
@@ -271,7 +289,7 @@ export function HrPortal() {
           </button>
           <button
             onClick={() => setActiveTab('jobs')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
               activeTab === 'jobs' ? 'bg-indigo-600 text-white' : 'text-slate-400'
             }`}
           >
@@ -279,7 +297,7 @@ export function HrPortal() {
           </button>
           <button
             onClick={() => setActiveTab('kanban')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
               activeTab === 'kanban' ? 'bg-indigo-600 text-white' : 'text-slate-400'
             }`}
           >
@@ -287,11 +305,19 @@ export function HrPortal() {
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
               activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'text-slate-400'
             }`}
           >
             Calendar
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
+              activeTab === 'analytics' ? 'bg-indigo-600 text-white' : 'text-slate-400'
+            }`}
+          >
+            Analytics & Reports
           </button>
         </div>
 
@@ -383,6 +409,13 @@ export function HrPortal() {
                   applications={applications}
                   selectedJobId={selectedJobId}
                   onSelectJobId={setSelectedJobId}
+                />
+              )}
+
+              {activeTab === 'analytics' && (
+                <HrAnalyticsView
+                  jobs={jobs}
+                  onSelectCandidate={(candId) => setViewingCandidateId(candId)}
                 />
               )}
             </>

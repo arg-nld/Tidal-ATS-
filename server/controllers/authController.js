@@ -8,13 +8,13 @@ function sanitizeUser(user) {
   return safe;
 }
 
-export function login(req, res) {
+export async function login(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
 
-  const user = store.getUserByEmailAndPassword(email, password);
+  const user = await store.getUserByEmailAndPassword(email, password);
   if (!user) {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
@@ -27,7 +27,7 @@ export function login(req, res) {
 
   const sessionHours = Number(process.env.SESSION_TTL_HOURS || 12);
   const ttlMs = (Number.isFinite(sessionHours) && sessionHours > 0 ? sessionHours : 12) * 60 * 60 * 1000;
-  const token = store.createSession(user.id, ttlMs);
+  const token = await store.createSession(user.id, ttlMs);
 
   return res.json({ user: sanitizeUser(user), token });
 }
@@ -77,12 +77,12 @@ export async function register(req, res) {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  if (store.getUserByEmail(normalizedEmail)) {
+  if (await store.getUserByEmail(normalizedEmail)) {
     return res.status(409).json({ error: 'An account with this email already exists.' });
   }
 
   const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-  const newUser = store.createUser({
+  const newUser = await store.createUser({
     name: fullName,
     firstName: normalizedFirst || fullName.split(' ')[0],
     lastName: normalizedLast || fullName.split(' ').slice(-1)[0],
@@ -103,7 +103,7 @@ export async function register(req, res) {
     await sendVerificationEmail({ user: newUser, token: emailVerificationToken });
   } catch (err) {
     console.error('[AuthController] Verification email failed:', err.message);
-    store.deleteUser(newUser.id);
+    await store.deleteUser(newUser.id);
 
     const providerMessage = String(err?.message || '');
     const resendTestingMode = providerMessage.toLowerCase().includes('only send testing emails to your own email address');
@@ -122,9 +122,9 @@ export async function register(req, res) {
   });
 }
 
-export function verifyEmail(req, res) {
+export async function verifyEmail(req, res) {
   const token = String(req.params.token || '').trim();
-  const user = store.getUsers().find(u => u.emailVerificationToken === token);
+  const user = (await store.getUsers()).find(u => u.emailVerificationToken === token);
 
   if (!user) {
     return res.status(400).json({ error: 'This verification link is invalid or has already been used.' });
@@ -136,7 +136,7 @@ export function verifyEmail(req, res) {
     return res.status(400).json({ error: 'This verification link has expired. Please register again or request a new verification email.' });
   }
 
-  const updated = store.updateUser?.(user.id, {
+  const updated = await store.updateUser?.(user.id, {
     emailVerified: true,
     emailVerificationToken: null,
     emailVerificationCreatedAt: null
@@ -148,12 +148,12 @@ export function verifyEmail(req, res) {
   });
 }
 
-export function logout(req, res) {
-  if (req.authToken) store.deleteSession(req.authToken);
+export async function logout(req, res) {
+  if (req.authToken) await store.deleteSession(req.authToken);
   return res.json({ message: 'Signed out successfully.' });
 }
 
-export function getCurrentUser(req, res) {
+export async function getCurrentUser(req, res) {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
   return res.json({ user: sanitizeUser(req.user) });
 }

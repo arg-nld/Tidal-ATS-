@@ -31,3 +31,8 @@ dist-ssr
 # Uploaded applicant resumes
 server/data/uploads/*
 !server/data/uploads/.gitkeep
+
+# Local runtime data and backups
+server/data/db.json
+server/data/backups/*
+!server/data/backups/.gitkeep
