@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"server,client\" -c \"blue,green\" \"node server/server.js\" \"vite\"",
+    "dev": "concurrently -n \"server,client\" -c \"blue,green\" \"node server/devServer.js\" \"vite\"",
     "server": "node server/server.js",
     "client": "vite",
     "build": "vite build",
@@ -31,7 +31,8 @@
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",
     "pg": "^8.16.3",
-    "@aws-sdk/client-s3": "^3.879.0"
+    "@aws-sdk/client-s3": "^3.879.0",
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -1319,7 +1319,7 @@ export function JobModal({ job, onClose, onSave, onDelete }) {
                             {formData.title || 'Untitled Role'}
                           </h3>
                           <p className="text-xs text-indigo-300 font-medium">
-                            {formData.department} Team • Tidal ATS (Philippines)
+                            {formData.department} Team • TIDAL Solutions (Philippines)
                           </p>
                           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 pt-1">
                             <span className="flex items-center gap-1">

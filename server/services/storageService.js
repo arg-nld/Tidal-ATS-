@@ -105,22 +105,31 @@ export async function getResume(ref) {
   }
 
   const root = path.resolve(process.env.LOCAL_UPLOAD_ROOT || 'server/data/uploads');
-  const rawKey = String(ref.storedName || ref.objectKey || '').replace(/^[/\\]*resumes[/\\]/i, '');
-  const stored = path.basename(rawKey);
-  if (!stored || stored !== rawKey) return null;
-  const filePath = path.join(root, stored);
-  const rootPrefix = `${root}${path.sep}`;
-  if (!filePath.startsWith(rootPrefix)) throw new Error('Stored resume reference is invalid.');
-  try {
-    return {
-      buffer: await fs.readFile(filePath),
-      mimeType: ref.mimeType || 'application/octet-stream',
-      originalName: safeName(ref.originalName || stored)
-    };
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
+  // Older records used values such as "resumes/<file>", "server/data/uploads/<file>",
+  // or absolute paths. Resolve only the basename and search known local storage roots;
+  // never trust a database path to read arbitrary files.
+  const rawKey = String(ref.storedName || ref.objectKey || ref.path || ref.filePath || '');
+  const stored = path.basename(rawKey.replace(/\\/g, '/'));
+  if (!stored || stored === '.' || stored === path.sep) return null;
+  const candidates = [
+    path.join(root, stored),
+    path.join(root, 'resumes', stored),
+    path.resolve('server/data/uploads', stored),
+    path.resolve('uploads', stored)
+  ];
+  for (const filePath of [...new Set(candidates)]) {
+    try {
+      const buffer = await fs.readFile(filePath);
+      return {
+        buffer,
+        mimeType: ref.mimeType || 'application/octet-stream',
+        originalName: safeName(ref.originalName || stored)
+      };
+    } catch (err) {
+      if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
+    }
   }
+  return null;
 }
 
 export const sanitizeOriginalFileName = safeName;

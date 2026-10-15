@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import {
-  Briefcase, Bell, ShieldCheck, Sparkles, LogOut
+  Bell, LogOut
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { ThemeToggle } from './ThemeToggle';
 
 export function PortalHeader({ onOpenNotifications, notificationCount = 0, onNotificationCountChange }) {
   const { user, isHr, logout } = useAuth();
+  const { theme } = useTheme();
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const fetchUnread = async () => {
@@ -26,16 +29,19 @@ export function PortalHeader({ onOpenNotifications, notificationCount = 0, onNot
   }, [user]);
 
   return (
-    <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+    <header className="portal-header bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 sm:px-5 lg:px-6 py-3 flex items-center justify-between gap-3 sticky top-0 z-30">
 
       {/* Brand & Portal Indicator */}
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-          {isHr ? <ShieldCheck size={20} className="text-white" /> : <Briefcase size={20} className="text-white" />}
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold text-slate-100 tracking-tight">Tidal Nexus</h1>
+      <div className="flex items-center gap-3 min-w-0">
+        <img
+          src={theme === 'dark' ? '/tidal-logo-dark.png' : '/tidal-logo.png'}
+          alt="TIDAL solutions"
+          className="tidal-header-logo shrink-0"
+        />
+        <div className="portal-brand-divider hidden sm:block" />
+        <div className="portal-brand-meta min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-base font-bold text-slate-100 tracking-tight">Talent</h1>
             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
               isHr
                 ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
@@ -51,7 +57,9 @@ export function PortalHeader({ onOpenNotifications, notificationCount = 0, onNot
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+
+        <ThemeToggle compact />
 
         {/* Notifications */}
         <button
@@ -69,7 +77,7 @@ export function PortalHeader({ onOpenNotifications, notificationCount = 0, onNot
 
         {/* User pill */}
         <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="hidden md:block">

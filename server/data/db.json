@@ -4,7 +4,7 @@
       "id": "user-hr-01",
       "name": "Sarah Lin",
       "email": "hr@tidalats.com",
-      "passwordHash": "scrypt$16384$8$1$772ee4b59eef35c0685c627e0f1ef8b2$5aa4c57336cffa7d2a4339e7f42affc3cfc5bc8a788beb6f192ca46b0bef571dbe3addbf3b8242f71e8e04adc0204e1ad8c97ead07ce7b69c559bde0b24de9f2",
+      "passwordHash": "scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07",
       "role": "hr",
       "title": "Head of Talent Acquisition",
       "company": "Tidal Technologies",
@@ -14,7 +14,7 @@
       "id": "user-app-01",
       "name": "Jordan Hayes",
       "email": "jordan.hayes@example.com",
-      "passwordHash": "scrypt$16384$8$1$1040462224e0a91e5732f24717821f29$f54eebaa0ba0fb0eed87a38ee85c56d91372fd5b78c19a9bc044edad7cfde4eaab85e9f1f2cbe37cdebe5ac88621d8d656f0dccf571dc6205a8ff16770c46a79",
+      "passwordHash": "scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07",
       "role": "applicant",
       "title": "Senior Software Engineer",
       "phone": "+1 (555) 234-5678",
@@ -24,99 +24,15 @@
       "id": "user-app-02",
       "name": "Elena Rostova",
       "email": "elena.rostova@example.com",
-      "passwordHash": "scrypt$16384$8$1$5732e8c98ebe53eb60c0b3c0db802e54$ccd16afa07845771fa3f5356b4d5390d434a367ca3804589cd67bba884ae44d196559f074d3179c5062f4ddf4ab13d8515f0d7be75bfa3e53e53890db1b0612d",
+      "passwordHash": "scrypt$16384$8$1$718d2cbe691211c434971e82d93d6be1$ace78bdbc68276cccb5b364a9c8e4b6353eca9081033526b3d2254b4fb31a17403c16f017d3751b20952c9379c28f4b7d9f70d446109bb782911f889762a2e07",
       "role": "applicant",
       "title": "Product Designer",
       "phone": "+1 (555) 876-5432",
       "emailVerified": true
-    },
-    {
-      "id": "user-1790926760734-2m8xk",
-      "createdAt": 1790926760734,
-      "name": "Test User",
-      "email": "test1234@example.com",
-      "role": "applicant",
-      "title": "Candidate",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$f12d4f9158aee440bfc4aa94a36fc604$1df0c0b2643c6510925827bda3f2f146408f1c264729e06a37dcfbee82228fca5fca93d8ee4373ef46fb270fdbc1fa27d63d78f697cced729e4a33bf118f5cc1"
-    },
-    {
-      "id": "user-1790927181204-oedih",
-      "createdAt": 1790927181204,
-      "name": "Test User",
-      "email": "test_user_404@tidalats.com",
-      "role": "applicant",
-      "title": "Candidate",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$0755c417d950c44b8f5ac5c0b30488bd$178b2ccabb6e5e36cfcde3b19aa4b621ea6e0b0addeff2f5d763168804d8868915a1685d6e32d18af9eb4fae50c9160706c4622b87ea1555712ec044bf991eeb"
-    },
-    {
-      "id": "user-1790928672012-vvfjq",
-      "createdAt": 1790928672012,
-      "name": "adsa",
-      "email": "asdada@gmaill.com",
-      "role": "applicant",
-      "title": "Candidate",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$37ac190ac2e3501fd7033f47522c831a$7f0135d594940edf1acd986009c9a6105368275926217e5a7a261aa9c41b12d6149d5e36b11d8145d278df97b3cb5ecd28b59078203a6587d2c3e1c843a946e2"
-    },
-    {
-      "id": "user-1790928733456-lvqdy",
-      "createdAt": 1790928733456,
-      "name": "AndreiCo",
-      "email": "andreico@gmail.com",
-      "role": "applicant",
-      "title": "Candidate",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$37ab04ab57c863261b26f7d9396e04df$c801dc4539503d82edc49ffdfdf2fc1397fe845836639fbc5fb3d5c90cb6e97fd8378f02e9bf76bbd55a3c45cb6a1048a615be15f8036aa7ab7b236c3480ffc1"
-    },
-    {
-      "id": "user-1790928827094-50ktf",
-      "createdAt": 1790928827094,
-      "name": "CoAndrei",
-      "email": "coandrei@gmail.com",
-      "role": "hr",
-      "title": "HR Recruiter",
-      "company": "Tidal Technologies",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$cd76700442d47bd85294b5983d333b75$da8ac561a375c3b902c5822eca218f78c3f4f5f83e22d192e2c3bccc3254d547947038b9a700db8bcca3ab4307364bb516bc2527ae8e026a733ba0fac251cb0d"
-    },
-    {
-      "id": "user-1791303322233-wjvfc",
-      "createdAt": 1791303322233,
-      "name": "ben price",
-      "email": "graypjoos@gmail.com",
-      "role": "applicant",
-      "title": "Candidate",
-      "emailVerified": true,
-      "passwordHash": "scrypt$16384$8$1$f03554e28764bab918d885331a654f46$cdb87d0efc78bf4b5c28b164755c786e8e53b3aa0f27689e0388e2cfd27260f1f2ee847161b57de540ef3ba3bb18c39a45b9428347f8a659b171a08b83f83f40"
     }
   ],
+  "pendingRegistrations": [],
   "jobs": [
-    {
-      "id": "job-1791427362666-t5w4x",
-      "title": "test admin",
-      "department": "General",
-      "location": "Remote",
-      "type": "Full-time",
-      "experienceLevel": "3 years",
-      "salaryRange": "1324",
-      "status": "open",
-      "description": "admin",
-      "scoringWeights": {
-        "requiredSkills": 70,
-        "nonRequiredSkills": 20,
-        "experience": 10
-      },
-      "requiredSkills": [
-        "Python"
-      ],
-      "nonRequiredSkills": [
-        "Python"
-      ],
-      "createdAt": 1791427362666,
-      "updatedAt": 1791427362666
-    },
     {
       "id": "job-01",
       "title": "Senior Full Stack Engineer (React & Node.js)",
@@ -149,8 +65,8 @@
         "automated testing"
       ],
       "description": "We are seeking an experienced Full Stack Engineer to lead architecture on our cloud applications. You will design resilient APIs, build high-performance React frontends, and collaborate with product teams on high-impact scalable services.\n\nRequirements:\n- 5+ years of experience with React, TypeScript/JavaScript, and Node.js.\n- Strong understanding of REST APIs, database schemas, and microservices.\n- Experience with cloud infrastructure and CI/CD pipelines.\n- Passion for clean architecture, automated testing, and developer experience.",
-      "createdAt": 1790310617455,
-      "updatedAt": 1790310617455
+      "createdAt": 1791436852560,
+      "updatedAt": 1791436852560
     },
     {
       "id": "job-02",
@@ -182,8 +98,8 @@
         "retrieval augmented generation"
       ],
       "description": "Lead the next generation of AI-driven recruiting and enterprise productivity intelligence. In this role, you will architect multimodal LLM pipelines, implement retrieval-augmented generation (RAG) frameworks, and deploy secure enterprise AI workflows.\n\nRequirements:\n- Deep expertise in foundation models, Gemini API, PyTorch, or Hugging Face.\n- Experience deploying scalable LLM systems in production.\n- Proven background in software engineering and distributed computing.",
-      "createdAt": 1790483417455,
-      "updatedAt": 1790483417455
+      "createdAt": 1791609652560,
+      "updatedAt": 1791609652560
     },
     {
       "id": "job-03",
@@ -214,13 +130,13 @@
         "HTML"
       ],
       "description": "Join our design team to craft state-of-the-art user experiences for enterprise workflow products. You will maintain our design system, facilitate user research, and build interactive prototypes.\n\nRequirements:\n- Proven portfolio showcasing high-fidelity UI/UX design and design tokens.\n- Mastery of Figma, component architecture, and accessibility (WCAG AA).\n- Strong communication skills and cross-functional leadership.",
-      "createdAt": 1790656217455,
-      "updatedAt": 1790656217455
+      "createdAt": 1791782452560,
+      "updatedAt": 1791782452560
     }
   ],
   "applications": [
     {
-      "id": "app-1791535800140-9ego1",
+      "id": "app-1792053848930-m8exw",
       "jobId": "job-offer-test",
       "userId": null,
       "name": "Jessica Ramos",
@@ -238,17 +154,17 @@
       "scorecards": [],
       "timeline": [
         {
-          "id": "tle-1791535800140-3a890a5c",
+          "id": "tle-1792053848930-d7678047",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Jessica Ramos",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791535800140
+          "timestamp": 1792053848930
         },
         {
-          "id": "tle-1791536040140-2612454d",
+          "id": "tle-1792054088930-d0d892e6",
           "type": "stage_changed",
           "title": "Advanced to Job Offer",
           "description": "Candidate progressed to stage \"Job Offer\"",
@@ -257,7 +173,7 @@
           "metadata": {
             "stage": "Job Offer"
           },
-          "timestamp": 1791536040140
+          "timestamp": 1792054088930
         }
       ],
       "offer": {
@@ -270,11 +186,11 @@
         "expiryDate": "2026-10-25",
         "notes": "Sign-on bonus included",
         "status": "accepted",
-        "createdAt": "2026-10-09T08:50:00.148Z",
+        "createdAt": "2026-10-15T08:44:08.930Z",
         "history": [
           {
             "action": "created",
-            "timestamp": "2026-10-09T08:50:00.148Z",
+            "timestamp": "2026-10-15T08:44:08.930Z",
             "actor": {
               "name": "Recruiter"
             }
@@ -283,9 +199,9 @@
         "approvedBy": {
           "name": "VP Talent"
         },
-        "approvedAt": "2026-10-09T08:50:00.164Z",
-        "sentAt": "2026-10-09T08:50:00.169Z",
-        "candidateRespondedAt": "2026-10-09T08:50:00.175Z",
+        "approvedAt": "2026-10-15T08:44:08.930Z",
+        "sentAt": "2026-10-15T08:44:08.931Z",
+        "candidateRespondedAt": "2026-10-15T08:44:08.931Z",
         "candidateComment": "Honored to accept!"
       },
       "mergedInto": null,
@@ -297,11 +213,11 @@
       "interview": null,
       "recruiterNotes": "",
       "evaluation": null,
-      "createdAt": 1791535800140,
-      "updatedAt": 1791535800175
+      "createdAt": 1792053848930,
+      "updatedAt": 1792053848931
     },
     {
-      "id": "app-1791535800097-w6m6d",
+      "id": "app-1792053848926-s3vwc",
       "jobId": "job-200",
       "userId": "user-2",
       "name": "Alexander Rivera",
@@ -326,17 +242,17 @@
       ],
       "timeline": [
         {
-          "id": "tle-1791535800097-bf0b2474",
+          "id": "tle-1792053848926-39b9cc7b",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alexander Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791535800097
+          "timestamp": 1792053848926
         },
         {
-          "id": "tle-1791536040097-9d88f6b2",
+          "id": "tle-1792054088926-7c7085a5",
           "type": "stage_changed",
           "title": "Advanced to Initial Screening",
           "description": "Candidate progressed to stage \"Initial Screening\"",
@@ -345,36 +261,36 @@
           "metadata": {
             "stage": "Initial Screening"
           },
-          "timestamp": 1791536040097
+          "timestamp": 1792054088926
         },
         {
-          "id": "tle-1791535800121-cdg02",
+          "id": "tle-1792053848928-f6gp6",
           "type": "candidate_merged",
           "title": "Merged into Primary Record",
           "description": "Merged into primary candidate profile: Alex Rivera (alex.rivera@gmail.com)",
           "performedBy": "HR Admin",
           "performedByRole": "hr",
-          "timestamp": 1791535800121,
+          "timestamp": 1792053848928,
           "metadata": {
-            "primaryId": "app-1791535800081-b9fl4"
+            "primaryId": "app-1792053848924-2f5lm"
           }
         }
       ],
       "offer": null,
-      "mergedInto": "app-1791535800081-b9fl4",
+      "mergedInto": "app-1792053848924-2f5lm",
       "mergedApplications": [],
       "geminiScore": null,
       "geminiRationale": null,
       "isScreening": false,
       "geminiError": null,
       "interview": null,
-      "recruiterNotes": "[MERGED INTO Alex Rivera (app-1791535800081-b9fl4)]\nDuplicate application note from previous cycle",
+      "recruiterNotes": "[MERGED INTO Alex Rivera (app-1792053848924-2f5lm)]\nDuplicate application note from previous cycle",
       "evaluation": null,
-      "createdAt": 1791535800097,
-      "updatedAt": 1791535800121
+      "createdAt": 1792053848926,
+      "updatedAt": 1792053848928
     },
     {
-      "id": "app-1791535800081-b9fl4",
+      "id": "app-1792053848924-2f5lm",
       "jobId": "job-100",
       "userId": "user-1",
       "name": "Alex Rivera",
@@ -399,27 +315,27 @@
       ],
       "timeline": [
         {
-          "id": "tle-1791535800081-5723decb",
+          "id": "tle-1792053848924-7f4524bd",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alex Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791535800081
+          "timestamp": 1792053848924
         },
         {
-          "id": "tle-1791535800097-bf0b2474",
+          "id": "tle-1792053848926-39b9cc7b",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alexander Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791535800097
+          "timestamp": 1792053848926
         },
         {
-          "id": "tle-1791535800116-e08g8",
+          "id": "tle-1792053848927-c2so2",
           "type": "candidate_merged",
           "title": "Candidate Profile Merged",
           "description": "Merged profiles for: Alexander Rivera (alex.rivera@gmail.com)",
@@ -427,15 +343,15 @@
             "name": "HR Admin"
           },
           "performedByRole": "hr",
-          "timestamp": 1791535800116,
+          "timestamp": 1792053848927,
           "metadata": {
             "mergedApplicationIds": [
-              "app-1791535800097-w6m6d"
+              "app-1792053848926-s3vwc"
             ]
           }
         },
         {
-          "id": "tle-1791536040081-c732e010",
+          "id": "tle-1792054088924-ca81004a",
           "type": "stage_changed",
           "title": "Advanced to Interview Scheduled",
           "description": "Candidate progressed to stage \"Interview Scheduled\"",
@@ -444,10 +360,10 @@
           "metadata": {
             "stage": "Interview Scheduled"
           },
-          "timestamp": 1791536040081
+          "timestamp": 1792054088924
         },
         {
-          "id": "tle-1791536040097-9d88f6b2",
+          "id": "tle-1792054088926-7c7085a5",
           "type": "stage_changed",
           "title": "Advanced to Initial Screening",
           "description": "Candidate progressed to stage \"Initial Screening\"",
@@ -456,13 +372,13 @@
           "metadata": {
             "stage": "Initial Screening"
           },
-          "timestamp": 1791536040097
+          "timestamp": 1792054088926
         }
       ],
       "offer": null,
       "mergedInto": null,
       "mergedApplications": [
-        "app-1791535800097-w6m6d"
+        "app-1792053848926-s3vwc"
       ],
       "geminiScore": null,
       "geminiRationale": null,
@@ -471,126 +387,11 @@
       "interview": null,
       "recruiterNotes": "Primary application note\n\n[Merged from Alexander Rivera (alex.rivera@gmail.com)]: Duplicate application note from previous cycle",
       "evaluation": null,
-      "createdAt": 1791535800081,
-      "updatedAt": 1791535800116
+      "createdAt": 1792053848924,
+      "updatedAt": 1792053848927
     },
     {
-      "id": "app-1791535279460-kvm54",
-      "jobId": "job-200",
-      "userId": "user-2",
-      "name": "Alexander Rivera",
-      "email": "alex.rivera@gmail.com",
-      "phone": "+63 917 555 1234",
-      "role": "",
-      "skills": [],
-      "experienceSummary": "",
-      "resumeText": "",
-      "fileName": "",
-      "fileSize": 0,
-      "resumeFile": null,
-      "stage": "Initial Screening",
-      "source": "Direct Application",
-      "scorecards": [
-        {
-          "id": "sc-dup-1",
-          "interviewerName": "Tech Lead",
-          "overallRating": 5,
-          "recommendation": "Strong Hire"
-        }
-      ],
-      "timeline": [
-        {
-          "id": "tle-1791535279460-a6b71a75",
-          "type": "application_submitted",
-          "title": "Application Submitted",
-          "description": "Application submitted for role \"Position\"",
-          "performedBy": "Alexander Rivera",
-          "performedByRole": "applicant",
-          "metadata": {},
-          "timestamp": 1791535279460
-        },
-        {
-          "id": "tle-1791535519460-581961ca",
-          "type": "stage_changed",
-          "title": "Advanced to Initial Screening",
-          "description": "Candidate progressed to stage \"Initial Screening\"",
-          "performedBy": "Hiring Team",
-          "performedByRole": "hr",
-          "metadata": {
-            "stage": "Initial Screening"
-          },
-          "timestamp": 1791535519460
-        }
-      ],
-      "offer": null,
-      "mergedInto": null,
-      "mergedApplications": [],
-      "geminiScore": null,
-      "geminiRationale": null,
-      "isScreening": false,
-      "geminiError": null,
-      "interview": null,
-      "recruiterNotes": "Duplicate application note from previous cycle",
-      "evaluation": null,
-      "createdAt": 1791535279460,
-      "updatedAt": 1791535279460
-    },
-    {
-      "id": "app-1791535279437-dpasc",
-      "jobId": "job-100",
-      "userId": "user-1",
-      "name": "Alex Rivera",
-      "email": "alex.rivera@gmail.com",
-      "phone": "+63 917 555 1234",
-      "role": "",
-      "skills": [],
-      "experienceSummary": "",
-      "resumeText": "",
-      "fileName": "",
-      "fileSize": 0,
-      "resumeFile": null,
-      "stage": "Interview Scheduled",
-      "source": "Direct Application",
-      "scorecards": [],
-      "timeline": [
-        {
-          "id": "tle-1791535279437-9bd166a3",
-          "type": "application_submitted",
-          "title": "Application Submitted",
-          "description": "Application submitted for role \"Position\"",
-          "performedBy": "Alex Rivera",
-          "performedByRole": "applicant",
-          "metadata": {},
-          "timestamp": 1791535279437
-        },
-        {
-          "id": "tle-1791535519437-c2703480",
-          "type": "stage_changed",
-          "title": "Advanced to Interview Scheduled",
-          "description": "Candidate progressed to stage \"Interview Scheduled\"",
-          "performedBy": "Hiring Team",
-          "performedByRole": "hr",
-          "metadata": {
-            "stage": "Interview Scheduled"
-          },
-          "timestamp": 1791535519437
-        }
-      ],
-      "offer": null,
-      "mergedInto": null,
-      "mergedApplications": [],
-      "geminiScore": null,
-      "geminiRationale": null,
-      "isScreening": false,
-      "geminiError": null,
-      "interview": null,
-      "recruiterNotes": "Primary application note",
-      "evaluation": null,
-      "createdAt": 1791535279438,
-      "updatedAt": 1791535279438
-    },
-    {
-      "id": "app-1791534983894-pj0zg",
+      "id": "app-1792053724988-4fqup",
       "jobId": "job-offer-test",
       "userId": null,
       "name": "Jessica Ramos",
@@ -603,22 +404,22 @@
       "fileName": "",
       "fileSize": 0,
       "resumeFile": null,
-      "stage": "Job Offer",
+      "stage": "Hired",
       "source": "Direct Application",
       "scorecards": [],
       "timeline": [
         {
-          "id": "tle-1791534983894-fd912099",
+          "id": "tle-1792053724988-2dd08bc9",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Jessica Ramos",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791534983894
+          "timestamp": 1792053724988
         },
         {
-          "id": "tle-1791535223894-c6aeedf9",
+          "id": "tle-1792053964988-0b38268d",
           "type": "stage_changed",
           "title": "Advanced to Job Offer",
           "description": "Candidate progressed to stage \"Job Offer\"",
@@ -627,10 +428,37 @@
           "metadata": {
             "stage": "Job Offer"
           },
-          "timestamp": 1791535223894
+          "timestamp": 1792053964988
         }
       ],
-      "offer": null,
+      "offer": {
+        "compensation": {
+          "amount": 150000,
+          "currency": "₱",
+          "period": "/ month"
+        },
+        "proposedStartDate": "2026-11-01",
+        "expiryDate": "2026-10-25",
+        "notes": "Sign-on bonus included",
+        "status": "accepted",
+        "createdAt": "2026-10-15T08:42:04.988Z",
+        "history": [
+          {
+            "action": "created",
+            "timestamp": "2026-10-15T08:42:04.988Z",
+            "actor": {
+              "name": "Recruiter"
+            }
+          }
+        ],
+        "approvedBy": {
+          "name": "VP Talent"
+        },
+        "approvedAt": "2026-10-15T08:42:04.989Z",
+        "sentAt": "2026-10-15T08:42:04.989Z",
+        "candidateRespondedAt": "2026-10-15T08:42:04.989Z",
+        "candidateComment": "Honored to accept!"
+      },
       "mergedInto": null,
       "mergedApplications": [],
       "geminiScore": null,
@@ -640,11 +468,11 @@
       "interview": null,
       "recruiterNotes": "",
       "evaluation": null,
-      "createdAt": 1791534983897,
-      "updatedAt": 1791534983897
+      "createdAt": 1792053724988,
+      "updatedAt": 1792053724989
     },
     {
-      "id": "app-1791534983791-7mjgr",
+      "id": "app-1792053724985-pdf4f",
       "jobId": "job-200",
       "userId": "user-2",
       "name": "Alexander Rivera",
@@ -669,17 +497,17 @@
       ],
       "timeline": [
         {
-          "id": "tle-1791534983791-4e732f5c",
+          "id": "tle-1792053724985-f70f71a3",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alexander Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791534983791
+          "timestamp": 1792053724985
         },
         {
-          "id": "tle-1791535223791-c1669020",
+          "id": "tle-1792053964985-ac6b8e9a",
           "type": "stage_changed",
           "title": "Advanced to Initial Screening",
           "description": "Candidate progressed to stage \"Initial Screening\"",
@@ -688,36 +516,36 @@
           "metadata": {
             "stage": "Initial Screening"
           },
-          "timestamp": 1791535223791
+          "timestamp": 1792053964985
         },
         {
-          "id": "tle-1791534983805-aqz21",
+          "id": "tle-1792053724986-0ezbr",
           "type": "candidate_merged",
           "title": "Merged into Primary Record",
           "description": "Merged into primary candidate profile: Alex Rivera (alex.rivera@gmail.com)",
           "performedBy": "HR Admin",
           "performedByRole": "hr",
-          "timestamp": 1791534983805,
+          "timestamp": 1792053724986,
           "metadata": {
-            "primaryId": "app-1791534983773-zlbqq"
+            "primaryId": "app-1792053724982-iu3t3"
           }
         }
       ],
       "offer": null,
-      "mergedInto": "app-1791534983773-zlbqq",
+      "mergedInto": "app-1792053724982-iu3t3",
       "mergedApplications": [],
       "geminiScore": null,
       "geminiRationale": null,
       "isScreening": false,
       "geminiError": null,
       "interview": null,
-      "recruiterNotes": "[MERGED INTO Alex Rivera (app-1791534983773-zlbqq)]\nDuplicate application note from previous cycle",
+      "recruiterNotes": "[MERGED INTO Alex Rivera (app-1792053724982-iu3t3)]\nDuplicate application note from previous cycle",
       "evaluation": null,
-      "createdAt": 1791534983791,
-      "updatedAt": 1791534983805
+      "createdAt": 1792053724985,
+      "updatedAt": 1792053724986
     },
     {
-      "id": "app-1791534983773-zlbqq",
+      "id": "app-1792053724982-iu3t3",
       "jobId": "job-100",
       "userId": "user-1",
       "name": "Alex Rivera",
@@ -742,27 +570,27 @@
       ],
       "timeline": [
         {
-          "id": "tle-1791534983773-28d872b8",
+          "id": "tle-1792053724982-343020d2",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alex Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791534983773
+          "timestamp": 1792053724982
         },
         {
-          "id": "tle-1791534983791-4e732f5c",
+          "id": "tle-1792053724985-f70f71a3",
           "type": "application_submitted",
           "title": "Application Submitted",
           "description": "Application submitted for role \"Position\"",
           "performedBy": "Alexander Rivera",
           "performedByRole": "applicant",
           "metadata": {},
-          "timestamp": 1791534983791
+          "timestamp": 1792053724985
         },
         {
-          "id": "tle-1791534983799-jnniu",
+          "id": "tle-1792053724985-wy8wc",
           "type": "candidate_merged",
           "title": "Candidate Profile Merged",
           "description": "Merged profiles for: Alexander Rivera (alex.rivera@gmail.com)",
@@ -770,15 +598,15 @@
             "name": "HR Admin"
           },
           "performedByRole": "hr",
-          "timestamp": 1791534983799,
+          "timestamp": 1792053724985,
           "metadata": {
             "mergedApplicationIds": [
-              "app-1791534983791-7mjgr"
+              "app-1792053724985-pdf4f"
             ]
           }
         },
         {
-          "id": "tle-1791535223773-33f4e3c0",
+          "id": "tle-1792053964982-bdd3d7bd",
           "type": "stage_changed",
           "title": "Advanced to Interview Scheduled",
           "description": "Candidate progressed to stage \"Interview Scheduled\"",
@@ -787,10 +615,10 @@
           "metadata": {
             "stage": "Interview Scheduled"
           },
-          "timestamp": 1791535223773
+          "timestamp": 1792053964982
         },
         {
-          "id": "tle-1791535223791-c1669020",
+          "id": "tle-1792053964985-ac6b8e9a",
           "type": "stage_changed",
           "title": "Advanced to Initial Screening",
           "description": "Candidate progressed to stage \"Initial Screening\"",
@@ -799,13 +627,13 @@
           "metadata": {
             "stage": "Initial Screening"
           },
-          "timestamp": 1791535223791
+          "timestamp": 1792053964985
         }
       ],
       "offer": null,
       "mergedInto": null,
       "mergedApplications": [
-        "app-1791534983791-7mjgr"
+        "app-1792053724985-pdf4f"
       ],
       "geminiScore": null,
       "geminiRationale": null,
@@ -814,381 +642,263 @@
       "interview": null,
       "recruiterNotes": "Primary application note\n\n[Merged from Alexander Rivera (alex.rivera@gmail.com)]: Duplicate application note from previous cycle",
       "evaluation": null,
-      "createdAt": 1791534983774,
-      "updatedAt": 1791534983800
+      "createdAt": 1792053724982,
+      "updatedAt": 1792053724985
     },
     {
-      "id": "app-1791303425428-evsq7",
-      "jobId": "job-01",
-      "userId": "user-1791303322233-wjvfc",
-      "name": "Ben",
-      "email": "graypjoos@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Data Scientist",
-      "skills": [
-        "Python",
-        "Java",
-        "SQL",
-        "Power BI",
-        "Tableau",
-        "Pandas",
-        "NumPy",
-        "Flutter",
-        "Git",
-        "NLP"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research.",
-      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.docx",
-      "fileSize": 42426,
-      "stage": "Interview Scheduled",
-      "geminiScore": 30,
-      "geminiRationale": "The candidate has a background in data science and Python/Flutter rather than the required 5+ years of professional experience in React, TypeScript/JavaScript, and Node.js for cloud applications.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": {
-        "scheduledAt": "2026-10-17T13:00",
-        "interviewer": "Sarah Lin (Talent Lead)",
-        "type": "Technical Interview",
-        "meetingLink": "https://meet.google.com/ats-technical",
-        "notes": "",
-        "scheduledBy": "CoAndrei",
-        "createdAt": 1791303547461
-      },
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1791303425428,
-      "updatedAt": 1791303547461
-    },
-    {
-      "id": "app-1791303379765-o5gcw",
-      "jobId": "job-02",
-      "userId": "user-1791303322233-wjvfc",
-      "name": "Ben Price",
-      "email": "andreireginaldc.co@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Data Science Undergraduate & Computer Science Student",
-      "skills": [
-        "Python",
-        "SQL",
-        "Java",
-        "Power BI",
-        "Tableau",
-        "Pandas",
-        "NumPy",
-        "Flutter",
-        "Git",
-        "SQLite"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science with practical experience in enterprise data governance at UnionBank, data analytics, and NLP research.",
-      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi  Database Dashboard  | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis \nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO \nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental \nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon \nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer \nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.docx",
-      "fileSize": 42426,
-      "stage": "Interview Scheduled",
-      "geminiScore": 35,
-      "geminiRationale": "The candidate is a computer science undergraduate with experience in data analytics, Python, and basic NLP, but lacks the senior-level requirements, production LLM system deployment, and distributed computing expertise needed for a Lead AI/ML Solutions Architect role.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": {
-        "scheduledAt": "2026-10-26T13:20",
-        "interviewer": "Sarah Lin (Talent Lead)",
-        "type": "Technical Interview",
-        "meetingLink": "https://meet.google.com/ats-technical",
-        "notes": "",
-        "scheduledBy": "CoAndrei",
-        "createdAt": 1791303560596
-      },
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1791303379765,
-      "updatedAt": 1791303560596
-    },
-    {
-      "id": "app-1791303355816-opqa9",
-      "jobId": "job-03",
-      "userId": "user-1791303322233-wjvfc",
-      "name": "Ben",
-      "email": "andreireginaldc.co@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Computer Science Undergraduate / Data Science",
-      "skills": [
-        "Python",
-        "Java",
-        "SQL",
-        "JavaScript",
-        "Dart",
-        "Flutter",
-        "Pandas",
-        "NumPy",
-        "Power BI",
-        "Tableau"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science with experience in end-to-end NLP pipelines, app development, and data governance internships.",
-      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\n\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\n\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n• Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n• Facilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\nTwitch SQLite Data Analysis | Data Analytics & SQL\n• Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n• Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n• Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n• Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\n• Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\n• Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\n• Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\n• Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.pdf",
-      "fileSize": 124832,
-      "stage": "Shortlisted",
-      "geminiScore": 21.67,
-      "geminiRationale": "Deterministic ATS match based on the job's configured weights (70% required skills, 20% non-required skills, 10% experience). 1/6 required skills matched; 2/4 non-required skills matched; 0 years detected vs 4 required.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": {
-        "scheduledAt": "2026-10-17T01:20",
-        "interviewer": "Sarah Lin (Talent Lead)",
-        "type": "Technical Interview",
-        "meetingLink": "https://meet.google.com/ats-technical",
-        "notes": "",
-        "scheduledBy": "CoAndrei",
-        "createdAt": 1791303583966
-      },
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1791303355816,
-      "updatedAt": 1791430442269,
-      "screeningBreakdown": {
-        "requiredSkills": 16.67,
-        "nonRequiredSkills": 50,
-        "experience": 0
-      },
-      "screeningWeights": {
-        "requiredSkills": 70,
-        "nonRequiredSkills": 20,
-        "experience": 10
-      },
-      "screeningMatchedRequiredSkills": [
-        "Figma"
-      ],
-      "screeningMissingRequiredSkills": [
-        "design systems",
-        "design tokens",
-        "component architecture",
-        "accessibility",
-        "user research"
-      ],
-      "screeningMatchedNonRequiredSkills": [
-        "CSS",
-        "HTML"
-      ],
-      "screeningMissingNonRequiredSkills": [
-        "prototyping",
-        "wireframing"
-      ],
-      "candidateExperienceYears": 0,
-      "requiredExperienceYears": 4,
-      "screeningVersion": 2
-    },
-    {
-      "id": "app-1791303193482-ptry6",
-      "jobId": "job-01",
-      "userId": "user-1790928733456-lvqdy",
-      "name": "ANDREI REGINALD C. CO",
-      "email": "andreireginaldc.co@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Data Scientist / Computer Science Undergraduate",
-      "skills": [
-        "Python",
-        "Java",
-        "SQL",
-        "Power BI",
-        "Tableau",
-        "Pandas",
-        "NumPy",
-        "Flutter",
-        "Git",
-        "Data Governance"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science with practical experience in enterprise data governance at UnionBank, SQL analytics, Power BI dashboards, and NLP research.",
-      "resumeText": "ANDREI REGINALD C. CO\n\nSta. Mesa, Manila, Philippines  |  (+63) 943-744-0155  |  andreireginaldc.co@gmail.com  |  https://github.com/arg-nld\n\nSUMMARY\n\nComputer Science undergraduate specializing in Data Science with experience in enterprise data governance, SQL analytics, Power BI dashboards, and NLP research. Passionate about transforming complex datasets into actionable business insights.\n\nTECHNICAL SKILLS\n\nLanguages:\nPython, Java, SQL, JavaScript, Dart\n\nWeb & Mobile:\nHTML, CSS, Flutter\n\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\n\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\n\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\n\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\nContributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\nFacilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\nExecuted complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi  Database Dashboard  | Data Visualization & Analytics\nDesigned and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\nDeveloped an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis \nDeveloped an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO \nEngineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental \nDeveloped a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon \nPrototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer \nDesigned and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.docx",
-      "fileSize": 42426,
-      "stage": "Initial Screening",
-      "geminiScore": 15.56,
-      "geminiRationale": "Deterministic ATS match based on the job's configured weights (70% required skills, 20% non-required skills, 10% experience). 2/9 required skills matched; 0/4 non-required skills matched; 0 years detected vs 5 required.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": null,
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1791303193482,
-      "updatedAt": 1791427275012,
-      "screeningBreakdown": {
-        "requiredSkills": 22.22,
-        "nonRequiredSkills": 0,
-        "experience": 0
-      },
-      "screeningWeights": {
-        "requiredSkills": 70,
-        "nonRequiredSkills": 20,
-        "experience": 10
-      },
-      "screeningMatchedRequiredSkills": [
-        "JavaScript",
-        "database"
-      ],
-      "screeningMissingRequiredSkills": [
-        "React",
-        "TypeScript",
-        "Node.js",
-        "REST APIs",
-        "microservices",
-        "cloud",
-        "CI/CD"
-      ],
-      "screeningMatchedNonRequiredSkills": [],
-      "screeningMissingNonRequiredSkills": [
-        "GraphQL",
-        "Docker",
-        "TailwindCSS",
-        "automated testing"
-      ],
-      "candidateExperienceYears": 0,
-      "requiredExperienceYears": 5,
-      "screeningVersion": 2
-    },
-    {
-      "id": "app-1791303174127-2s9rl",
-      "jobId": "job-03",
-      "userId": "user-1790928733456-lvqdy",
-      "name": "ANDREI REGINALD C. CO",
-      "email": "andreireginaldc.co@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Computer Science Undergraduate / Data Science",
-      "skills": [
-        "Python",
-        "Java",
-        "SQL",
-        "JavaScript",
-        "Dart",
-        "Flutter",
-        "Pandas",
-        "NumPy",
-        "Power BI",
-        "Tableau"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science at UST with experience in data governance, NLP pipelines, and application development.",
-      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n· Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n· Facilitated student support operations, department communications, and crisis management initiatives.\nPROJECTS\nTwitch SQLite Data Analysis | Data Analytics & SQL\n· Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n· Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n· Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n· Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\nPayroll Management System | FullStack Developer - ARCO\n· Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\nDental Book Mobile App | FullStack Developer - CAC Dental\n· Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\nAiB Banking App | Front End Developer - BPI Hackathon\n· Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\nTruck-In-N-Out Logistics System | Front End Developer\n· Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.pdf",
-      "fileSize": 124832,
-      "stage": "Initial Screening",
-      "geminiScore": 21.67,
-      "geminiRationale": "Deterministic ATS match based on the job's configured weights (70% required skills, 20% non-required skills, 10% experience). 1/6 required skills matched; 2/4 non-required skills matched; 0 years detected vs 4 required.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": null,
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1791303174127,
-      "updatedAt": 1791427281081,
-      "screeningBreakdown": {
-        "requiredSkills": 16.67,
-        "nonRequiredSkills": 50,
-        "experience": 0
-      },
-      "screeningWeights": {
-        "requiredSkills": 70,
-        "nonRequiredSkills": 20,
-        "experience": 10
-      },
-      "screeningMatchedRequiredSkills": [
-        "Figma"
-      ],
-      "screeningMissingRequiredSkills": [
-        "design systems",
-        "design tokens",
-        "component architecture",
-        "accessibility",
-        "user research"
-      ],
-      "screeningMatchedNonRequiredSkills": [
-        "CSS",
-        "HTML"
-      ],
-      "screeningMissingNonRequiredSkills": [
-        "prototyping",
-        "wireframing"
-      ],
-      "candidateExperienceYears": 0,
-      "requiredExperienceYears": 4,
-      "screeningVersion": 2
-    },
-    {
-      "id": "app-1790929869994-bmmci",
-      "jobId": "job-02",
-      "userId": "user-1790928733456-lvqdy",
-      "name": "Andrei Reginald C. Co",
-      "email": "andreireginaldc.co@gmail.com",
-      "phone": "(+63) 943-744-0155",
-      "role": "Computer Science Undergraduate Specializing in Data Science",
-      "skills": [
-        "Python",
-        "Java",
-        "SQL",
-        "JavaScript",
-        "Dart",
-        "Flutter",
-        "Pandas",
-        "Power BI",
-        "Tableau",
-        "SQLite"
-      ],
-      "experienceSummary": "Computer Science undergraduate specializing in Data Science at UST, with practical experience in end-to-end NLP pipelines, desktop/mobile app development, and data governance.",
-      "resumeText": "ANDREI REGINALD C. CO\nSta. Mesa, Manila, Philippines | (+63) 943-744-0155 | andreireginaldc.co@gmail.com | https://github.com/arg-nld\n\nSUMMARY\nComputer Science undergraduate specializing in Data Science at UST. Experienced in end-to-end NLP pipelines, desktop/mobile app development, and currently interning in UnionBank's Transformation Strategy & Data Governance Group. Dedicated to delivering robust and scalable data-driven solutions.\n\nTECHNICAL SKILLS\nLanguages:\nPython, Java, SQL, JavaScript, Dart\nWeb & Mobile:\nHTML, CSS, Flutter\nData Science & Analytics:\nPandas, NumPy, Power Bi, Tableau, SAS, SQLite, Excel (Pivot Tables)\nTools:\nFigma, Canva, Git, Collate\n\nEDUCATION\nUniversity of Santo Tomas\nBS in Computer Science\nSpecialization: Data Science\nAug 2023 – June 2026\n\nCERTIFICATIONS\n• Professor Widoms Data Science Workshop (DLSU, 2024)\n• Responsive Web Design (FreeCodeCamp, 2023)\n\nSPOKEN LANGUAGES\nEnglish (Fluent)\nMandarin (Proficient/Fluent)\nHokkien (Fluent)\nFilipino (Native)\n\nEXPERIENCE\nUnionBank | Transformation Strategy & Data Governance Intern\nFeb 2026 – May 2026\n• Contributing to enterprise data governance frameworks, digital transformation strategy, and process optimization.\n\nICS Student Council | OIVP Crisis Management Staff\nAug 2024 – May 2025\n• Facilitated student support operations, department communications, and crisis management initiatives.\n\nPROJECTS\n\nTwitch SQLite Data Analysis | Data Analytics & SQL\n• Executed complex SQL queries and relational database analysis on Twitch streaming data stored in SQLite to uncover user engagement patterns, streaming behavior, and platform metrics.\n\nSteam Power Bi Database Dashboard | Data Visualization & Analytics\n• Designed and built an interactive Power BI database dashboard parsing Steam 2025 kaggle dataset to aggregate and visualize valuable KPI metrics and performance trends.\n\nAmazon BeautifulSoup Scraper | Python Web Scraping Pipeline\n• Developed an automated web scraping pipeline in Python using BeautifulSoup (scraper.py) to extract, cleanse, and structure Amazon Bestsellers product data directly into CSV format.\n\nTagalog-AI Ensemble Model | ML Lead - Undergraduate Thesis\n• Developed an end-to-end Tagalog NLP pipeline combining OpenAI Whisper ASR and Tagalog RoBERTa for context-aware speech recognition and translation.\n\nPayroll Management System | FullStack Developer - ARCO\n• Engineered a desktop payroll app using Python, Tkinter, and SQLite to automate weekly salary processing and generate instant PDF financial summaries via ReportLab.\n\nDental Book Mobile App | FullStack Developer - CAC Dental\n• Developed a cross-platform Flutter app featuring real-time Google Calendar API schedule synchronization and a secure patient record database.\n\nAiB Banking App | Front End Developer - BPI Hackathon\n• Prototyped a responsive banking dashboard featuring a custom Savings Goal Predictor, AI chatbot simulation, and dynamic transaction filtering.\n\nTruck-In-N-Out Logistics System | Front End Developer\n• Designed and implemented responsive front-end user interface modules for a capstone logistics tracking dashboard.",
-      "fileName": "Co_Resume.pdf",
-      "fileSize": 124832,
-      "stage": "Initial Screening",
-      "geminiScore": 20,
-      "geminiRationale": "The candidate is a current undergraduate student with internship-level experience, lacking the extensive professional background, distributed computing expertise, and production-scale LLM deployment experience required for a Lead Architect role.",
-      "isScreening": false,
-      "geminiError": null,
-      "interview": {
-        "scheduledAt": "2026-10-05T13:00",
-        "interviewer": "Sarah Lin (Talent Lead)",
-        "type": "Technical Interview",
-        "meetingLink": "https://meet.google.com/ats-technical",
-        "notes": "",
-        "scheduledBy": "CoAndrei",
-        "createdAt": 1790930008010
-      },
-      "recruiterNotes": "",
-      "evaluation": null,
-      "createdAt": 1790929869994,
-      "updatedAt": 1791303238288
-    },
-    {
-      "id": "app-1790915817577-67qpr",
-      "jobId": "job-01",
+      "id": "app-1792053689195-gndqm",
+      "jobId": "job-offer-test",
       "userId": null,
-      "name": "Maya Patel",
-      "email": "maya.patel@test.com",
-      "phone": "+1 (555) 432-1098",
-      "role": "Full Stack Engineer",
-      "skills": [
-        "React",
-        "Node.js",
-        "PostgreSQL"
-      ],
-      "experienceSummary": "4 years of experience building full stack web applications with React and Express.",
-      "resumeText": "MAYA PATEL - Full Stack Engineer. Skilled in React, Node.js, Express, PostgreSQL.",
+      "name": "Jessica Ramos",
+      "email": "jessica.ramos@example.com",
+      "phone": "",
+      "role": "",
+      "skills": [],
+      "experienceSummary": "",
+      "resumeText": "",
       "fileName": "",
       "fileSize": 0,
-      "stage": "Job Offer",
-      "geminiScore": 30,
-      "geminiRationale": "While the candidate lists the core technologies of React and Node.js, the resume provides no evidence of the required 5+ years of experience, cloud infrastructure knowledge, or senior-level architectural capabilities.",
+      "resumeFile": null,
+      "stage": "Hired",
+      "source": "Direct Application",
+      "scorecards": [],
+      "timeline": [
+        {
+          "id": "tle-1792053689195-88d90b40",
+          "type": "application_submitted",
+          "title": "Application Submitted",
+          "description": "Application submitted for role \"Position\"",
+          "performedBy": "Jessica Ramos",
+          "performedByRole": "applicant",
+          "metadata": {},
+          "timestamp": 1792053689195
+        },
+        {
+          "id": "tle-1792053929195-04b48e06",
+          "type": "stage_changed",
+          "title": "Advanced to Job Offer",
+          "description": "Candidate progressed to stage \"Job Offer\"",
+          "performedBy": "Hiring Team",
+          "performedByRole": "hr",
+          "metadata": {
+            "stage": "Job Offer"
+          },
+          "timestamp": 1792053929195
+        }
+      ],
+      "offer": {
+        "compensation": {
+          "amount": 150000,
+          "currency": "₱",
+          "period": "/ month"
+        },
+        "proposedStartDate": "2026-11-01",
+        "expiryDate": "2026-10-25",
+        "notes": "Sign-on bonus included",
+        "status": "accepted",
+        "createdAt": "2026-10-15T08:41:29.195Z",
+        "history": [
+          {
+            "action": "created",
+            "timestamp": "2026-10-15T08:41:29.195Z",
+            "actor": {
+              "name": "Recruiter"
+            }
+          }
+        ],
+        "approvedBy": {
+          "name": "VP Talent"
+        },
+        "approvedAt": "2026-10-15T08:41:29.196Z",
+        "sentAt": "2026-10-15T08:41:29.197Z",
+        "candidateRespondedAt": "2026-10-15T08:41:29.197Z",
+        "candidateComment": "Honored to accept!"
+      },
+      "mergedInto": null,
+      "mergedApplications": [],
+      "geminiScore": null,
+      "geminiRationale": null,
       "isScreening": false,
       "geminiError": null,
-      "interview": {
-        "scheduledAt": "2026-10-08T14:00:00Z",
-        "interviewer": "David Chen & Sarah Lin",
-        "type": "Technical Interview",
-        "meetingLink": "https://meet.google.com/test-meet",
-        "notes": "Prepare a 15-minute code walkthrough.",
-        "scheduledBy": "Sarah Lin",
-        "createdAt": 1790915817679
-      },
-      "recruiterNotes": "Strong fundamentals in React. Follow up on database optimization.",
+      "interview": null,
+      "recruiterNotes": "",
       "evaluation": null,
-      "createdAt": 1790915817577,
-      "updatedAt": 1791367669835
+      "createdAt": 1792053689195,
+      "updatedAt": 1792053689197
+    },
+    {
+      "id": "app-1792053689189-eeqit",
+      "jobId": "job-200",
+      "userId": "user-2",
+      "name": "Alexander Rivera",
+      "email": "alex.rivera@gmail.com",
+      "phone": "+63 917 555 1234",
+      "role": "",
+      "skills": [],
+      "experienceSummary": "",
+      "resumeText": "",
+      "fileName": "",
+      "fileSize": 0,
+      "resumeFile": null,
+      "stage": "Archived (Duplicate Merged)",
+      "source": "Direct Application",
+      "scorecards": [
+        {
+          "id": "sc-dup-1",
+          "interviewerName": "Tech Lead",
+          "overallRating": 5,
+          "recommendation": "Strong Hire"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "tle-1792053689189-39843456",
+          "type": "application_submitted",
+          "title": "Application Submitted",
+          "description": "Application submitted for role \"Position\"",
+          "performedBy": "Alexander Rivera",
+          "performedByRole": "applicant",
+          "metadata": {},
+          "timestamp": 1792053689189
+        },
+        {
+          "id": "tle-1792053929189-a6cf1539",
+          "type": "stage_changed",
+          "title": "Advanced to Initial Screening",
+          "description": "Candidate progressed to stage \"Initial Screening\"",
+          "performedBy": "Hiring Team",
+          "performedByRole": "hr",
+          "metadata": {
+            "stage": "Initial Screening"
+          },
+          "timestamp": 1792053929189
+        },
+        {
+          "id": "tle-1792053689191-gmx45",
+          "type": "candidate_merged",
+          "title": "Merged into Primary Record",
+          "description": "Merged into primary candidate profile: Alex Rivera (alex.rivera@gmail.com)",
+          "performedBy": "HR Admin",
+          "performedByRole": "hr",
+          "timestamp": 1792053689191,
+          "metadata": {
+            "primaryId": "app-1792053689187-beq69"
+          }
+        }
+      ],
+      "offer": null,
+      "mergedInto": "app-1792053689187-beq69",
+      "mergedApplications": [],
+      "geminiScore": null,
+      "geminiRationale": null,
+      "isScreening": false,
+      "geminiError": null,
+      "interview": null,
+      "recruiterNotes": "[MERGED INTO Alex Rivera (app-1792053689187-beq69)]\nDuplicate application note from previous cycle",
+      "evaluation": null,
+      "createdAt": 1792053689190,
+      "updatedAt": 1792053689191
+    },
+    {
+      "id": "app-1792053689187-beq69",
+      "jobId": "job-100",
+      "userId": "user-1",
+      "name": "Alex Rivera",
+      "email": "alex.rivera@gmail.com",
+      "phone": "+63 917 555 1234",
+      "role": "",
+      "skills": [],
+      "experienceSummary": "",
+      "resumeText": "",
+      "fileName": "",
+      "fileSize": 0,
+      "resumeFile": null,
+      "stage": "Interview Scheduled",
+      "source": "Direct Application",
+      "scorecards": [
+        {
+          "id": "sc-dup-1",
+          "interviewerName": "Tech Lead",
+          "overallRating": 5,
+          "recommendation": "Strong Hire"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "tle-1792053689187-5eb1f21f",
+          "type": "application_submitted",
+          "title": "Application Submitted",
+          "description": "Application submitted for role \"Position\"",
+          "performedBy": "Alex Rivera",
+          "performedByRole": "applicant",
+          "metadata": {},
+          "timestamp": 1792053689187
+        },
+        {
+          "id": "tle-1792053689189-39843456",
+          "type": "application_submitted",
+          "title": "Application Submitted",
+          "description": "Application submitted for role \"Position\"",
+          "performedBy": "Alexander Rivera",
+          "performedByRole": "applicant",
+          "metadata": {},
+          "timestamp": 1792053689189
+        },
+        {
+          "id": "tle-1792053689191-fa71b",
+          "type": "candidate_merged",
+          "title": "Candidate Profile Merged",
+          "description": "Merged profiles for: Alexander Rivera (alex.rivera@gmail.com)",
+          "performedBy": {
+            "name": "HR Admin"
+          },
+          "performedByRole": "hr",
+          "timestamp": 1792053689191,
+          "metadata": {
+            "mergedApplicationIds": [
+              "app-1792053689189-eeqit"
+            ]
+          }
+        },
+        {
+          "id": "tle-1792053929187-e2952432",
+          "type": "stage_changed",
+          "title": "Advanced to Interview Scheduled",
+          "description": "Candidate progressed to stage \"Interview Scheduled\"",
+          "performedBy": "Hiring Team",
+          "performedByRole": "hr",
+          "metadata": {
+            "stage": "Interview Scheduled"
+          },
+          "timestamp": 1792053929187
+        },
+        {
+          "id": "tle-1792053929189-a6cf1539",
+          "type": "stage_changed",
+          "title": "Advanced to Initial Screening",
+          "description": "Candidate progressed to stage \"Initial Screening\"",
+          "performedBy": "Hiring Team",
+          "performedByRole": "hr",
+          "metadata": {
+            "stage": "Initial Screening"
+          },
+          "timestamp": 1792053929189
+        }
+      ],
+      "offer": null,
+      "mergedInto": null,
+      "mergedApplications": [
+        "app-1792053689189-eeqit"
+      ],
+      "geminiScore": null,
+      "geminiRationale": null,
+      "isScreening": false,
+      "geminiError": null,
+      "interview": null,
+      "recruiterNotes": "Primary application note\n\n[Merged from Alexander Rivera (alex.rivera@gmail.com)]: Duplicate application note from previous cycle",
+      "evaluation": null,
+      "createdAt": 1792053689187,
+      "updatedAt": 1792053689191
     },
     {
       "id": "app-01",
@@ -1211,9 +921,9 @@
       "resumeText": "JORDAN HAYES\nSenior Full Stack Developer\njordan.hayes@example.com | +1 (555) 234-5678 | San Francisco, CA\n\nSUMMARY\nAccomplished Full Stack Software Engineer with 6+ years of specialized experience designing and maintaining high-throughput web applications using React, TypeScript, Node.js, and relational databases. Strong focus on clean architecture, component reusability, and automated testing.\n\nEXPERIENCE\nSenior Software Engineer - CloudScale Technologies (2022 - Present)\n- Led a squad of 5 engineers delivering high-performance customer dashboard.\n- Re-architected legacy backend services into modular Node.js REST APIs.\n- Built real-time WebSocket notifications and data pipelines.\n\nFull Stack Developer - NextGen Systems (2019 - 2022)\n- Created dynamic React components and optimized client bundle sizes.\n- Authored unit and integration test suites achieving 88% coverage.\n\nEDUCATION\nB.S. in Computer Science - University of California, Berkeley (2019)\n\nSKILLS\nReact, Node.js, Express, JavaScript, TypeScript, PostgreSQL, TailwindCSS, Docker, CI/CD, Jest",
       "fileName": "Jordan_Hayes_Resume.pdf",
       "fileSize": 42000,
-      "stage": "Rejected",
-      "geminiScore": 95,
-      "geminiRationale": "The candidate strongly matches the job requirements with 6+ years of experience in React, TypeScript, and Node.js, alongside proven cloud architecture and API design skills.",
+      "stage": "Shortlisted",
+      "geminiScore": 92,
+      "geminiRationale": "Exceptional match. Candidate boasts 6+ years of direct React and Node.js expertise with proven architectural leadership and cloud delivery.",
       "isScreening": false,
       "geminiError": null,
       "interview": {
@@ -1229,10 +939,10 @@
         "recommendation": "Strong Hire",
         "comments": "Excellent culture fit, depth in Node and React architecture.",
         "evaluatedBy": "Sarah Lin",
-        "evaluatedAt": 1790872217455
+        "evaluatedAt": 1791998452560
       },
-      "createdAt": 1790569817455,
-      "updatedAt": 1791367726857
+      "createdAt": 1791696052560,
+      "updatedAt": 1791998452560
     },
     {
       "id": "app-02",
@@ -1254,384 +964,19 @@
       "resumeText": "ELENA ROSTOVA\nLead Product Designer\nelena.rostova@example.com | New York, NY\n\nPROFESSIONAL SUMMARY\nProduct Designer with 5+ years of experience leading design system initiatives and building complex user flows for enterprise B2B software.\n\nEXPERIENCE\nSenior UI/UX Designer - Apex Design Lab (2021 - Present)\n- Built comprehensive multi-brand design system in Figma.\n- Conducted 60+ usability testing sessions to streamline applicant workflows.\n\nSKILLS\nFigma, Design Systems, Design Tokens, User Testing, Wireframing, CSS/HTML fundamentals",
       "fileName": "Elena_Rostova_Portfolio_Resume.pdf",
       "fileSize": 38000,
-      "stage": "Rejected",
+      "stage": "Initial Screening",
       "geminiScore": 88,
       "geminiRationale": "Strong alignment with the Design Systems role. Extensive Figma component architecture and research experience.",
       "isScreening": false,
       "geminiError": null,
       "interview": null,
       "recruiterNotes": "Reviewing portfolio case studies. Clean aesthetic and solid design system governance.",
-      "evaluation": {
-        "rating": 4,
-        "recommendation": "Hire",
-        "comments": "",
-        "evaluatedBy": "Sarah Lin",
-        "evaluatedAt": 1790917625352
-      },
-      "createdAt": 1790742617455,
-      "updatedAt": 1790921349932
+      "evaluation": null,
+      "createdAt": 1791868852560,
+      "updatedAt": 1791955252560
     }
   ],
   "notifications": [
-    {
-      "id": "notif-1791385527390-kbs5w",
-      "applicationId": "app-1791303355816-opqa9",
-      "recipientUserId": "user-1791303322233-wjvfc",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Product Designer (Design Systems)",
-      "body": "Dear Ben,\n\nCongratulations! Your profile has been shortlisted for the Senior Product Designer (Design Systems) position at Tidal Nexus.\n\nOur recruiting team will contact you shortly regarding next steps.\n\nSincerely,\nTidal Nexus Talent Team",
-      "deliveryStatus": "sent",
-      "deliveryError": null,
-      "providerMessageId": "01a116e5-df8a-7170-bb1f-87a8555fd2c9",
-      "emailType": "transactional",
-      "sentAt": 1791385527390,
-      "read": false
-    },
-    {
-      "id": "notif-1791385524454-d6izn",
-      "applicationId": "app-1791303355816-opqa9",
-      "recipientUserId": "user-1791303322233-wjvfc",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
-      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus. We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "deliveryStatus": "sent",
-      "deliveryError": null,
-      "providerMessageId": "01a116e5-d400-79df-bffe-4acc8e212aaf",
-      "emailType": "transactional",
-      "sentAt": 1791385524454,
-      "read": false
-    },
-    {
-      "id": "notif-1791367726858-s784d",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Rejected",
-      "subject": "Update regarding your application for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nThank you very much for taking the time to apply and interview for the Senior Full Stack Engineer (React & Node.js) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791367726858,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1791367722661-u7ac6",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Hired",
-      "subject": "Official Welcome to Tidal Nexus - You're Hired!",
-      "body": "Dear Jordan Hayes,\n\nWelcome to the team! We are ecstatic to confirm that your hiring process for Senior Full Stack Engineer (React & Node.js) is complete and official.\n\nOur People Operations team will be reaching out soon with onboarding materials, equipment shipping details, and first-day orientation schedules.\n\nWelcome aboard!\nTidal Nexus People & Culture",
-      "sentAt": 1791367722661,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1791367716564-wgc9q",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Rejected",
-      "subject": "Update regarding your application for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nThank you very much for taking the time to apply and interview for the Senior Full Stack Engineer (React & Node.js) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791367716564,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1791367676697-gvweh",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
-      "sentAt": 1791367676697,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1791367674643-61agp",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
-      "body": "Dear Jordan Hayes,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791367674643,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1791367672562-rb9ws",
-      "applicationId": "app-1791303355816-opqa9",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Product Designer (Design Systems)",
-      "body": "Dear Ben,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Product Designer (Design Systems) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
-      "sentAt": 1791367672562,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303583968-g25hx",
-      "applicationId": "app-1791303355816-opqa9",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
-      "body": "Dear Ben,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Saturday, October 17, 2026 at 1:20 AM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303583968,
-      "read": true,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303560598-p911y",
-      "applicationId": "app-1791303379765-o5gcw",
-      "jobId": "job-02",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben Price",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
-      "body": "Dear Ben Price,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Monday, October 26, 2026 at 1:20 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303560598,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303547477-vlx2k",
-      "applicationId": "app-1791303425428-evsq7",
-      "jobId": "job-01",
-      "recipientEmail": "graypjoos@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
-      "body": "Dear Ben,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Technical Interview\n• Date & Time: Saturday, October 17, 2026 at 1:00 PM\n• Interviewer(s): Sarah Lin (Talent Lead)\n• Meeting Link: https://meet.google.com/ats-technical\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303547477,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303519952-mlkrb",
-      "applicationId": "app-1791303379765-o5gcw",
-      "jobId": "job-02",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben Price",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Lead AI / ML Solutions Architect with Tidal Nexus",
-      "body": "Dear Ben Price,\n\nYour interview for the Lead AI / ML Solutions Architect role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303519952,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303516519-e44tk",
-      "applicationId": "app-1791303355816-opqa9",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
-      "body": "Dear Ben,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303516519,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303514354-pawnq",
-      "applicationId": "app-1791303425428-evsq7",
-      "jobId": "job-01",
-      "recipientEmail": "graypjoos@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Senior Full Stack Engineer (React & Node.js) with Tidal Nexus",
-      "body": "Dear Ben,\n\nYour interview for the Senior Full Stack Engineer (React & Node.js) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1791303514354,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303425429-yjvb3",
-      "applicationId": "app-1791303425428-evsq7",
-      "jobId": "job-01",
-      "recipientEmail": "graypjoos@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Senior Full Stack Engineer (React & Node.js) at Tidal Nexus",
-      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Full Stack Engineer (React & Node.js) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791303425429,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303379766-vjt3l",
-      "applicationId": "app-1791303379765-o5gcw",
-      "jobId": "job-02",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben Price",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Lead AI / ML Solutions Architect at Tidal Nexus",
-      "body": "Dear Ben Price,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Lead AI / ML Solutions Architect role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791303379766,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1791303355817-zgz8j",
-      "applicationId": "app-1791303355816-opqa9",
-      "jobId": "job-03",
-      "recipientEmail": "andreireginaldc.co@gmail.com",
-      "recipientName": "Ben",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
-      "body": "Dear Ben,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1791303355817,
-      "read": false,
-      "recipientUserId": "user-1791303322233-wjvfc"
-    },
-    {
-      "id": "notif-1790928840641-ob462",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
-      "sentAt": 1790928840641,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790928838588-wxufu",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Initial Screening",
-      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
-      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
-      "sentAt": 1790928838588,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790923204266-3wx10",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
-      "sentAt": 1790923204266,
-      "read": true,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790923202339-6myoy",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Initial Screening",
-      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
-      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
-      "sentAt": 1790923202339,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790923200171-0zvqh",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Shortlisted",
-      "subject": "Great News! You've been shortlisted for Senior Full Stack Engineer (React & Node.js)",
-      "body": "Dear Jordan Hayes,\n\nCongratulations! We are delighted to inform you that your profile has been shortlisted for the Senior Full Stack Engineer (React & Node.js) position at Tidal Nexus.\n\nOur team was thoroughly impressed by your background and skills. A member of our recruiting team will contact you shortly to coordinate an interview schedule.\n\nSincerely,\nTidal Nexus Talent Team",
-      "sentAt": 1790923200171,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790923197743-ef711",
-      "applicationId": "app-01",
-      "jobId": "job-01",
-      "recipientEmail": "jordan.hayes@example.com",
-      "recipientName": "Jordan Hayes",
-      "stage": "Initial Screening",
-      "subject": "Application Update: Senior Full Stack Engineer (React & Node.js) - Screening in Progress",
-      "body": "Dear Jordan Hayes,\n\nWe are writing to let you know that your application for Senior Full Stack Engineer (React & Node.js) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
-      "sentAt": 1790923197743,
-      "read": false,
-      "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-1790921349932-biyk8",
-      "applicationId": "app-02",
-      "jobId": "job-03",
-      "recipientEmail": "elena.rostova@example.com",
-      "recipientName": "Elena Rostova",
-      "stage": "Rejected",
-      "subject": "Update regarding your application for Senior Product Designer (Design Systems)",
-      "body": "Dear Elena Rostova,\n\nThank you very much for taking the time to apply and interview for the Senior Product Designer (Design Systems) position with Tidal Nexus.\n\nWhile your credentials and experience are noteworthy, we have decided to move forward with another candidate whose background more directly aligns with our current specialized priorities.\n\nWe sincerely appreciate your interest in Tidal Nexus and wish you the best in your career endeavors. We will keep your profile in our talent network for future opportunities.\n\nRespectfully,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1790921349932,
-      "read": true,
-      "recipientUserId": "user-app-02"
-    },
-    {
-      "id": "notif-1790921343589-m467e",
-      "applicationId": "app-02",
-      "jobId": "job-03",
-      "recipientEmail": "elena.rostova@example.com",
-      "recipientName": "Elena Rostova",
-      "stage": "Interview Scheduled",
-      "subject": "Interview Scheduled: Senior Product Designer (Design Systems) with Tidal Nexus",
-      "body": "Dear Elena Rostova,\n\nYour interview for the Senior Product Designer (Design Systems) role has been scheduled!\n\nHere are the details for your upcoming discussion:\n• Round Type: Video Technical Interview\n• Date & Time: Date & Time to be confirmed\n• Interviewer(s): Tidal Interview Panel\n• Meeting Link: https://meet.google.com/ats-session\n\nPlease test your microphone and camera ahead of time. If you need to reschedule, please let us know at least 24 hours in advance.\n\nBest of luck,\nTidal Nexus Hiring Team",
-      "sentAt": 1790921343589,
-      "read": true,
-      "recipientUserId": "user-app-02"
-    },
-    {
-      "id": "notif-1790917502504-ols5t",
-      "applicationId": "app-02",
-      "jobId": "job-03",
-      "recipientEmail": "elena.rostova@example.com",
-      "recipientName": "Elena Rostova",
-      "stage": "Initial Screening",
-      "subject": "Application Update: Senior Product Designer (Design Systems) - Screening in Progress",
-      "body": "Dear Elena Rostova,\n\nWe are writing to let you know that your application for Senior Product Designer (Design Systems) is now undergoing initial review and qualification screening by our recruiting team.\n\nWe assess all candidate profiles carefully against our current team requirements. We will update you as soon as this phase concludes.\n\nWarm regards,\nTidal Nexus Recruiting",
-      "sentAt": 1790917502504,
-      "read": true,
-      "recipientUserId": "user-app-02"
-    },
-    {
-      "id": "notif-1790917439703-4sbsl",
-      "applicationId": "app-02",
-      "jobId": "job-03",
-      "recipientEmail": "elena.rostova@example.com",
-      "recipientName": "Elena Rostova",
-      "stage": "Application Submitted",
-      "subject": "Application Received: Senior Product Designer (Design Systems) at Tidal Nexus",
-      "body": "Dear Elena Rostova,\n\nThank you for your interest in joining Tidal Nexus! We have received your application for the Senior Product Designer (Design Systems) role.\n\nOur talent acquisition team will review your qualifications and experience. You can monitor the real-time status of your application directly inside your Tidal Applicant Portal at any time.\n\nBest regards,\nThe Talent Acquisition Team\nTidal Nexus",
-      "sentAt": 1790917439703,
-      "read": true,
-      "recipientUserId": "user-app-02"
-    },
     {
       "id": "notif-01",
       "applicationId": "app-01",
@@ -1641,128 +986,9 @@
       "stage": "Shortlisted",
       "subject": "Update on your application: Senior Full Stack Engineer (React & Node.js)",
       "body": "Hi Jordan,\n\nWe are pleased to inform you that your application for Senior Full Stack Engineer (React & Node.js) has been shortlisted!\n\nOur recruiting team was very impressed with your background. We will be reaching out soon with next steps regarding scheduling your technical interview.\n\nBest regards,\nTidal Talent Team",
-      "sentAt": 1790872217455,
-      "read": true,
+      "sentAt": 1791998452560,
+      "read": false,
       "recipientUserId": "user-app-01"
-    },
-    {
-      "id": "notif-hr-app-1791303425428-evsq7-user-hr-01",
-      "applicationId": "app-1791303425428-evsq7",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-01",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Ben\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303547461,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303379765-o5gcw-user-hr-01",
-      "applicationId": "app-1791303379765-o5gcw",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-02",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Lead AI / ML Solutions Architect",
-      "body": "Candidate: Ben Price\nPosition: Lead AI / ML Solutions Architect\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303560596,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303355816-opqa9-user-hr-01",
-      "applicationId": "app-1791303355816-opqa9",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-03",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Shortlisted",
-      "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: Ben\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Shortlisted\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791430442269,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303193482-ptry6-user-hr-01",
-      "applicationId": "app-1791303193482-ptry6",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-01",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: ANDREI REGINALD C. CO\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791427275012,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303174127-2s9rl-user-hr-01",
-      "applicationId": "app-1791303174127-2s9rl",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-03",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: ANDREI REGINALD C. CO\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791427281081,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1790929869994-bmmci-user-hr-01",
-      "applicationId": "app-1790929869994-bmmci",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-02",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Lead AI / ML Solutions Architect",
-      "body": "Candidate: Andrei Reginald C. Co\nPosition: Lead AI / ML Solutions Architect\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303238288,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1790915817577-67qpr-user-hr-01",
-      "applicationId": "app-1790915817577-67qpr",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-01",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Job Offer",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Maya Patel\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Job Offer\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791367669835,
-      "read": false
     },
     {
       "id": "notif-hr-app-01-user-hr-01",
@@ -1771,14 +997,14 @@
       "jobId": "job-01",
       "recipientEmail": "hr@tidalats.com",
       "recipientName": "Sarah Lin",
-      "stage": "Rejected",
+      "stage": "Shortlisted",
       "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Jordan Hayes\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Rejected\n\nReview this application in the HR portal.",
+      "body": "Candidate: Jordan Hayes\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Shortlisted\n\nReview this application in the HR portal.",
       "deliveryStatus": "internal",
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791367726857,
+      "sentAt": 1791998452560,
       "read": false
     },
     {
@@ -1788,172 +1014,19 @@
       "jobId": "job-03",
       "recipientEmail": "hr@tidalats.com",
       "recipientName": "Sarah Lin",
-      "stage": "Rejected",
-      "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: Elena Rostova\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Rejected\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1790921349932,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303425428-evsq7-user-1790928827094-50ktf",
-      "applicationId": "app-1791303425428-evsq7",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-01",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Ben\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303547461,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303379765-o5gcw-user-1790928827094-50ktf",
-      "applicationId": "app-1791303379765-o5gcw",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-02",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Lead AI / ML Solutions Architect",
-      "body": "Candidate: Ben Price\nPosition: Lead AI / ML Solutions Architect\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303560596,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303355816-opqa9-user-1790928827094-50ktf",
-      "applicationId": "app-1791303355816-opqa9",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-03",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Shortlisted",
-      "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: Ben\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Shortlisted\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791430442269,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303193482-ptry6-user-1790928827094-50ktf",
-      "applicationId": "app-1791303193482-ptry6",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-01",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: ANDREI REGINALD C. CO\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791427275012,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791303174127-2s9rl-user-1790928827094-50ktf",
-      "applicationId": "app-1791303174127-2s9rl",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-03",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
       "stage": "Initial Screening",
       "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: ANDREI REGINALD C. CO\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
+      "body": "Candidate: Elena Rostova\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
       "deliveryStatus": "internal",
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791427281081,
+      "sentAt": 1791955252560,
       "read": false
     },
     {
-      "id": "notif-hr-app-1790929869994-bmmci-user-1790928827094-50ktf",
-      "applicationId": "app-1790929869994-bmmci",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-02",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Lead AI / ML Solutions Architect",
-      "body": "Candidate: Andrei Reginald C. Co\nPosition: Lead AI / ML Solutions Architect\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791303238288,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1790915817577-67qpr-user-1790928827094-50ktf",
-      "applicationId": "app-1790915817577-67qpr",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-01",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Job Offer",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Maya Patel\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Job Offer\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791367669835,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-01-user-1790928827094-50ktf",
-      "applicationId": "app-01",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-01",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Rejected",
-      "subject": "Application activity: Senior Full Stack Engineer (React & Node.js)",
-      "body": "Candidate: Jordan Hayes\nPosition: Senior Full Stack Engineer (React & Node.js)\nCurrent stage: Rejected\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791367726857,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-02-user-1790928827094-50ktf",
-      "applicationId": "app-02",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-03",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Rejected",
-      "subject": "Application activity: Senior Product Designer (Design Systems)",
-      "body": "Candidate: Elena Rostova\nPosition: Senior Product Designer (Design Systems)\nCurrent stage: Rejected\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1790921349932,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791534983791-7mjgr-user-hr-01",
-      "applicationId": "app-1791534983791-7mjgr",
+      "id": "notif-hr-app-1792053689189-eeqit-user-hr-01",
+      "applicationId": "app-1792053689189-eeqit",
       "recipientUserId": "user-hr-01",
       "jobId": "job-200",
       "recipientEmail": "hr@tidalats.com",
@@ -1965,29 +1038,12 @@
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791534983805,
+      "sentAt": 1792053689191,
       "read": false
     },
     {
-      "id": "notif-hr-app-1791534983791-7mjgr-user-1790928827094-50ktf",
-      "applicationId": "app-1791534983791-7mjgr",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-200",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Archived (Duplicate Merged)",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Archived (Duplicate Merged)\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791534983805,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791534983773-zlbqq-user-hr-01",
-      "applicationId": "app-1791534983773-zlbqq",
+      "id": "notif-hr-app-1792053689187-beq69-user-hr-01",
+      "applicationId": "app-1792053689187-beq69",
       "recipientUserId": "user-hr-01",
       "jobId": "job-100",
       "recipientEmail": "hr@tidalats.com",
@@ -1999,199 +1055,12 @@
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791534983800,
+      "sentAt": 1792053689191,
       "read": false
     },
     {
-      "id": "notif-hr-app-1791534983773-zlbqq-user-1790928827094-50ktf",
-      "applicationId": "app-1791534983773-zlbqq",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-100",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791534983800,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791534983894-pj0zg-user-hr-01",
-      "applicationId": "app-1791534983894-pj0zg",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-offer-test",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Job Offer",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Jessica Ramos\nPosition: Position\nCurrent stage: Job Offer\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791534983897,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791534983894-pj0zg-user-1790928827094-50ktf",
-      "applicationId": "app-1791534983894-pj0zg",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-offer-test",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Job Offer",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Jessica Ramos\nPosition: Position\nCurrent stage: Job Offer\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791534983897,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535279460-kvm54-user-hr-01",
-      "applicationId": "app-1791535279460-kvm54",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-200",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535279460,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535279460-kvm54-user-1790928827094-50ktf",
-      "applicationId": "app-1791535279460-kvm54",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-200",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Initial Screening",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Initial Screening\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535279460,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535279437-dpasc-user-hr-01",
-      "applicationId": "app-1791535279437-dpasc",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-100",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535279438,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535279437-dpasc-user-1790928827094-50ktf",
-      "applicationId": "app-1791535279437-dpasc",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-100",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535279438,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535800097-w6m6d-user-hr-01",
-      "applicationId": "app-1791535800097-w6m6d",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-200",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Archived (Duplicate Merged)",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Archived (Duplicate Merged)\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535800121,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535800097-w6m6d-user-1790928827094-50ktf",
-      "applicationId": "app-1791535800097-w6m6d",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-200",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Archived (Duplicate Merged)",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Archived (Duplicate Merged)\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535800121,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535800081-b9fl4-user-hr-01",
-      "applicationId": "app-1791535800081-b9fl4",
-      "recipientUserId": "user-hr-01",
-      "jobId": "job-100",
-      "recipientEmail": "hr@tidalats.com",
-      "recipientName": "Sarah Lin",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535800116,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535800081-b9fl4-user-1790928827094-50ktf",
-      "applicationId": "app-1791535800081-b9fl4",
-      "recipientUserId": "user-1790928827094-50ktf",
-      "jobId": "job-100",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
-      "stage": "Interview Scheduled",
-      "subject": "Application activity: Job Application",
-      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
-      "deliveryStatus": "internal",
-      "deliveryError": null,
-      "providerMessageId": null,
-      "emailType": "hr-internal",
-      "sentAt": 1791535800116,
-      "read": false
-    },
-    {
-      "id": "notif-hr-app-1791535800140-9ego1-user-hr-01",
-      "applicationId": "app-1791535800140-9ego1",
+      "id": "notif-hr-app-1792053689195-gndqm-user-hr-01",
+      "applicationId": "app-1792053689195-gndqm",
       "recipientUserId": "user-hr-01",
       "jobId": "job-offer-test",
       "recipientEmail": "hr@tidalats.com",
@@ -2203,16 +1072,50 @@
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791535800175,
+      "sentAt": 1792053689197,
       "read": false
     },
     {
-      "id": "notif-hr-app-1791535800140-9ego1-user-1790928827094-50ktf",
-      "applicationId": "app-1791535800140-9ego1",
-      "recipientUserId": "user-1790928827094-50ktf",
+      "id": "notif-hr-app-1792053724985-pdf4f-user-hr-01",
+      "applicationId": "app-1792053724985-pdf4f",
+      "recipientUserId": "user-hr-01",
+      "jobId": "job-200",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
+      "stage": "Archived (Duplicate Merged)",
+      "subject": "Application activity: Job Application",
+      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Archived (Duplicate Merged)\n\nReview this application in the HR portal.",
+      "deliveryStatus": "internal",
+      "deliveryError": null,
+      "providerMessageId": null,
+      "emailType": "hr-internal",
+      "sentAt": 1792053724986,
+      "read": false
+    },
+    {
+      "id": "notif-hr-app-1792053724982-iu3t3-user-hr-01",
+      "applicationId": "app-1792053724982-iu3t3",
+      "recipientUserId": "user-hr-01",
+      "jobId": "job-100",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
+      "stage": "Interview Scheduled",
+      "subject": "Application activity: Job Application",
+      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
+      "deliveryStatus": "internal",
+      "deliveryError": null,
+      "providerMessageId": null,
+      "emailType": "hr-internal",
+      "sentAt": 1792053724985,
+      "read": false
+    },
+    {
+      "id": "notif-hr-app-1792053724988-4fqup-user-hr-01",
+      "applicationId": "app-1792053724988-4fqup",
+      "recipientUserId": "user-hr-01",
       "jobId": "job-offer-test",
-      "recipientEmail": "coandrei@gmail.com",
-      "recipientName": "CoAndrei",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
       "stage": "Hired",
       "subject": "Application activity: Job Application",
       "body": "Candidate: Jessica Ramos\nPosition: Position\nCurrent stage: Hired\n\nReview this application in the HR portal.",
@@ -2220,7 +1123,58 @@
       "deliveryError": null,
       "providerMessageId": null,
       "emailType": "hr-internal",
-      "sentAt": 1791535800175,
+      "sentAt": 1792053724989,
+      "read": false
+    },
+    {
+      "id": "notif-hr-app-1792053848926-s3vwc-user-hr-01",
+      "applicationId": "app-1792053848926-s3vwc",
+      "recipientUserId": "user-hr-01",
+      "jobId": "job-200",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
+      "stage": "Archived (Duplicate Merged)",
+      "subject": "Application activity: Job Application",
+      "body": "Candidate: Alexander Rivera\nPosition: Position\nCurrent stage: Archived (Duplicate Merged)\n\nReview this application in the HR portal.",
+      "deliveryStatus": "internal",
+      "deliveryError": null,
+      "providerMessageId": null,
+      "emailType": "hr-internal",
+      "sentAt": 1792053848928,
+      "read": false
+    },
+    {
+      "id": "notif-hr-app-1792053848924-2f5lm-user-hr-01",
+      "applicationId": "app-1792053848924-2f5lm",
+      "recipientUserId": "user-hr-01",
+      "jobId": "job-100",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
+      "stage": "Interview Scheduled",
+      "subject": "Application activity: Job Application",
+      "body": "Candidate: Alex Rivera\nPosition: Position\nCurrent stage: Interview Scheduled\n\nReview this application in the HR portal.",
+      "deliveryStatus": "internal",
+      "deliveryError": null,
+      "providerMessageId": null,
+      "emailType": "hr-internal",
+      "sentAt": 1792053848927,
+      "read": false
+    },
+    {
+      "id": "notif-hr-app-1792053848930-m8exw-user-hr-01",
+      "applicationId": "app-1792053848930-m8exw",
+      "recipientUserId": "user-hr-01",
+      "jobId": "job-offer-test",
+      "recipientEmail": "hr@tidalats.com",
+      "recipientName": "Sarah Lin",
+      "stage": "Hired",
+      "subject": "Application activity: Job Application",
+      "body": "Candidate: Jessica Ramos\nPosition: Position\nCurrent stage: Hired\n\nReview this application in the HR portal.",
+      "deliveryStatus": "internal",
+      "deliveryError": null,
+      "providerMessageId": null,
+      "emailType": "hr-internal",
+      "sentAt": 1792053848931,
       "read": false
     }
   ],

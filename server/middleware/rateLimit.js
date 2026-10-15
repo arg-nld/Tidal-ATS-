@@ -5,15 +5,22 @@ function getClientKey(req, keyBy = 'ip') {
   return `ip:${req.ip || 'unknown'}`;
 }
 
+let limiterSequence = 0;
+
 export function createRateLimiter({
   windowMs = 5 * 60 * 1000,
   max = 300,
   keyBy = 'ip',
-  message = 'Too many requests. Please try again later.'
+  message = 'Too many requests. Please try again later.',
+  namespace
 } = {}) {
+  // Every limiter needs its own bucket namespace. Previously all IP-based
+  // limiters shared `ip:<address>`, so normal API traffic consumed the
+  // registration allowance before the user even registered.
+  const limiterKey = namespace || `limiter:${++limiterSequence}`;
   return (req, res, next) => {
     const now = Date.now();
-    const key = getClientKey(req, keyBy);
+    const key = `${limiterKey}:${getClientKey(req, keyBy)}`;
     const existing = buckets.get(key);
 
     if (!existing || existing.expiresAt <= now) {
@@ -35,6 +42,7 @@ export function createRateLimiter({
 export const globalRateLimiter = createRateLimiter({
   windowMs: 5 * 60 * 1000,
   max: 300,
+  namespace: 'global',
   message: 'Too many requests from this client. Please slow down and try again later.'
 });
 
@@ -77,13 +85,15 @@ export const loginRateLimiter = (() => {
 
 export const registerRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: 10,
+  namespace: 'register',
   message: 'Too many registration attempts. Please try again later.'
 });
 
 export const verificationRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   max: 10,
+  namespace: 'verification',
   message: 'Too many verification requests. Please try again later.'
 });
 

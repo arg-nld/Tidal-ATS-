@@ -21,12 +21,18 @@ function shouldRetryEmail(err) {
 }
 
 function requireEmailConfig() {
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim();
-  if (!apiKey || !from) {
-    throw new Error('Email delivery is not configured. Add RESEND_API_KEY and EMAIL_FROM to the backend .env.');
+  const provider = String(process.env.EMAIL_PROVIDER || 'resend').trim().toLowerCase();
+  const from = process.env.EMAIL_FROM?.trim() || process.env.GMAIL_USER?.trim();
+  if (!from) throw new Error('Email delivery is not configured. Set EMAIL_FROM (or GMAIL_USER for Gmail SMTP).');
+  if (['gmail', 'smtp'].includes(provider)) {
+    const user = process.env.GMAIL_USER?.trim();
+    const pass = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, '');
+    if (!user || !pass) throw new Error('Gmail SMTP requires GMAIL_USER and GMAIL_APP_PASSWORD. Use a Google App Password, not your normal Gmail password.');
+    return { provider, from, user, pass };
   }
-  return { apiKey, from };
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) throw new Error('Resend email delivery requires RESEND_API_KEY and EMAIL_FROM.');
+  return { provider: 'resend', apiKey, from };
 }
 
 function textToHtml(text = '') {
@@ -40,7 +46,7 @@ function textToHtml(text = '') {
 export function generateEmailForStatusChange({ applicant, job, newStage, interviewDetails, customNote }) {
   const applicantName = applicant?.name || 'Applicant';
   const jobTitle = job?.title || 'Open Position';
-  const companyName = process.env.COMPANY_NAME || 'Tidal Nexus';
+  const companyName = process.env.COMPANY_NAME || 'TIDAL Solutions';
 
   let subject = '';
   let body = '';
@@ -92,7 +98,8 @@ async function deliverEmailNow({
   _skipLog = false,
   maxAttempts = EMAIL_MAX_RETRIES
 }) {
-  const { apiKey, from } = requireEmailConfig();
+  const emailConfig = requireEmailConfig();
+  const { from } = emailConfig;
 
   const recipients = (Array.isArray(to) ? to : [to]).map(recipient => validEmail(recipient));
   const safeSubject = cleanString(subject, { field: 'Email subject', max: 200, min: 1, allowEmpty: false, singleLine: true });
@@ -146,6 +153,28 @@ async function deliverEmailNow({
   const attemptLimit = Math.max(1, Number(maxAttempts) || 1);
   for (let attempt = 1; attempt <= attemptLimit; attempt += 1) {
     try {
+      if (emailConfig.provider === 'gmail' || emailConfig.provider === 'smtp') {
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: emailConfig.user, pass: emailConfig.pass }
+        });
+        const result = await transporter.sendMail({
+          from,
+          to: recipients,
+          subject: safeSubject,
+          text: safeBody,
+          html: html || `<div style="font-family:Arial,sans-serif;line-height:1.6">${textToHtml(safeBody)}</div>`,
+          attachments: attachments.map(file => ({
+            filename: String(file.filename || 'attachment').replace(/[^a-zA-Z0-9._ -]/g, '_').slice(0, 180),
+            content: file.contentBase64 || file.content
+          }))
+        });
+        if (log) await store.updateEmailLog(log.id, {
+          status: 'sent', attempts: attempt, providerMessageId: result.messageId, error: null
+        });
+        return { id: result.messageId, provider: 'gmail' };
+      }
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
       let response;
@@ -370,14 +399,26 @@ export function createHrApplicationNotification({ applicant, job, notificationSt
 }
 
 export async function sendVerificationEmail({ user, token }) {
-  const appUrl = (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+  const appUrl = (process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
   const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(token)}`;
-  const body = `Hi ${user.name || 'there'},\n\nThanks for creating a Tidal Nexus account. Please verify your email address by opening this link:\n\n${verifyUrl}\n\nThis verification link is for your account only.\n\nTidal Nexus`;
+  const body = `Hi ${user.name || 'there'},\n\nThanks for creating a TIDAL Solutions account. Please verify your email address by opening this link:\n\n${verifyUrl}\n\nThis verification link expires in 15 minutes and is for your account only.\n\nTIDAL Solutions`;
 
   return sendEmail({
     to: user.email,
-    subject: 'Verify your Tidal Nexus account',
+    subject: 'Verify your TIDAL Solutions account',
     body,
     idempotencyKey: `verify/${user.id}/${token}`
+  });
+}
+
+export async function sendPasswordResetEmail({ user, token }) {
+  const appUrl = (process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, '');
+  const resetUrl = `${appUrl}/reset-password?token=${encodeURIComponent(token)}`;
+  const body = `Hi ${user.name || 'there'},\n\nWe received a request to reset your TIDAL Solutions account password. Open the link below to choose a new password. This link expires in 5 minutes and can only be used once.\n\n${resetUrl}\n\nIf you did not request this, you can ignore this email.\n\nTIDAL Solutions`;
+  return sendEmail({
+    to: user.email,
+    subject: 'Reset your TIDAL Solutions password',
+    body,
+    idempotencyKey: `password-reset/${user.id}/${token}`
   });
 }

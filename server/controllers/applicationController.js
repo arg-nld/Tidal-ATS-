@@ -77,7 +77,7 @@ export async function getApplications(req, res) {
 
 export async function getApplicationById(req, res) {
   const app = await store.getApplicationById(req.params.id);
-  if (!app) return res.status(404).json({ error: 'Application not found' });
+  if (!app) return res.status(404).json({ error: 'Application not found for this resume request.', code: 'APPLICATION_NOT_FOUND', requestId: req.requestId, diagnostic: { layer: 'application_lookup', applicationId: req.params.id } });
 
   const isHr = req.user && req.user.role === 'hr';
   if (!isHr && (!req.user || app.userId !== req.user.id)) return res.status(403).json({ error: 'Access denied to this candidate record' });
@@ -99,11 +99,11 @@ export async function getResumeFile(req, res) {
   const isHr = req.user?.role === 'hr';
   if (!isHr && (!req.user || app.userId !== req.user.id)) return res.status(403).json({ error: 'Access denied' });
   if (!app.resumeFile?.storedName && !app.resumeFile?.objectKey) {
-    return res.status(404).json({ error: 'Original resume file is not available for this application.' });
+    return res.status(404).json({ error: 'This application has no original resume file attached.', code: 'RESUME_NOT_ATTACHED', requestId: req.requestId, diagnostic: { layer: 'application_record', applicationId: req.params.id } });
   }
 
   const file = await getResume(app.resumeFile);
-  if (!file) return res.status(404).json({ error: 'Resume file no longer exists in storage.' });
+  if (!file) return res.status(404).json({ error: 'Resume metadata exists, but the file could not be found in configured storage.', code: 'RESUME_STORAGE_OBJECT_MISSING', requestId: req.requestId, diagnostic: { layer: 'resume_storage', applicationId: req.params.id, storageConfigured: Boolean(process.env.S3_BUCKET) } });
 
   res.setHeader('Content-Type', String(file.mimeType || 'application/octet-stream').toLowerCase());
   res.setHeader('Content-Disposition', `inline; filename="${sanitizeOriginalFileName(file.originalName || app.fileName || 'resume').replace(/"/g, '_')}"`);

@@ -5,6 +5,7 @@ import { PortalHeader } from './components/common/PortalHeader';
 import { NotificationDrawer } from './components/common/NotificationDrawer';
 import { HrPortal } from './components/hr/HrPortal';
 import { ApplicantPortal } from './components/applicant/ApplicantPortal';
+import { ThemeProvider } from './context/ThemeContext';
 
 function AtsApp() {
   const { isHr, isAuthenticated, authReady, user } = useAuth();
@@ -15,6 +16,12 @@ function AtsApp() {
   if (!authReady) {
     return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-sm">Loading session...</div>;
   }
+
+  // Email action links must render their own token-processing screen even if
+  // this browser already has an HR session. Otherwise the dashboard masks the
+  // verification/reset page and makes the email link appear to go to the portal.
+  const authActionPath = ['/verify-email', '/reset-password', '/forgot-password-sent', '/password-reset-success'].includes(window.location.pathname);
+  if (authActionPath) return <AuthPage />;
 
   // Show auth screen if not signed in
   if (!isAuthenticated) {
@@ -51,8 +58,10 @@ function AtsApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AtsApp />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AtsApp />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -52,3 +52,43 @@ test('interview scheduling update rejects conflicts and succeeds for open slots'
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('pending registration is stored separately from active users and keeps only a password hash', () => {
+  const { dir, store } = tempStore();
+  try {
+    const pending = store.createPendingRegistration({
+      name: 'Pending Candidate',
+      firstName: 'Pending',
+      lastName: 'Candidate',
+      middleInitial: 'M',
+      email: 'pending.candidate@example.com',
+      password: 'a-secure-test-password',
+      role: 'applicant',
+      emailVerificationToken: 'single-use-verification-token'
+    });
+
+    assert.equal(store.getUserByEmail('pending.candidate@example.com'), undefined);
+    assert.equal(store.getPendingRegistrationByToken('single-use-verification-token')?.id, pending.id);
+    assert.equal(store.getPendingRegistrationByEmail('PENDING.CANDIDATE@example.com')?.email, 'pending.candidate@example.com');
+    assert.equal(Object.hasOwn(pending, 'password'), false);
+    assert.equal(pending.passwordHash.startsWith('scrypt$'), true);
+
+    const activated = store.createUser({
+      name: pending.name,
+      firstName: pending.firstName,
+      lastName: pending.lastName,
+      middleInitial: pending.middleInitial,
+      email: pending.email,
+      passwordHash: pending.passwordHash,
+      role: pending.role,
+      emailVerified: true
+    });
+    store.deletePendingRegistration(pending.id);
+
+    assert.equal(store.getUserByEmail('pending.candidate@example.com')?.id, activated.id);
+    assert.equal(store.getUserByEmail('pending.candidate@example.com')?.emailVerified, true);
+    assert.equal(store.getPendingRegistrationByToken('single-use-verification-token'), null);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

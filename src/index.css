@@ -34,3 +34,529 @@
 .time-wheel-value--down {
   animation: time-wheel-slide-down 180ms ease-out;
 }
+
+/* TIDAL Solutions design system and persistent light/dark theme. */
+:root {
+  color-scheme: light;
+  /* Eye-friendly maritime slate light mode: soft resting luminance, zero glare */
+  --tidal-page: #edf2f7;
+  --tidal-surface: #ffffff;
+  --tidal-surface-muted: #e2ecf4;
+  --tidal-surface-hover: #d7e4ef;
+  --tidal-border: #cbdbe8;
+  --tidal-text: #163252;
+  --tidal-text-strong: #0a1e36;
+  --tidal-text-muted: #486585;
+  --tidal-text-subtle: #6b86a2;
+  /* Deep oceanic teal accent with proper contrast and zero chromatic glare */
+  --tidal-accent: #0284a8;
+  --tidal-accent-strong: #016885;
+  --tidal-accent-soft: rgb(2 132 168 / 11%);
+  --tidal-accent-border: rgb(2 132 168 / 28%);
+  --tidal-shadow: 0 10px 30px rgb(16 42 67 / 7%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --tidal-page: #061a32;
+  --tidal-surface: #0a2341;
+  --tidal-surface-muted: #102d50;
+  --tidal-surface-hover: #17395f;
+  --tidal-border: #1b416a;
+  --tidal-text: #e7f2fb;
+  --tidal-text-strong: #f4faff;
+  --tidal-text-muted: #9ab6d1;
+  --tidal-text-subtle: #7394b7;
+  --tidal-accent: #2cc5e7;
+  --tidal-accent-strong: #55d8f1;
+  --tidal-accent-soft: rgb(44 197 231 / 13%);
+  --tidal-accent-border: rgb(44 197 231 / 37%);
+  --tidal-shadow: 0 18px 44px rgb(0 0 0 / 20%);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--tidal-page);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+body {
+  margin: 0;
+  background: var(--tidal-page);
+  color: var(--tidal-text);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Re-map the existing slate UI tokens for the Soft Ocean Light theme. */
+:root[data-theme="light"] [class~="bg-slate-950"] {
+  background-color: var(--tidal-page) !important;
+}
+:root[data-theme="light"] [class*="bg-slate-950/"] {
+  background-color: var(--tidal-surface-muted) !important;
+}
+
+/* Modal Backdrops specifically: deep semi-transparent blue backdrop so modals pop cleanly */
+:root[data-theme="light"] .fixed[class*="bg-slate-950"],
+:root[data-theme="light"] .fixed[class*="backdrop-blur"] {
+  background-color: rgb(15 35 60 / 52%) !important;
+}
+
+:root[data-theme="light"] [class~="bg-slate-900"] {
+  background-color: var(--tidal-surface) !important;
+}
+:root[data-theme="light"] [class*="bg-slate-900/"] {
+  background-color: rgb(255 255 255 / 94%) !important;
+}
+:root[data-theme="light"] [class~="bg-slate-800"] {
+  background-color: var(--tidal-surface-muted) !important;
+}
+:root[data-theme="light"] [class*="bg-slate-800/"] {
+  background-color: rgb(226 236 244 / 90%) !important;
+}
+:root[data-theme="light"] [class~="bg-slate-700"] {
+  background-color: #d3e2ee !important;
+}
+:root[data-theme="light"] [class*="bg-slate-700/"] {
+  background-color: rgb(211 226 238 / 90%) !important;
+}
+
+:root[data-theme="light"] [class~="text-slate-100"] { color: var(--tidal-text-strong) !important; }
+:root[data-theme="light"] [class~="text-slate-200"] { color: #163252 !important; }
+:root[data-theme="light"] [class~="text-slate-300"] { color: #28476a !important; }
+:root[data-theme="light"] [class~="text-slate-400"] { color: var(--tidal-text-muted) !important; }
+:root[data-theme="light"] [class~="text-slate-500"] { color: var(--tidal-text-subtle) !important; }
+:root[data-theme="light"] [class~="text-slate-600"] { color: #627e9b !important; }
+:root[data-theme="light"] [class~="text-slate-700"] { color: #3b5775 !important; }
+
+:root[data-theme="light"] [class*="border-slate-"] {
+  border-color: var(--tidal-border) !important;
+}
+:root[data-theme="light"] [class*="hover:bg-slate-800"]:hover,
+:root[data-theme="light"] [class*="hover:bg-slate-700"]:hover {
+  background-color: var(--tidal-surface-hover) !important;
+}
+:root[data-theme="light"] [class*="hover:text-white"]:hover {
+  color: var(--tidal-text-strong) !important;
+}
+
+/* Indigo was the starter theme's primary color; convert it to TIDAL aqua. */
+:root[data-theme="light"] [class*="text-indigo-"] { color: var(--tidal-accent-strong) !important; }
+:root[data-theme="light"] [class*="border-indigo-"] { border-color: var(--tidal-accent-border) !important; }
+:root[data-theme="light"] [class~="bg-indigo-600"],
+:root[data-theme="light"] [class~="bg-indigo-500"],
+:root[data-theme="light"] [class~="bg-indigo-400"],
+:root[data-theme="light"] [class~="bg-indigo-800"] {
+  background-color: var(--tidal-accent) !important;
+}
+:root[data-theme="light"] [class*="bg-indigo-500/"],
+:root[data-theme="light"] [class*="bg-indigo-600/"],
+:root[data-theme="light"] [class*="bg-indigo-800/"] {
+  background-color: var(--tidal-accent-soft) !important;
+}
+:root[data-theme="light"] [class*="hover:bg-indigo-"]:hover {
+  background-color: var(--tidal-accent-strong) !important;
+}
+:root[data-theme="light"] [class*="hover:text-indigo-"]:hover { color: var(--tidal-accent-strong) !important; }
+:root[data-theme="light"] [class*="ring-indigo-"] { --tw-ring-color: var(--tidal-accent-border) !important; }
+:root[data-theme="light"] [class*="from-indigo-"] {
+  background-image: linear-gradient(135deg, var(--tidal-accent) 0%, var(--tidal-accent-strong) 100%) !important;
+  background-color: var(--tidal-accent) !important;
+  color: #ffffff !important;
+}
+:root[data-theme="light"] [class*="from-indigo-"]:hover {
+  filter: brightness(1.08);
+}
+
+/* Dark mode: deep-ocean panels with brighter cyan/aqua accents. */
+:root[data-theme="dark"] [class*="text-indigo-"] { color: var(--tidal-accent-strong) !important; }
+:root[data-theme="dark"] [class*="border-indigo-"] { border-color: var(--tidal-accent-border) !important; }
+:root[data-theme="dark"] [class~="bg-indigo-600"],
+:root[data-theme="dark"] [class~="bg-indigo-500"],
+:root[data-theme="dark"] [class~="bg-indigo-400"],
+:root[data-theme="dark"] [class~="bg-indigo-800"] {
+  background-color: var(--tidal-accent) !important;
+}
+:root[data-theme="dark"] [class*="bg-indigo-500/"],
+:root[data-theme="dark"] [class*="bg-indigo-600/"],
+:root[data-theme="dark"] [class*="bg-indigo-800/"] {
+  background-color: var(--tidal-accent-soft) !important;
+}
+:root[data-theme="dark"] [class*="hover:bg-indigo-"]:hover { background-color: #19aaca !important; }
+:root[data-theme="dark"] [class*="hover:text-indigo-"]:hover { color: var(--tidal-accent-strong) !important; }
+:root[data-theme="dark"] [class*="ring-indigo-"] { --tw-ring-color: var(--tidal-accent-border) !important; }
+:root[data-theme="dark"] [class*="from-indigo-"] {
+  background-image: linear-gradient(135deg, #15bce0 0%, #087fae 100%) !important;
+  background-color: #15bce0 !important;
+  color: #ffffff !important;
+}
+:root[data-theme="dark"] [class*="from-indigo-"]:hover {
+  filter: brightness(1.08);
+}
+
+/* Forms and workspace chrome get the same palette in both portals. */
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select {
+  accent-color: var(--tidal-accent);
+  background-color: #ffffff !important;
+  color: var(--tidal-text-strong) !important;
+  border-color: var(--tidal-border) !important;
+}
+:root[data-theme="light"] input:focus,
+:root[data-theme="light"] textarea:focus,
+:root[data-theme="light"] select:focus {
+  border-color: var(--tidal-accent) !important;
+  box-shadow: 0 0 0 3px var(--tidal-accent-soft) !important;
+}
+:root[data-theme="light"] input::placeholder,
+:root[data-theme="light"] textarea::placeholder {
+  color: #728da9;
+  opacity: 1;
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: #7895b5;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--tidal-border);
+  border-radius: 12px;
+  background: var(--tidal-surface);
+  color: var(--tidal-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(16 55 87 / 5%);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.theme-toggle:hover {
+  background: var(--tidal-surface-hover);
+  border-color: var(--tidal-accent-border);
+  color: var(--tidal-accent-strong);
+}
+.theme-toggle:active { transform: scale(0.97); }
+.theme-toggle:focus-visible { outline: 3px solid var(--tidal-accent-border); outline-offset: 2px; }
+.theme-toggle--compact { width: 40px; min-width: 40px; height: 40px; padding: 0; }
+
+.tidal-header-logo { display: block; width: clamp(112px, 13vw, 166px); height: auto; }
+.tidal-auth-logo { display: block; width: min(210px, 58vw); height: auto; }
+.portal-brand-divider { height: 34px; width: 1px; background: var(--tidal-border); }
+.portal-header { background-image: linear-gradient(105deg, rgb(8 166 202 / 2%), transparent 52%); }
+:root[data-theme="dark"] .portal-header { background-image: linear-gradient(105deg, rgb(44 197 231 / 5%), transparent 55%); }
+
+:root[data-theme="light"] .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #c5dbe9; }
+:root[data-theme="light"] .custom-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #9cbdd2; }
+:root[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #1d486f; }
+:root[data-theme="dark"] .custom-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #2c638c; }
+
+@media (max-width: 640px) {
+  .tidal-header-logo { width: 108px; }
+  .portal-header { gap: 8px; }
+  .portal-brand-meta { display: none; }
+  .portal-header .theme-toggle--compact { width: 36px; min-width: 36px; height: 36px; }
+  .portal-header .rounded-xl.px-3.py-1\.5 { padding-inline: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html, body, .theme-toggle { transition: none; }
+}
+
+:root[data-theme="dark"] [class~="bg-slate-950"] { background-color: var(--tidal-page) !important; }
+:root[data-theme="dark"] [class*="bg-slate-950/"] { background-color: rgb(6 26 50 / 76%) !important; }
+:root[data-theme="dark"] [class~="bg-slate-950/80"],
+:root[data-theme="dark"] [class~="bg-slate-950/85"] { background-color: rgb(0 8 19 / 76%) !important; }
+:root[data-theme="dark"] [class~="bg-slate-900"] { background-color: var(--tidal-surface) !important; }
+:root[data-theme="dark"] [class*="bg-slate-900/"] { background-color: rgb(10 35 65 / 91%) !important; }
+:root[data-theme="dark"] [class~="bg-slate-800"] { background-color: var(--tidal-surface-muted) !important; }
+:root[data-theme="dark"] [class*="bg-slate-800/"] { background-color: rgb(16 45 80 / 88%) !important; }
+:root[data-theme="dark"] [class~="bg-slate-700"] { background-color: #17395f !important; }
+:root[data-theme="dark"] [class*="bg-slate-700/"] { background-color: rgb(23 57 95 / 88%) !important; }
+:root[data-theme="dark"] [class~="text-slate-100"] { color: var(--tidal-text-strong) !important; }
+:root[data-theme="dark"] [class~="text-slate-200"] { color: #d9e9f7 !important; }
+:root[data-theme="dark"] [class~="text-slate-300"] { color: #bdd2e7 !important; }
+:root[data-theme="dark"] [class~="text-slate-400"] { color: var(--tidal-text-muted) !important; }
+:root[data-theme="dark"] [class~="text-slate-500"] { color: var(--tidal-text-subtle) !important; }
+:root[data-theme="dark"] [class~="text-slate-600"] { color: #5f81a6 !important; }
+:root[data-theme="dark"] [class*="border-slate-"] { border-color: var(--tidal-border) !important; }
+:root[data-theme="dark"] [class*="hover:bg-slate-800"]:hover,
+:root[data-theme="dark"] [class*="hover:bg-slate-700"]:hover { background-color: var(--tidal-surface-hover) !important; }
+:root[data-theme="dark"] [class*="bg-indigo-950/"] { background-color: var(--tidal-accent-soft) !important; }
+:root[data-theme="light"] [class*="bg-indigo-950/"] { background-color: var(--tidal-accent-soft) !important; }
+
+/* =========================================================================
+   ACCESSIBLE BADGES & STATUS TAGS (LIGHT & DARK THEMES)
+   ========================================================================= */
+
+/* Ensure light mode badges and tags have crystal clear contrast and no neon eye-glare */
+:root[data-theme="light"] [class*="text-emerald-400"] {
+  color: #047857 !important;
+}
+:root[data-theme="light"] [class*="bg-emerald-500/"] {
+  background-color: rgb(16 185 129 / 12%) !important;
+  border-color: rgb(16 185 129 / 24%) !important;
+}
+
+:root[data-theme="light"] [class*="text-amber-300"],
+:root[data-theme="light"] [class*="text-amber-400"] {
+  color: #92400e !important;
+}
+:root[data-theme="light"] [class*="bg-amber-500/"] {
+  background-color: rgb(245 158 11 / 14%) !important;
+  border-color: rgb(245 158 11 / 28%) !important;
+}
+
+:root[data-theme="light"] [class*="text-rose-400"] {
+  color: #be123c !important;
+}
+:root[data-theme="light"] [class*="bg-rose-500/"] {
+  background-color: rgb(244 63 94 / 12%) !important;
+  border-color: rgb(244 63 94 / 24%) !important;
+}
+
+:root[data-theme="light"] [class*="text-sky-400"] {
+  color: #0369a1 !important;
+}
+:root[data-theme="light"] [class*="bg-sky-500/"] {
+  background-color: rgb(2 132 199 / 12%) !important;
+  border-color: rgb(2 132 199 / 24%) !important;
+}
+
+:root[data-theme="light"] [class*="text-blue-400"] {
+  color: #1d4ed8 !important;
+}
+:root[data-theme="light"] [class*="bg-blue-500/"] {
+  background-color: rgb(59 130 246 / 12%) !important;
+  border-color: rgb(59 130 246 / 24%) !important;
+}
+
+:root[data-theme="light"] [class*="text-purple-400"] {
+  color: #6d28d9 !important;
+}
+:root[data-theme="light"] [class*="bg-purple-500/"] {
+  background-color: rgb(147 51 234 / 12%) !important;
+  border-color: rgb(147 51 234 / 24%) !important;
+}
+
+:root[data-theme="light"] [class*="text-teal-300"],
+:root[data-theme="light"] [class*="text-teal-400"] {
+  color: #0f766e !important;
+}
+:root[data-theme="light"] [class*="bg-teal-500/"] {
+  background-color: rgb(20 184 166 / 12%) !important;
+  border-color: rgb(20 184 166 / 24%) !important;
+}
+
+/* =========================================================================
+   CANDIDATE PIPELINE (KANBAN BOARD) - THEME ADAPTATIONS
+   ========================================================================= */
+
+/* Light Mode: Column lanes */
+:root[data-theme="light"] .kanban-column {
+  background-color: #e2ecf5 !important;
+  border-color: #c6d7e6 !important;
+  box-shadow: 0 4px 16px rgb(16 42 67 / 4%);
+}
+:root[data-theme="light"] .kanban-column.is-drag-over,
+:root[data-theme="light"] .kanban-column--over {
+  background-color: rgb(2 132 168 / 10%) !important;
+  border-color: var(--tidal-accent) !important;
+  box-shadow: 0 8px 24px rgb(2 132 168 / 18%) !important;
+}
+:root[data-theme="light"] .kanban-column-header {
+  background-color: #dbe7f2 !important;
+  border-color: #c6d7e6 !important;
+}
+:root[data-theme="light"] .kanban-stage-num {
+  color: #537292 !important;
+}
+:root[data-theme="light"] .kanban-stage-title {
+  color: var(--tidal-text-strong) !important;
+}
+:root[data-theme="light"] .kanban-stage-badge {
+  background-color: #ffffff !important;
+  color: #163252 !important;
+  border-color: #c6d7e6 !important;
+  box-shadow: 0 1px 3px rgb(16 42 67 / 6%);
+}
+:root[data-theme="light"] .kanban-empty-lane {
+  border-color: #c4d6e6 !important;
+  color: #5c7998 !important;
+  background-color: rgb(255 255 255 / 40%) !important;
+}
+:root[data-theme="light"] .kanban-empty-lane span:last-child {
+  color: #7b96b2 !important;
+}
+
+/* Light Mode: Candidate Cards */
+:root[data-theme="light"] .kanban-card {
+  background-color: #ffffff !important;
+  border-color: #cfdeea !important;
+  box-shadow: 0 2px 6px rgb(16 42 67 / 6%), 0 1px 2px rgb(16 42 67 / 4%) !important;
+}
+:root[data-theme="light"] .kanban-card:hover {
+  background-color: #ffffff !important;
+  border-color: var(--tidal-accent) !important;
+  box-shadow: 0 8px 22px rgb(16 42 67 / 10%), 0 0 0 1px rgb(2 132 168 / 20%) !important;
+  transform: translateY(-1px);
+}
+:root[data-theme="light"] .kanban-card-title {
+  color: var(--tidal-text-strong) !important;
+}
+:root[data-theme="light"] .kanban-card:hover .kanban-card-title {
+  color: var(--tidal-accent) !important;
+}
+:root[data-theme="light"] .kanban-card-role {
+  color: var(--tidal-text-muted) !important;
+}
+
+/* Skills Pills */
+:root[data-theme="light"] .kanban-skill-pill {
+  background-color: #edf4fa !important;
+  border-color: #d1e0ec !important;
+  color: #1e3d60 !important;
+}
+:root[data-theme="light"] .kanban-skill-more {
+  color: #64819e !important;
+}
+
+/* Interview Scheduled Tag */
+:root[data-theme="light"] .kanban-interview-tag {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+:root[data-theme="light"] .kanban-interview-tag span:last-child {
+  color: #78350f !important;
+}
+
+/* Recruiter Notes */
+:root[data-theme="light"] .kanban-notes {
+  color: #486585 !important;
+}
+:root[data-theme="light"] .kanban-notes .italic {
+  color: #3b5775 !important;
+}
+
+/* AI Score Box & Button */
+:root[data-theme="light"] .kanban-ai-box {
+  background-color: #f7fafc !important;
+  border-color: #d8e5f0 !important;
+}
+:root[data-theme="light"] .kanban-screen-btn {
+  background-color: rgb(2 132 168 / 8%) !important;
+  border-color: rgb(2 132 168 / 22%) !important;
+  color: var(--tidal-accent-strong) !important;
+}
+:root[data-theme="light"] .kanban-screen-btn:hover {
+  background-color: rgb(2 132 168 / 15%) !important;
+}
+
+/* Advance Row */
+:root[data-theme="light"] .kanban-advance-row {
+  border-color: #e5edf5 !important;
+}
+:root[data-theme="light"] .kanban-advance-row button {
+  color: var(--tidal-text-muted) !important;
+}
+:root[data-theme="light"] .kanban-advance-row button:hover {
+  color: var(--tidal-accent) !important;
+}
+
+/* Dark Mode explicit overrides for Kanban */
+:root[data-theme="dark"] .kanban-column {
+  background-color: rgb(10 35 65 / 60%) !important;
+  border-color: rgb(27 65 106 / 90%) !important;
+}
+:root[data-theme="dark"] .kanban-column-header {
+  background-color: rgb(10 35 65 / 80%) !important;
+  border-color: #1b416a !important;
+}
+:root[data-theme="dark"] .kanban-card {
+  background-color: rgb(6 26 50 / 80%) !important;
+  border-color: #1b416a !important;
+}
+:root[data-theme="dark"] .kanban-card:hover {
+  background-color: #0a2341 !important;
+  border-color: rgb(44 197 231 / 50%) !important;
+  box-shadow: 0 10px 25px rgb(0 0 0 / 30%) !important;
+}
+:root[data-theme="dark"] .kanban-skill-pill {
+  background-color: #0a2341 !important;
+  border-color: #1b416a !important;
+  color: #bdd2e7 !important;
+}
+:root[data-theme="dark"] .kanban-ai-box {
+  background-color: #0a2341 !important;
+  border-color: #1b416a !important;
+}
+:root[data-theme="dark"] .kanban-advance-row {
+  border-color: #061a32 !important;
+}
+
+/* =========================================================================
+   TEXT VISIBILITY SAFEGUARDS (LIGHT MODE)
+   Never keep white text on light surfaces
+   ========================================================================= */
+
+/* Headings, paragraphs, labels, and strong tags must never remain white in light mode */
+:root[data-theme="light"] strong.text-white,
+:root[data-theme="light"] h1.text-white,
+:root[data-theme="light"] h2.text-white,
+:root[data-theme="light"] h3.text-white,
+:root[data-theme="light"] h4.text-white,
+:root[data-theme="light"] h5.text-white,
+:root[data-theme="light"] p.text-white,
+:root[data-theme="light"] label.text-white {
+  color: var(--tidal-text-strong) !important;
+}
+
+/* Any text-white element that is NOT a primary colored button or pill must be dark text in light mode */
+:root[data-theme="light"] [class~="text-white"]:not(
+  button[class*="bg-indigo-"],
+  button[class*="from-indigo-"],
+  button[class*="bg-emerald-"],
+  button[class*="bg-rose-"],
+  button[class*="bg-teal-"],
+  button[class*="bg-purple-"],
+  a[class*="bg-indigo-"],
+  a[class*="from-indigo-"],
+  .auth-submit-btn,
+  .w-7.h-7,
+  [class*="rounded-full"][class*="bg-indigo-500"],
+  [class*="rounded-2xl"][class*="bg-gradient-to-tr"]
+) {
+  color: var(--tidal-text-strong) !important;
+}
+
+/* Any hover:text-white on neutral/slate surfaces must hover to deep navy, not invisible white */
+:root[data-theme="light"] [class*="hover:text-white"]:hover {
+  color: var(--tidal-text-strong) !important;
+}
+
+/* Auth Submit Button explicit guarantee */
+.auth-submit-btn {
+  background: linear-gradient(135deg, var(--tidal-accent) 0%, var(--tidal-accent-strong) 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgb(2 132 168 / 28%) !important;
+}
+.auth-submit-btn:hover {
+  filter: brightness(1.08);
+}
+:root[data-theme="dark"] .auth-submit-btn {
+  background: linear-gradient(135deg, #15bce0 0%, #087fae 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgb(21 188 224 / 28%) !important;
+}

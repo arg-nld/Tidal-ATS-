@@ -14,6 +14,7 @@ const MAX_BACKUPS = Math.max(3, Number(process.env.DB_MAX_BACKUPS || 10));
 const BACKUP_INTERVAL_MS = Math.max(30_000, Number(process.env.DB_BACKUP_INTERVAL_MS || 5 * 60 * 1000));
 
 const INITIAL_DATA = {
+  pendingRegistrations: [],
   users: [
     {
       id: 'user-hr-01',
@@ -353,6 +354,7 @@ class Store {
 
       const data = {
         users,
+        pendingRegistrations: Array.isArray(parsed.pendingRegistrations) ? parsed.pendingRegistrations : [],
         jobs: (Array.isArray(parsed.jobs) ? parsed.jobs : INITIAL_DATA.jobs).map(job => {
           const seed = INITIAL_DATA.jobs.find(item => item.id === job.id) || {};
           return {
@@ -433,6 +435,51 @@ class Store {
   getUserByEmail(email) {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     return this.data.users.find(u => String(u.email || '').toLowerCase() === normalizedEmail);
+  }
+
+  getPendingRegistrationByEmail(email) {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const pending = Array.isArray(this.data.pendingRegistrations) ? this.data.pendingRegistrations : [];
+    return pending.find(item => String(item.email || '').toLowerCase() === normalizedEmail) || null;
+  }
+
+  getPendingRegistrationByToken(token) {
+    if (!token) return null;
+    const pending = Array.isArray(this.data.pendingRegistrations) ? this.data.pendingRegistrations : [];
+    return pending.find(item => item.emailVerificationToken === token) || null;
+  }
+
+  createPendingRegistration(registrationData) {
+    const now = Date.now();
+    const email = String(registrationData.email || '').trim().toLowerCase();
+    const passwordHash = isPasswordHash(registrationData.passwordHash)
+      ? registrationData.passwordHash
+      : hashPassword(registrationData.password);
+    const pending = {
+      ...registrationData,
+      id: registrationData.id || `pending-${now}-${crypto.randomBytes(5).toString('hex')}`,
+      createdAt: now,
+      emailVerificationCreatedAt: now,
+      email,
+      passwordHash
+    };
+    delete pending.password;
+    const entries = Array.isArray(this.data.pendingRegistrations) ? this.data.pendingRegistrations : [];
+    const index = entries.findIndex(item => String(item.email || '').toLowerCase() === email);
+    if (index >= 0) entries[index] = pending;
+    else entries.push(pending);
+    this.data.pendingRegistrations = entries;
+    this.save();
+    return pending;
+  }
+
+  deletePendingRegistration(id) {
+    if (!id || !Array.isArray(this.data.pendingRegistrations)) return false;
+    const before = this.data.pendingRegistrations.length;
+    this.data.pendingRegistrations = this.data.pendingRegistrations.filter(item => item.id !== id);
+    const deleted = before !== this.data.pendingRegistrations.length;
+    if (deleted) this.save();
+    return deleted;
   }
 
   getUserByEmailAndPassword(email, password) {

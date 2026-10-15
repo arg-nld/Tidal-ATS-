@@ -80,8 +80,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
       status: selectedStatus,
       recruiter: selectedRecruiter
     };
-    const url = api.analytics.downloadCsvUrl(params);
-    window.open(url, '_blank');
+    api.analytics.downloadCsv(params).catch(err => setError(err.message || 'CSV export failed.'));
   };
 
   const handlePrint = () => {

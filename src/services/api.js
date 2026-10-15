@@ -1,4 +1,10 @@
-const BASE_URL = '/api';
+// Keep API requests relative by default so the browser never needs to know
+// the backend's local port. Vite proxies /api to Express during development;
+// production can use the same-origin /api path or an explicit backend URL set
+// at frontend build time with VITE_API_BASE_URL (including the /api suffix).
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const BASE_URL = (configuredApiBaseUrl || '/api').replace(/\/+$/, '');
+const HEALTH_URL = `${BASE_URL}/health`;
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('ats_token');
@@ -9,12 +15,44 @@ async function request(endpoint, options = {}) {
 
   if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
-  const data = await response.json().catch(() => null);
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  } catch (cause) {
+    const error = new Error(`API_CONNECTION_FAILED: Could not reach the configured API base (${BASE_URL}). Confirm that the backend is deployed and VITE_API_BASE_URL points to it if the frontend and backend use different hosts.`);
+    error.code = 'API_CONNECTION_FAILED';
+    error.cause = cause;
+    error.data = { code: error.code, endpoint, baseUrl: BASE_URL };
+    throw error;
+  }
+  const contentType = response.headers.get('Content-Type') || '';
+  const rawBody = contentType.includes('application/json')
+    ? null
+    : await response.text().catch(() => '');
+  const data = contentType.includes('application/json')
+    ? await response.json().catch(() => null)
+    : (rawBody ? { error: rawBody.slice(0, 500) } : null);
 
   if (!response.ok) {
-    const error = new Error(data?.error || `Request failed with status ${response.status}`);
+    // Express's default HTML "Cannot POST ..." page means the request reached
+    // a server that does not have the route, rather than this project's API
+    // returning a structured diagnostic error.
+    const isDefaultExpress404 = response.status === 404
+      && /<!doctype html|<html/i.test(rawBody || '')
+      && /Cannot (GET|POST|PUT|PATCH|DELETE|OPTIONS) \/api\//i.test(rawBody || '');
+    const code = isDefaultExpress404
+      ? 'WRONG_OR_OLD_BACKEND_INSTANCE'
+      : (data?.code || `HTTP_${response.status}`);
+    const requestId = data?.requestId;
+    const message = isDefaultExpress404
+      ? `The server at ${BASE_URL} returned Express's default HTML 404 for ${options.method || 'GET'} ${endpoint}. This project registers this route, so the configured API host may be pointing to a different or outdated backend. Verify the backend health endpoint at ${HEALTH_URL} and confirm VITE_API_BASE_URL is correct for this environment.`
+      : (data?.error || `Request failed with HTTP ${response.status}.`);
+    const error = new Error(`${code}: ${message}${requestId ? ` (Request ID: ${requestId})` : ''}`);
+    error.name = 'ApiRequestError';
+    error.code = code;
     error.status = response.status;
+    error.requestId = requestId;
+    error.diagnostic = data?.diagnostic;
     error.data = data;
     throw error;
   }
@@ -26,6 +64,8 @@ export const api = {
     login: credentials => request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
     register: userData => request('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
     verifyEmail: token => request(`/auth/verify-email/${encodeURIComponent(token)}`),
+    forgotPassword: email => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+    resetPassword: (token, password) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
     getCurrentUser: () => request('/auth/me'),
     logout: () => request('/auth/logout', { method: 'POST' })
   },
@@ -83,7 +123,16 @@ export const api = {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        throw new Error(data?.error || `Could not load resume (${response.status})`);
+        const code = data?.code || `HTTP_${response.status}`;
+        const requestId = data?.requestId;
+        const message = data?.error || `Could not load resume (HTTP ${response.status}).`;
+        const error = new Error(`${code}: ${message}${requestId ? ` (Request ID: ${requestId})` : ''}`);
+        error.name = 'ApiRequestError';
+        error.code = code;
+        error.status = response.status;
+        error.requestId = requestId;
+        error.diagnostic = data?.diagnostic;
+        throw error;
       }
       return {
         blob: await response.blob(),
@@ -97,9 +146,29 @@ export const api = {
       const query = new URLSearchParams(params).toString();
       return request(`/analytics${query ? `?${query}` : ''}`);
     },
-    downloadCsvUrl: (params = {}) => {
-      const query = new URLSearchParams(params).toString();
-      return `${BASE_URL}/analytics/csv${query ? `?${query}` : ''}`;
+    downloadCsv: async (params = {}) => {
+      const query = new URLSearchParams(
+        Object.fromEntries(Object.entries(params).filter(([, value]) => value !== '' && value != null))
+      ).toString();
+      const token = localStorage.getItem('ats_token');
+      const response = await fetch(`${BASE_URL}/analytics/csv${query ? `?${query}` : ''}`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || `CSV export failed (HTTP ${response.status}).`);
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || 'Tidal_ATS_Recruitment_Report.csv';
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
     }
   },
   ai: {

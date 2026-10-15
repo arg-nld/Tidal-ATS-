@@ -173,29 +173,29 @@ function KanbanColumn({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`w-72 sm:w-80 flex flex-col rounded-2xl border transition-all ${
+      className={`kanban-column w-72 sm:w-80 flex flex-col rounded-2xl border transition-all ${
         isOver
-          ? 'bg-indigo-950/20 border-indigo-500 shadow-xl shadow-indigo-950/30'
+          ? 'kanban-column--over is-drag-over bg-indigo-950/20 border-indigo-500 shadow-xl shadow-indigo-950/30'
           : 'bg-slate-900/60 border-slate-800/90'
       }`}
     >
       {/* Column Header */}
-      <div className="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80 rounded-t-2xl">
+      <div className="kanban-column-header p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80 rounded-t-2xl">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono font-bold text-slate-500">
+          <span className="kanban-stage-num text-[10px] font-mono font-bold text-slate-500">
             0{stageIdx + 1}
           </span>
-          <h3 className="font-bold text-xs text-slate-200">{stage}</h3>
+          <h3 className="kanban-stage-title font-bold text-xs text-slate-200">{stage}</h3>
         </div>
-        <span className="text-xs font-mono font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
+        <span className="kanban-stage-badge text-xs font-mono font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
           {candidates.length}
         </span>
       </div>
 
       {/* Cards Scroll Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="kanban-cards-area flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
         {candidates.length === 0 ? (
-          <div className="h-28 flex flex-col items-center justify-center text-[11px] text-slate-600 border border-dashed border-slate-800/80 rounded-xl">
+          <div className="kanban-empty-lane h-28 flex flex-col items-center justify-center text-[11px] text-slate-600 border border-dashed border-slate-800/80 rounded-xl">
             <span>No candidates in {stage}</span>
             <span className="text-[10px] text-slate-700">Drag profile here to advance</span>
           </div>
@@ -246,15 +246,15 @@ function KanbanCard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={() => onViewCandidate(candidate)}
-      className="bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:shadow-indigo-950/20 group space-y-2.5"
+      className="kanban-card bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:shadow-indigo-950/20 group space-y-2.5"
     >
       {/* Card Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h4 className="text-xs font-bold text-slate-100 group-hover:text-indigo-300 transition-colors truncate">
+          <h4 className="kanban-card-title text-xs font-bold text-slate-100 group-hover:text-indigo-300 transition-colors truncate">
             {candidate.name}
           </h4>
-          <p className="text-[11px] text-slate-400 truncate mt-0.5">
+          <p className="kanban-card-role text-[11px] text-slate-400 truncate mt-0.5">
             {job?.title || candidate.role}
           </p>
         </div>
@@ -278,13 +278,13 @@ function KanbanCard({
           {candidate.skills.slice(0, 3).map((skill, idx) => (
             <span
               key={idx}
-              className="bg-slate-900 text-slate-300 border border-slate-800 text-[10px] px-1.5 py-0.2 rounded"
+              className="kanban-skill-pill bg-slate-900 text-slate-300 border border-slate-800 text-[10px] px-1.5 py-0.5 rounded"
             >
               {skill}
             </span>
           ))}
           {candidate.skills.length > 3 && (
-            <span className="text-[10px] text-slate-500 font-mono">
+            <span className="kanban-skill-more text-[10px] text-slate-500 font-mono">
               +{candidate.skills.length - 3}
             </span>
           )}
@@ -293,7 +293,7 @@ function KanbanCard({
 
       {/* Scheduled Interview Tag if exists */}
       {candidate.interview && (
-        <div className="bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] text-amber-300">
+        <div className="kanban-interview-tag bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] text-amber-300">
           <span className="flex items-center gap-1 font-medium">
             <Calendar size={11} /> Interview Scheduled
           </span>
@@ -305,7 +305,7 @@ function KanbanCard({
 
       {/* Recruiter Notes Indicator */}
       {candidate.recruiterNotes && (
-        <div className="flex items-center gap-1 text-[10px] text-slate-400">
+        <div className="kanban-notes flex items-center gap-1 text-[10px] text-slate-400">
           <MessageSquare size={11} className="text-indigo-400" />
           <span className="line-clamp-1 italic">"{candidate.recruiterNotes}"</span>
         </div>
@@ -314,11 +314,11 @@ function KanbanCard({
       {/* AI Score Badge or Trigger */}
       <div onClick={(e) => e.stopPropagation()}>
         {candidate.geminiScore !== null && candidate.geminiScore !== undefined ? (
-          <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg flex items-center justify-between">
+          <div className="kanban-ai-box bg-slate-900 border border-slate-800 p-2 rounded-lg flex items-center justify-between">
             <span className="text-[10px] font-semibold text-slate-400 flex items-center gap-1">
               <BrainCircuit size={11} className="text-indigo-400" /> AI Score
             </span>
-            <span className={`text-[11px] font-extrabold px-1.5 py-0.2 rounded ${
+            <span className={`kanban-score-badge text-[11px] font-extrabold px-1.5 py-0.5 rounded ${
               candidate.geminiScore >= 80 ? 'text-emerald-400 bg-emerald-500/10' :
               candidate.geminiScore >= 60 ? 'text-amber-400 bg-amber-500/10' :
               'text-rose-400 bg-rose-500/10'
@@ -331,7 +331,7 @@ function KanbanCard({
             type="button"
             onClick={() => onScreenCandidate(candidate)}
             disabled={candidate.isScreening}
-            className="w-full py-1.5 text-[10px] font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-300 rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+            className="kanban-screen-btn w-full py-1.5 text-[10px] font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 text-indigo-300 rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
           >
             {candidate.isScreening ? (
               <>
@@ -350,7 +350,7 @@ function KanbanCard({
 
       {/* Quick Advance Button */}
       {nextStage && (
-        <div className="pt-1.5 border-t border-slate-900 flex justify-end" onClick={(e) => e.stopPropagation()}>
+        <div className="kanban-advance-row pt-1.5 border-t border-slate-900 flex justify-end" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={() => onRequestStageChange(candidate, nextStage)}

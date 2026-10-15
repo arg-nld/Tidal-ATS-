@@ -312,7 +312,7 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                       </div>
                     ) : (
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        Congratulations! Tidal Nexus has officially extended a conditional job offer for this position. Our talent acquisition lead will contact you to discuss compensation and welcome you to the team.
+                        Congratulations! TIDAL Solutions has officially extended a conditional job offer for this position. Our talent acquisition lead will contact you to discuss compensation and welcome you to the team.
                       </p>
                     )}
 

@@ -21,6 +21,17 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower_unique ON users(lower(email));
 
+-- A registration is not an account until its email address is verified.
+CREATE TABLE IF NOT EXISTS pending_registrations (
+  id TEXT PRIMARY KEY,
+  created_at BIGINT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  verification_token TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE INDEX IF NOT EXISTS idx_pending_registrations_created ON pending_registrations(created_at);
+
 CREATE TABLE IF NOT EXISTS jobs (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -225,6 +236,19 @@ function mapUser(r) {
   };
 }
 
+function mapPendingRegistration(r) {
+  if (!r) return null;
+  return {
+    id: r.id,
+    createdAt: Number(r.created_at),
+    emailVerificationCreatedAt: Number(r.created_at),
+    email: r.email,
+    passwordHash: r.password_hash,
+    emailVerificationToken: r.verification_token,
+    ...(r.metadata || {})
+  };
+}
+
 function mapApplication(r) {
   if (!r) return null;
   const metadata = r.metadata || {};
@@ -306,6 +330,46 @@ export class PostgresStore {
     await this.ready();
     const { rows } = await this.pool.query('SELECT * FROM users WHERE lower(email)=lower($1) LIMIT 1', [String(email || '').trim()]);
     return mapUser(rows[0]);
+  }
+  async getPendingRegistrationByEmail(email) {
+    await this.ready();
+    const { rows } = await this.pool.query('SELECT * FROM pending_registrations WHERE lower(email)=lower($1) LIMIT 1', [String(email || '').trim()]);
+    return mapPendingRegistration(rows[0]);
+  }
+  async getPendingRegistrationByToken(token) {
+    await this.ready();
+    if (!token) return null;
+    const { rows } = await this.pool.query('SELECT * FROM pending_registrations WHERE verification_token=$1 LIMIT 1', [String(token)]);
+    return mapPendingRegistration(rows[0]);
+  }
+  async createPendingRegistration(registrationData) {
+    await this.ready();
+    const now = Date.now();
+    const email = String(registrationData.email || '').trim().toLowerCase();
+    const id = registrationData.id || `pending-${now}-${crypto.randomBytes(5).toString('hex')}`;
+    const passwordHash = isPasswordHash(registrationData.passwordHash)
+      ? registrationData.passwordHash
+      : hashPassword(registrationData.password);
+    const metadata = Object.fromEntries(Object.entries(registrationData).filter(([key]) => ![
+      'id', 'createdAt', 'email', 'password', 'passwordHash', 'emailVerificationToken', 'emailVerificationCreatedAt'
+    ].includes(key)));
+    const { rows } = await this.pool.query(
+      `INSERT INTO pending_registrations(id,created_at,email,verification_token,password_hash,metadata)
+       VALUES($1,$2,$3,$4,$5,$6)
+       ON CONFLICT (email) DO UPDATE SET
+         id=EXCLUDED.id, created_at=EXCLUDED.created_at,
+         verification_token=EXCLUDED.verification_token,
+         password_hash=EXCLUDED.password_hash, metadata=EXCLUDED.metadata
+       RETURNING *`,
+      [id, now, email, String(registrationData.emailVerificationToken || ''), passwordHash, JSON.stringify(metadata)]
+    );
+    return mapPendingRegistration(rows[0]);
+  }
+  async deletePendingRegistration(id) {
+    await this.ready();
+    if (!id) return false;
+    const result = await this.pool.query('DELETE FROM pending_registrations WHERE id=$1', [id]);
+    return result.rowCount > 0;
   }
   async getUserByEmailAndPassword(email, password) {
     const user = await this.getUserByEmail(email);

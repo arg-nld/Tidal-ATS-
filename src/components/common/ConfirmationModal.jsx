@@ -2,6 +2,19 @@ import { useEffect } from 'react';
 import { AlertCircle, CheckCircle2, HelpCircle, Trash2, X, AlertTriangle } from 'lucide-react';
 import { Spinner } from './Spinner';
 
+function formatDetailValue(value) {
+  if (value === null || value === undefined || value === '') return '—';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) return value.map(formatDetailValue).join(', ');
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
 export function ConfirmationModal({
   isOpen,
   onClose,
@@ -105,18 +118,29 @@ export function ConfirmationModal({
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-2 text-xs">
               {Array.isArray(details) ? (
                 <ul className="space-y-1.5 text-slate-300">
-                  {details.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-indigo-400 font-bold">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
+                  {details.map((item, idx) => {
+                    const isLabelValue = item && typeof item === 'object' && !Array.isArray(item)
+                      && ('label' in item || 'value' in item);
+                    return (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-indigo-400 font-bold">•</span>
+                        {isLabelValue ? (
+                          <span className="flex-1 flex flex-wrap justify-between gap-x-3 gap-y-0.5">
+                            <span className="text-slate-400">{formatDetailValue(item.label)}</span>
+                            <span className="font-semibold text-slate-200 text-right">{formatDetailValue(item.value)}</span>
+                          </span>
+                        ) : (
+                          <span>{formatDetailValue(item)}</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : typeof details === 'object' ? (
                 Object.entries(details).map(([key, val]) => (
                   <div key={key} className="flex justify-between items-center py-0.5 border-b border-slate-900 last:border-none">
                     <span className="text-slate-500 capitalize">{key}:</span>
-                    <span className="font-semibold text-slate-200">{String(val)}</span>
+                    <span className="font-semibold text-slate-200">{formatDetailValue(val)}</span>
                   </div>
                 ))
               ) : (
