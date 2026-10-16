@@ -1,6 +1,12 @@
 function serialize(value) {
-  if (value instanceof Error) return { name: value.name, message: value.message, stack: process.env.NODE_ENV === 'production' ? undefined : value.stack };
+  // Full diagnostics remain server-side; responses to clients are sanitized by
+  // the Express error handler and frontend API wrapper.
+  if (value instanceof Error) return { name: value.name, message: value.message, stack: value.stack };
   return value;
+}
+
+function safeLogPath(value) {
+  return String(value || '').replace(/(\/verify-email\/)[^/]+/ig, '$1[redacted]');
 }
 
 function write(level, event, fields = {}) {
@@ -28,7 +34,7 @@ export function requestLogger(req, res, next) {
   res.once('finish', () => {
     logger.info('http.request', {
       method: req.method,
-      path: req.path,
+      path: safeLogPath(req.path),
       status: res.statusCode,
       durationMs: Date.now() - started,
       requestId: req.requestId || null

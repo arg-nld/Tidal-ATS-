@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import readline from 'node:readline';
 import { store } from '../services/store.js';
 
@@ -69,8 +70,14 @@ try {
   console.log('\nTidal ATS — Create HR Account');
   console.log('This command is intended for a trusted server administrator.\n');
 
-  const firstName = await ask('First name: ');
-  const lastName = await ask('Last name: ');
+  const firstNameInput = (await ask('First name: ')).replace(/\s+/g, ' ').trim();
+  const lastNameInput = (await ask('Last name: ')).replace(/\s+/g, ' ').trim();
+  const validPersonName = value => /^[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*$/u.test(value);
+  if (!validPersonName(firstNameInput) || !validPersonName(lastNameInput)) {
+    throw new Error('First and last names may contain letters and spaces only.');
+  }
+  const firstName = firstNameInput.toUpperCase();
+  const lastName = lastNameInput.toUpperCase();
   const middleInitialRaw = await ask('Middle initial (optional): ');
   const suffix = await ask('Suffix (optional): ');
   const email = (await ask('Email: ')).toLowerCase();

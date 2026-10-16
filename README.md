@@ -1,5 +1,7 @@
 # TIDAL Solutions Talent ATS
 
+> Before deploying, follow [`DEPLOYMENT_READINESS_AUDIT.md`](./DEPLOYMENT_READINESS_AUDIT.md). It contains production environment setup, security notes, release gates, and APIs/services to monitor.
+
 ## Setup
 
 ```bash
@@ -54,16 +56,19 @@ npm run dev
 - New jobs leave salary range and experience level blank.
 - Candidate-facing Gemini/AI parsing language was removed from the applicant UI.
 - Deterministic job scoring remains configurable and must total 100%.
+- Password resets reject reuse of the current password, and the reset-link request button shows a loading state while sending.
+- Applicant first and last names are normalized to uppercase and restricted to letters and spaces.
+- Analytics exclude merged duplicate applications and do not invent time-to-hire, time-to-fill, or stage-duration values when recorded timestamps are missing. Source-level cost per hire remains unavailable until source-level spend is tracked.
 
 
 ## Email verification, Gmail SMTP, and password reset
 
-New applicant registrations send an email verification link. Accounts cannot sign in until verified. Verification links expire after 24 hours.
+New applicant registrations send an email verification link. Accounts cannot sign in until verified. Verification links expire after 15 minutes.
 
 Forgot-password flow:
 - The sign-in page has a **Forgot password?** link.
 - A reset email is sent when an account matches the supplied address. The API response avoids disclosing whether an account exists.
-- Reset links expire after 1 hour and can only be used once.
+- Reset links expire after 5 minutes and can only be used once.
 - Successful password resets invalidate existing sessions.
 
 ### Gmail SMTP configuration
@@ -270,3 +275,35 @@ configured API base. In production, that URL should use the deployed backend hos
 ### Email action links (verification and password reset)
 
 Set `FRONTEND_URL` to the exact public origin where the React app is hosted (for example, `https://your-frontend.example.com`) in production. The email links are built from `FRONTEND_URL`, then `APP_URL`, then the local-development fallback `http://localhost:5173`. Do not leave the production value pointing at localhost.
+
+## Production setup
+
+See `PRODUCTION_SETUP_GUIDE.md` for step-by-step instructions to configure managed PostgreSQL for a fresh database, production HTTPS/CORS/email URLs, backups and restore tests, resume-retention policy, session-cookie hardening, CSP, distributed rate limiting, and the release checklist. See `DEPLOYMENT_READINESS_AUDIT.md` for the source-code audit and APIs/services to monitor.
+
+## Analyst-ready recruitment analytics export
+
+The HR **Recruitment Analytics & Reports** page has an **Export Analyst Pack** action. It exports the same active dashboard filters as a ZIP archive of separate CSV datasets, instead of a single file containing only summary totals. The export is available through the authenticated HR-only endpoint `GET /api/analytics/analyst-pack`.
+
+The archive contains:
+
+- `executive_summary.csv` — KPI values, units, numerator/denominator where applicable, calculation rule, source tables, and caveats.
+- `application_detail.csv` — one row per filtered, non-merged application, including stage reached flags, source, current stage, screening score, scorecard summary, offer facts, dates, and calculated time-to-hire where valid.
+- `time_to_hire_observations.csv` — exact per-application observations contributing to the average and median time-to-hire.
+- `funnel.csv`, `funnel_membership.csv`, and `source_effectiveness.csv` — funnel denominators, conversions, drop-offs, normalized stage membership, source counts, and outcomes.
+- `timeline_events.csv` and `stage_duration_observations.csv` — recorded event evidence and per-application stage duration calculations.
+- `stage_duration_summary.csv`, `job_fill_analysis.csv`, `rejection_reasons.csv`, `stalled_applications.csv`, and `overdue_evaluations.csv` — operational analysis tables.
+- `offer_history.csv` and `scorecards.csv` — offer lifecycle and evaluation observations.
+- `data_dictionary.csv`, `filter_context.csv`, and `README.txt` — field definitions, dataset grain, effective filters, formula descriptions, and limitations.
+
+Use `application_id` to join application-level data to events, stage observations, offers, and scorecards. All timestamps are exported as ISO-8601 UTC values. Candidate names, email addresses, phone numbers, and resume text are intentionally omitted; the `candidate_user_id` may be blank for guest/legacy applications.
+
+Important interpretation rules:
+
+- Merged duplicate applications are excluded from active metrics.
+- Funnel counts represent applications that reached a stage, so they are cumulative and not mutually exclusive current-stage counts.
+- A candidate is treated as qualified when the recorded resume match score is at least 70 or the application reached Shortlisted, Interview Scheduled, Job Offer, or Hired.
+- Time-to-hire is application creation to a recorded acceptance/hire timestamp. Missing timestamps are blank, not silently replaced by an update date.
+- Time-to-fill is measured at job level and intentionally follows the selected job filter, not source/status/date/recruiter filters.
+- Source-level cost-per-hire stays unavailable until channel-level recruiting spend is recorded; job-level spend is not incorrectly assigned to individual sources.
+
+The legacy `GET /api/analytics/csv` route remains available for the compact CSV report. The dashboard button uses the analyst pack route.

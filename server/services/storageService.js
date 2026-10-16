@@ -6,6 +6,8 @@ let S3Client;
 let PutObjectCommand;
 let GetObjectCommand;
 let DeleteObjectCommand;
+let s3Client;
+let s3ClientConfigKey;
 
 async function loadS3() {
   if (!S3Client) {
@@ -15,6 +17,40 @@ async function loadS3() {
     GetObjectCommand = mod.GetObjectCommand;
     DeleteObjectCommand = mod.DeleteObjectCommand;
   }
+}
+
+// Reuse one S3-compatible client for Cloudflare R2 instead of creating a new
+// client for every resume operation. Credentials remain server-side in .env.
+async function getS3Client() {
+  await loadS3();
+  const bucket = String(process.env.S3_BUCKET || '').trim();
+  const endpoint = String(process.env.S3_ENDPOINT || '').trim();
+  const accessKeyId = String(process.env.S3_ACCESS_KEY_ID || '').trim();
+  const secretAccessKey = String(process.env.S3_SECRET_ACCESS_KEY || '').trim();
+
+  if (!bucket) throw new Error('S3_BUCKET is required when OBJECT_STORAGE_PROVIDER=s3.');
+  if (!endpoint) throw new Error('S3_ENDPOINT is required for Cloudflare R2.');
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error('S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY are required for Cloudflare R2.');
+  }
+
+  const configKey = JSON.stringify({
+    region: process.env.S3_REGION || 'auto',
+    endpoint,
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    accessKeyId,
+    secretAccessKey
+  });
+  if (!s3Client || s3ClientConfigKey !== configKey) {
+    s3Client = new S3Client({
+      region: process.env.S3_REGION || 'auto',
+      endpoint,
+      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+      credentials: { accessKeyId, secretAccessKey }
+    });
+    s3ClientConfigKey = configKey;
+  }
+  return { client: s3Client, bucket };
 }
 
 function safeName(name) {
@@ -32,18 +68,7 @@ export async function putResume(file) {
   const key = `resumes/${crypto.randomUUID()}${extension}`;
 
   if (provider === 's3') {
-    await loadS3();
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) throw new Error('S3_BUCKET is required when OBJECT_STORAGE_PROVIDER=s3.');
-    const client = new S3Client({
-      region: process.env.S3_REGION || 'us-east-1',
-      endpoint: process.env.S3_ENDPOINT || undefined,
-      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
-      credentials: process.env.S3_ACCESS_KEY_ID ? {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-      } : undefined
-    });
+    const { client, bucket } = await getS3Client();
     await client.send(new PutObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -82,18 +107,7 @@ export async function getResume(ref) {
   if (!ref) return null;
   const provider = ref.provider || storageProvider();
   if (provider === 's3') {
-    await loadS3();
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) throw new Error('S3_BUCKET is required when OBJECT_STORAGE_PROVIDER=s3.');
-    const client = new S3Client({
-      region: process.env.S3_REGION || 'us-east-1',
-      endpoint: process.env.S3_ENDPOINT || undefined,
-      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
-      credentials: process.env.S3_ACCESS_KEY_ID ? {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-      } : undefined
-    });
+    const { client, bucket } = await getS3Client();
     const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: ref.objectKey || ref.storedName }));
     const chunks = [];
     for await (const chunk of result.Body) chunks.push(Buffer.from(chunk));
@@ -138,18 +152,7 @@ export async function deleteResume(ref) {
   if (!ref) return;
   const provider = ref.provider || storageProvider();
   if (provider === 's3') {
-    await loadS3();
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) return;
-    const client = new S3Client({
-      region: process.env.S3_REGION || 'us-east-1',
-      endpoint: process.env.S3_ENDPOINT || undefined,
-      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
-      credentials: process.env.S3_ACCESS_KEY_ID ? {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-      } : undefined
-    });
+    const { client, bucket } = await getS3Client();
     await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: ref.objectKey || ref.storedName }));
     return;
   }

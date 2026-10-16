@@ -1,6 +1,9 @@
 import crypto from 'node:crypto';
 import { store } from '../services/store.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
+import { matchesExistingPassword, verifyPassword } from '../services/passwordService.js';
+import { deleteResume } from '../services/storageService.js';
+import { logger } from '../services/logger.js';
 
 const EMAIL_VERIFICATION_TTL_MS = 15 * 60 * 1000;
 const PASSWORD_RESET_TTL_MS = 5 * 60 * 1000;
@@ -50,10 +53,11 @@ export async function register(req, res) {
     phone
   } = req.body;
 
-  const normalizedFirst = String(firstName || '').trim();
-  const normalizedLast = String(lastName || '').trim();
+  const normalizedFirst = String(firstName || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  const normalizedLast = String(lastName || '').trim().replace(/\s+/g, ' ').toUpperCase();
   const normalizedMiddle = String(middleInitial || '').trim().replace(/\.$/, '').slice(0, 1).toUpperCase();
   const normalizedSuffix = String(suffix || '').trim();
+  const validSuffixes = new Set(['', 'Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']);
   const derivedName = [
     normalizedFirst,
     normalizedMiddle ? `${normalizedMiddle}.` : '',
@@ -62,6 +66,17 @@ export async function register(req, res) {
   ].filter(Boolean).join(' ');
 
   const fullName = derivedName || String(name || '').trim();
+  const validName = value => /^[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*$/u.test(value);
+
+  if (!validName(normalizedFirst) || !validName(normalizedLast)) {
+    return res.status(400).json({ error: 'First and last names may contain letters and spaces only.' });
+  }
+  if (normalizedMiddle && !/^[\p{L}\p{M}]$/u.test(normalizedMiddle)) {
+    return res.status(400).json({ error: 'Middle initial must be one letter only.' });
+  }
+  if (!validSuffixes.has(normalizedSuffix)) {
+    return res.status(400).json({ error: 'Please select a valid suffix.' });
+  }
 
   if (!fullName || !email || !password) {
     return res.status(400).json({ error: 'First name, last name, email, and password are required.' });
@@ -236,8 +251,21 @@ export async function resetPassword(req, res) {
     return res.status(400).json({ error: 'This password reset link has expired. Please request another one.' });
   }
 
+  // Require a genuinely new password. Enforce this on the server so callers
+  // cannot bypass the rule by submitting directly to the API.
+  const passwordHistory = Array.isArray(user.passwordHistory) ? user.passwordHistory.filter(Boolean) : [];
+  const matchesPasswordHistory = passwordHistory.some(previousHash => verifyPassword(password, previousHash));
+  if (matchesExistingPassword(password, user) || matchesPasswordHistory) {
+    return res.status(400).json({ error: 'You cannot reuse any previous password. Choose a password you have never used on this account.' });
+  }
+
+  // Preserve every prior password hash, including the current one, so future resets
+  // can reject reuse without storing plaintext passwords.
+  const nextPasswordHistory = [...passwordHistory];
+  if (user.passwordHash && !nextPasswordHistory.includes(user.passwordHash)) nextPasswordHistory.push(user.passwordHash);
   await store.updateUser(user.id, {
     password,
+    passwordHistory: nextPasswordHistory,
     passwordResetToken: null,
     passwordResetCreatedAt: null
   });
@@ -248,6 +276,80 @@ export async function resetPassword(req, res) {
 export async function logout(req, res) {
   if (req.authToken) await store.deleteSession(req.authToken);
   return res.json({ message: 'Signed out successfully.' });
+}
+
+export async function deleteCurrentAccount(req, res) {
+  const password = String(req.body?.password || '');
+  const confirmation = String(req.body?.confirmation || '');
+  if (!password) {
+    return res.status(400).json({ error: 'Enter your password to confirm account deletion.' });
+  }
+  if (password.length > 128) {
+    return res.status(400).json({ error: 'The password is invalid. Please try again.' });
+  }
+  if (confirmation !== 'DELETE') {
+    return res.status(400).json({ error: 'Type DELETE to confirm account deletion.' });
+  }
+
+  const user = await store.getUserById(req.user.id);
+  if (!user || !matchesExistingPassword(password, user)) {
+    return res.status(401).json({ error: 'Your password could not be verified. Your account has not been deleted.' });
+  }
+
+  // Avoid locking the organization out of its own ATS.
+  if (user.role === 'hr') {
+    const hrUsers = await store.getUsersByRole('hr');
+    if (hrUsers.length <= 1) {
+      return res.status(409).json({ error: 'This is the only HR account. Create another HR account before deleting it.' });
+    }
+  }
+
+  const applications = user.role === 'applicant'
+    ? await (store.getApplicationsForAccountDeletion
+      ? store.getApplicationsForAccountDeletion(user.id, user.email)
+      : store.getApplicationsByUserId(user.id))
+    : [];
+  const cleanupFailures = [];
+  for (const application of applications) {
+    if (!application.resumeFile) continue;
+    try {
+      await deleteResume(application.resumeFile);
+    } catch (error) {
+      cleanupFailures.push(application.id);
+      logger.error('account.delete_resume_failed', {
+        requestId: req.requestId,
+        userId: user.id,
+        applicationId: application.id,
+        error
+      });
+    }
+  }
+
+  // Do not remove the account/database records until storage cleanup succeeds.
+  // DeleteObject is safe to retry, so any partial cleanup can be completed by
+  // submitting the same request again after the underlying storage issue clears.
+  if (cleanupFailures.length) {
+    return res.status(503).json({
+      error: 'We could not remove all files linked to your account. Your account is still active; please try again later.',
+      code: 'ACCOUNT_FILE_CLEANUP_FAILED'
+    });
+  }
+
+  const result = await store.deleteAccount(user.id, user.email);
+  if (!result?.deleted) return res.status(404).json({ error: 'This account could not be found.' });
+
+  logger.info('account.deleted', {
+    requestId: req.requestId,
+    userId: user.id,
+    role: user.role,
+    deletedApplicationCount: applications.length,
+    deletedResumeCount: applications.filter(application => !!application.resumeFile).length
+  });
+  return res.json({
+    message: user.role === 'applicant'
+      ? 'Your account, applications, and associated resume files have been deleted.'
+      : 'Your HR account has been deleted. Shared jobs and candidate records were preserved.'
+  });
 }
 
 export async function getCurrentUser(req, res) {

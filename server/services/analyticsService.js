@@ -1,5 +1,97 @@
 import { ensureApplicationTimeline } from './atsHelper.js';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const FUNNEL_STAGES = [
+  { key: 'Application Submitted', label: 'Applied' },
+  { key: 'Initial Screening', label: 'Screened' },
+  { key: 'Shortlisted', label: 'Shortlisted' },
+  { key: 'Interview Scheduled', label: 'Interviewed' },
+  { key: 'Job Offer', label: 'Offered' },
+  { key: 'Hired', label: 'Hired' }
+];
+const ACTIVE_STAGES = ['Application Submitted', 'Initial Screening', 'Shortlisted', 'Interview Scheduled', 'Job Offer'];
+const MEASURED_STAGE_NAMES = ACTIVE_STAGES;
+
+function parseTimestamp(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return numeric;
+  const parsed = Date.parse(String(value));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseDateBoundary(value, isEnd = false) {
+  if (!value) return null;
+  const raw = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const dayStart = Date.parse(`${raw}T00:00:00.000Z`);
+    return Number.isFinite(dayStart) ? dayStart + (isEnd ? DAY_MS - 1 : 0) : null;
+  }
+  return parseTimestamp(raw);
+}
+
+function roundDays(start, end) {
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
+  return Number(((end - start) / DAY_MS).toFixed(1));
+}
+
+function stageFromEvent(event) {
+  if (event?.type === 'application_submitted') return 'Application Submitted';
+  if (event?.type === 'offer_accepted') return 'Hired';
+
+  const stage = event?.metadata?.toStage || event?.metadata?.newStage || event?.metadata?.stage;
+  if (stage) return stage;
+  if (event?.type === 'interview_scheduled') return 'Interview Scheduled';
+  if (typeof event?.type === 'string' && event.type.startsWith('offer_')) return 'Job Offer';
+  return null;
+}
+
+function hasAcceptedOffer(application) {
+  const offer = application?.offer || {};
+  const events = Array.isArray(application?.recordedTimeline)
+    ? application.recordedTimeline
+    : (Array.isArray(application?.timeline) ? application.timeline : []);
+  return String(offer.status || '').toLowerCase() === 'accepted' ||
+    (Array.isArray(offer.history) && offer.history.some(item => String(item.action || '').toLowerCase() === 'accepted')) ||
+    events.some(event => event?.type === 'offer_accepted');
+}
+
+function getHireTimestamp(application) {
+  const offer = application?.offer || {};
+  const acceptedOffer = hasAcceptedOffer(application);
+
+  if (acceptedOffer) {
+    const acceptedTimes = [offer.acceptedAt, offer.respondedAt, offer.candidateRespondedAt]
+      .map(parseTimestamp).filter(value => value !== null);
+    if (Array.isArray(offer.history)) {
+      offer.history
+        .filter(item => String(item.action || '').toLowerCase() === 'accepted')
+        .map(item => parseTimestamp(item.timestamp))
+        .filter(value => value !== null)
+        .forEach(value => acceptedTimes.push(value));
+    }
+    if (acceptedTimes.length) return Math.min(...acceptedTimes);
+  }
+
+  const events = Array.isArray(application?.recordedTimeline)
+    ? application.recordedTimeline
+    : (Array.isArray(application?.timeline) ? application.timeline : []);
+  const hireEvents = events
+    .filter(event => event?.type === 'offer_accepted' || (
+      event?.type === 'stage_changed' && ['Hired'].includes(event?.metadata?.toStage || event?.metadata?.newStage || event?.metadata?.stage)
+    ))
+    .map(event => parseTimestamp(event.timestamp))
+    .filter(value => value !== null);
+  return hireEvents.length ? Math.min(...hireEvents) : null;
+}
+
+function getTimeToHireDays(application) {
+  const appliedAt = parseTimestamp(application?.createdAt);
+  const hiredAt = getHireTimestamp(application);
+  if (appliedAt === null || hiredAt === null) return null;
+  return roundDays(appliedAt, hiredAt);
+}
+
 export function calculateAnalytics({
   applications = [],
   jobs = [],
@@ -14,12 +106,20 @@ export function calculateAnalytics({
     endDate
   } = filters;
 
-  const startMs = startDate ? new Date(startDate).getTime() : 0;
-  const endMs = endDate ? new Date(endDate).getTime() + (24 * 60 * 60 * 1000 - 1) : Infinity;
+  const parsedStart = parseDateBoundary(startDate, false);
+  const parsedEnd = parseDateBoundary(endDate, true);
+  const startMs = parsedStart === null ? 0 : parsedStart;
+  const endMs = parsedEnd === null ? Infinity : parsedEnd;
+
+  // Merged-away duplicate records are retained for audit/history in the ATS,
+  // but must not be counted as separate applications in recruitment metrics.
+  const activeApplications = applications.filter(app =>
+    !app.mergedInto && String(app.stage || '').toLowerCase() !== 'archived (duplicate merged)'
+  );
 
   // Filter applications by date range, job, source, status, recruiter
-  const filteredApps = applications.filter(app => {
-    const created = Number(app.createdAt) || 0;
+  const filteredApps = activeApplications.filter(app => {
+    const created = parseTimestamp(app.createdAt) ?? 0;
     if (created < startMs || created > endMs) return false;
     if (jobId && jobId !== 'all' && app.jobId !== jobId) return false;
     if (source && source !== 'all' && (app.source || 'Direct Application') !== source) return false;
@@ -38,6 +138,9 @@ export function calculateAnalytics({
   // Ensure timelines on all filtered applications
   const appsWithTimeline = filteredApps.map(app => ({
     ...app,
+    // Preserve the original event history separately; the helper may synthesize
+    // events for legacy UI features, but synthetic events must not drive metrics.
+    recordedTimeline: Array.isArray(app.timeline) ? app.timeline : [],
     timeline: ensureApplicationTimeline(app),
     job: jobsMap.get(app.jobId) || null
   }));
@@ -45,15 +148,6 @@ export function calculateAnalytics({
   // ==========================================
   // 1. RECRUITMENT FUNNEL
   // ==========================================
-  const FUNNEL_STAGES = [
-    { key: 'Application Submitted', label: 'Applied' },
-    { key: 'Initial Screening', label: 'Screened' },
-    { key: 'Shortlisted', label: 'Shortlisted' },
-    { key: 'Interview Scheduled', label: 'Interviewed' },
-    { key: 'Job Offer', label: 'Offered' },
-    { key: 'Hired', label: 'Hired' }
-  ];
-
   const stageOrder = {
     'Application Submitted': 1,
     'Initial Screening': 2,
@@ -74,11 +168,14 @@ export function calculateAnalytics({
     // Check timeline events
     if (Array.isArray(app.timeline)) {
       if (targetStage === 'Application Submitted') return true;
-      if (targetStage === 'Initial Screening' && (app.geminiScore != null || app.timeline.some(t => t.type === 'screening_completed' || t.metadata?.stage === 'Initial Screening'))) return true;
-      if (targetStage === 'Shortlisted' && app.timeline.some(t => t.metadata?.stage === 'Shortlisted')) return true;
-      if (targetStage === 'Interview Scheduled' && (app.interview?.scheduledAt || app.timeline.some(t => t.type === 'interview_scheduled' || t.metadata?.stage === 'Interview Scheduled'))) return true;
-      if (targetStage === 'Job Offer' && (app.offer || app.timeline.some(t => t.type?.startsWith('offer_') || t.metadata?.stage === 'Job Offer'))) return true;
-      if (targetStage === 'Hired' && (app.stage === 'Hired' || app.timeline.some(t => t.type === 'offer_accepted' || t.metadata?.stage === 'Hired'))) return true;
+      if (targetStage === 'Initial Screening' && (app.geminiScore != null || app.timeline.some(t => t.type === 'screening_completed' || stageFromEvent(t) === 'Initial Screening'))) return true;
+      if (targetStage === 'Shortlisted' && app.timeline.some(t => stageFromEvent(t) === 'Shortlisted')) return true;
+      if (targetStage === 'Interview Scheduled' && (app.interview?.scheduledAt || app.timeline.some(t => stageFromEvent(t) === 'Interview Scheduled'))) return true;
+      if (targetStage === 'Job Offer' && (
+        ['sent', 'accepted', 'declined', 'expired', 'withdrawn'].includes(String(app.offer?.status || '').toLowerCase()) ||
+        app.timeline.some(t => ['offer_sent', 'offer_accepted', 'offer_declined', 'offer_expired', 'offer_withdrawn'].includes(t.type) || stageFromEvent(t) === 'Job Offer')
+      )) return true;
+      if (targetStage === 'Hired' && (app.stage === 'Hired' || getHireTimestamp(app) !== null)) return true;
     }
     return false;
   }
@@ -117,8 +214,8 @@ export function calculateAnalytics({
   const rejectedApps = appsWithTimeline.filter(a => a.stage === 'Rejected');
   const rejectionReasonsMap = {};
   rejectedApps.forEach(app => {
-    let reason = 'Did Not Meet Role Criteria';
-    if (app.recruiterNotes) {
+    let reason = String(app.rejectionReason || app.rejectionNotes || app.disqualificationReason || '').trim();
+    if (!reason && app.recruiterNotes) {
       const lower = app.recruiterNotes.toLowerCase();
       if (lower.includes('salary') || lower.includes('compensation')) reason = 'Compensation Mismatch';
       else if (lower.includes('experience') || lower.includes('junior') || lower.includes('years')) reason = 'Insufficient Experience';
@@ -126,9 +223,10 @@ export function calculateAnalytics({
       else if (lower.includes('culture') || lower.includes('communication')) reason = 'Culture / Soft Skills';
       else if (lower.includes('withdrew') || lower.includes('declined')) reason = 'Candidate Withdrew';
       else reason = app.recruiterNotes.slice(0, 45);
-    } else if (app.geminiScore != null && app.geminiScore < 60) {
+    } else if (!reason && app.geminiScore != null && app.geminiScore < 60) {
       reason = 'Low Resume Match Score';
     }
+    if (!reason) reason = 'Reason Not Recorded';
     rejectionReasonsMap[reason] = (rejectionReasonsMap[reason] || 0) + 1;
   });
 
@@ -142,46 +240,46 @@ export function calculateAnalytics({
   // 2. RECRUITMENT SPEED
   // ==========================================
   const now = Date.now();
-  const DAY_MS = 24 * 60 * 60 * 1000;
 
-  // Time to hire (for Hired candidates)
+  // Only calculate time-to-hire where the application has a recorded hire/offer
+  // acceptance timestamp. UpdatedAt is not a reliable substitute for hiredAt.
   const hiredApps = appsWithTimeline.filter(a => a.stage === 'Hired');
-  const timeToHireDaysList = hiredApps.map(app => {
-    const hiredEvent = app.timeline.find(t => t.metadata?.stage === 'Hired' || t.type === 'offer_accepted');
-    const hiredAt = hiredEvent ? hiredEvent.timestamp : Number(app.updatedAt) || now;
-    const created = Number(app.createdAt) || hiredAt;
-    const days = Math.max(1, Math.round((hiredAt - created) / DAY_MS));
-    return days;
-  }).sort((a, b) => a - b);
+  const timeToHireDaysList = hiredApps
+    .map(getTimeToHireDays)
+    .filter(value => value !== null)
+    .sort((a, b) => a - b);
 
   const avgTimeToHire = timeToHireDaysList.length > 0
     ? Number((timeToHireDaysList.reduce((acc, d) => acc + d, 0) / timeToHireDaysList.length).toFixed(1))
-    : 0;
+    : null;
 
   const medianTimeToHire = timeToHireDaysList.length > 0
     ? (timeToHireDaysList.length % 2 === 0
       ? Number(((timeToHireDaysList[timeToHireDaysList.length / 2 - 1] + timeToHireDaysList[timeToHireDaysList.length / 2]) / 2).toFixed(1))
       : timeToHireDaysList[Math.floor(timeToHireDaysList.length / 2)])
-    : 0;
+    : null;
 
-  // Time to fill per job
-  const timeToFillByJob = jobs.map(job => {
-    const jobHires = hiredApps.filter(a => a.jobId === job.id);
-    const created = Number(job.createdAt) || now;
+  // Time-to-fill is a job-lifecycle measure, not an application-cohort measure.
+  // It therefore uses all non-merged hires and honors only the selected job filter.
+  // A role is considered filled only when it is closed and at least one hire exists;
+  // open roles show age-in-days rather than a misleading completed fill time.
+  const allHiredApplications = activeApplications.filter(app => app.stage === 'Hired');
+  const jobsForFill = jobId && jobId !== 'all' ? jobs.filter(job => job.id === jobId) : jobs;
+  const timeToFillByJob = jobsForFill.map(job => {
+    const jobHires = allHiredApplications.filter(app => app.jobId === job.id);
+    const created = parseTimestamp(job.createdAt);
+    const hireTimes = jobHires
+      .map(getHireTimestamp)
+      .filter(value => value !== null && (created === null || value >= created));
+    const isClosed = String(job.status || '').toLowerCase() === 'closed';
+    const isFilled = isClosed && jobHires.length > 0;
     let daysToFill = null;
-    let isFilled = false;
+    let daysOpen = null;
 
-    if (jobHires.length > 0) {
-      const latestHireTime = Math.max(...jobHires.map(a => Number(a.updatedAt) || now));
-      daysToFill = Math.max(1, Math.round((latestHireTime - created) / DAY_MS));
-      isFilled = true;
-    } else if (job.status === 'closed') {
-      const closedAt = Number(job.updatedAt) || now;
-      daysToFill = Math.max(1, Math.round((closedAt - created) / DAY_MS));
-      isFilled = true;
-    } else {
-      daysToFill = Math.max(1, Math.round((now - created) / DAY_MS));
-      isFilled = false;
+    if (isFilled && created !== null && hireTimes.length > 0) {
+      daysToFill = roundDays(created, Math.min(...hireTimes));
+    } else if (!isClosed && created !== null) {
+      daysOpen = roundDays(created, now);
     }
 
     return {
@@ -190,60 +288,79 @@ export function calculateAnalytics({
       department: job.department,
       status: job.status,
       hiresCount: jobHires.length,
-      daysToFill,
-      isFilled
+      daysToFill: isFilled ? daysToFill : null,
+      daysOpen,
+      isFilled,
+      isClosed
     };
   });
 
-  const avgTimeToFill = timeToFillByJob.filter(j => j.isFilled).length > 0
-    ? Number((timeToFillByJob.filter(j => j.isFilled).reduce((a, b) => a + b.daysToFill, 0) / timeToFillByJob.filter(j => j.isFilled).length).toFixed(1))
-    : (timeToFillByJob.length > 0 ? Number((timeToFillByJob.reduce((a, b) => a + b.daysToFill, 0) / timeToFillByJob.length).toFixed(1)) : 0);
+  const completedFillTimes = timeToFillByJob
+    .filter(job => job.isFilled && job.daysToFill !== null)
+    .map(job => job.daysToFill);
+  const avgTimeToFill = completedFillTimes.length > 0
+    ? Number((completedFillTimes.reduce((sum, days) => sum + days, 0) / completedFillTimes.length).toFixed(1))
+    : null;
 
-  // Time spent in each recruitment stage
-  const stageDurationTotals = {
-    'Application Submitted': [],
-    'Initial Screening': [],
-    'Shortlisted': [],
-    'Interview Scheduled': [],
-    'Job Offer': []
-  };
+  // Time spent in each recruitment stage. Only real timeline events and known
+  // offer-response timestamps are used; generated legacy timelines do not count
+  // as historical evidence for stage velocity.
+  const stageDurationTotals = Object.fromEntries(
+    MEASURED_STAGE_NAMES.map(stageName => [stageName, []])
+  );
 
   appsWithTimeline.forEach(app => {
-    const events = [...(app.timeline || [])].sort((a, b) => a.timestamp - b.timestamp);
-    for (let i = 0; i < events.length; i++) {
-      const curr = events[i];
-      const stageName = curr.metadata?.stage || (curr.type === 'application_submitted' ? 'Application Submitted' : curr.type === 'interview_scheduled' ? 'Interview Scheduled' : null);
-      if (stageName && stageDurationTotals[stageName]) {
-        const nextTime = i + 1 < events.length ? events[i + 1].timestamp : Number(app.updatedAt) || now;
-        const diffDays = Math.max(0.5, Number(((nextTime - curr.timestamp) / DAY_MS).toFixed(1)));
-        stageDurationTotals[stageName].push(diffDays);
-      }
+    const recordedEvents = Array.isArray(app.recordedTimeline) ? app.recordedTimeline : [];
+    const transitions = recordedEvents
+      .map(event => ({ stage: stageFromEvent(event), timestamp: parseTimestamp(event.timestamp) }))
+      .filter(event => event.stage && event.timestamp !== null && (MEASURED_STAGE_NAMES.includes(event.stage) || event.stage === 'Hired'));
+
+    const hireTimestamp = getHireTimestamp(app);
+    if (app.stage === 'Hired' && hireTimestamp !== null && !transitions.some(event => event.stage === 'Hired')) {
+      transitions.push({ stage: 'Hired', timestamp: hireTimestamp });
     }
+
+    transitions.sort((a, b) => a.timestamp - b.timestamp);
+    // Ignore duplicate consecutive stage events generated by imports/merges.
+    const distinctTransitions = transitions.filter((event, index, all) =>
+      index === 0 || event.stage !== all[index - 1].stage
+    );
+
+    distinctTransitions.forEach((event, index) => {
+      if (!stageDurationTotals[event.stage]) return;
+      const nextTransition = distinctTransitions[index + 1];
+      let endAt = null;
+      if (nextTransition) {
+        endAt = nextTransition.timestamp;
+      } else if (app.stage === event.stage) {
+        // The candidate is still in this stage, so use elapsed time up to now.
+        endAt = now;
+      }
+      if (endAt === null || endAt < event.timestamp) return;
+      const duration = roundDays(event.timestamp, endAt);
+      if (duration !== null) stageDurationTotals[event.stage].push(duration);
+    });
   });
 
-  const averageStageDurations = Object.entries(stageDurationTotals).map(([stageName, durations]) => {
-    const avgDays = durations.length > 0
-      ? Number((durations.reduce((a, b) => a + b, 0) / durations.length).toFixed(1))
-      : 3.5; // reasonable baseline if stage was skipped or instantly moved
-    return {
-      stage: stageName,
-      averageDays: avgDays,
-      dataPoints: durations.length
-    };
-  });
+  const averageStageDurations = Object.entries(stageDurationTotals).map(([stageName, durations]) => ({
+    stage: stageName,
+    averageDays: durations.length > 0
+      ? Number((durations.reduce((sum, days) => sum + days, 0) / durations.length).toFixed(1))
+      : null,
+    dataPoints: durations.length
+  }));
 
   // Stalled applications (in progress stages without activity for > 14 days)
-  const ACTIVE_STAGES = ['Application Submitted', 'Initial Screening', 'Shortlisted', 'Interview Scheduled', 'Job Offer'];
   const STALLED_THRESHOLD_MS = 14 * DAY_MS;
 
   const stalledApplications = appsWithTimeline
     .filter(app => ACTIVE_STAGES.includes(app.stage))
     .filter(app => {
-      const lastActive = Number(app.updatedAt) || Number(app.createdAt) || 0;
+      const lastActive = parseTimestamp(app.updatedAt) ?? parseTimestamp(app.createdAt) ?? 0;
       return (now - lastActive) > STALLED_THRESHOLD_MS;
     })
     .map(app => {
-      const lastActive = Number(app.updatedAt) || Number(app.createdAt) || 0;
+      const lastActive = parseTimestamp(app.updatedAt) ?? parseTimestamp(app.createdAt) ?? 0;
       const daysInactive = Math.round((now - lastActive) / DAY_MS);
       return {
         id: app.id,
@@ -260,15 +377,15 @@ export function calculateAnalytics({
 
   // Overdue evaluations (interviews scheduled before now with no scorecard or evaluation)
   const overdueEvaluations = appsWithTimeline
-    .filter(app => app.interview?.scheduledAt)
+    .filter(app => app.stage === 'Interview Scheduled' && app.interview?.scheduledAt)
     .filter(app => {
-      const interviewTime = new Date(app.interview.scheduledAt).getTime();
+      const interviewTime = parseTimestamp(app.interview.scheduledAt);
       const hasEvaluation = Boolean(app.evaluation?.rating) || (Array.isArray(app.scorecards) && app.scorecards.length > 0);
-      return interviewTime < now && !hasEvaluation;
+      return interviewTime !== null && interviewTime < now && !hasEvaluation;
     })
     .map(app => {
-      const interviewTime = new Date(app.interview.scheduledAt).getTime();
-      const daysOverdue = Math.max(1, Math.round((now - interviewTime) / DAY_MS));
+      const interviewTime = parseTimestamp(app.interview.scheduledAt);
+      const daysOverdue = Number(((now - interviewTime) / DAY_MS).toFixed(1));
       return {
         id: app.id,
         name: app.name,
@@ -316,15 +433,13 @@ export function calculateAnalytics({
     if (hasReachedStage(app, 'Job Offer')) item.offers += 1;
     if (app.stage === 'Hired') {
       item.hires += 1;
-      const hiredEvent = app.timeline.find(t => t.metadata?.stage === 'Hired' || t.type === 'offer_accepted');
-      const hiredAt = hiredEvent ? hiredEvent.timestamp : Number(app.updatedAt) || now;
-      const created = Number(app.createdAt) || hiredAt;
-      item.timeToHireList.push(Math.max(1, Math.round((hiredAt - created) / DAY_MS)));
+      const timeToHireDays = getTimeToHireDays(app);
+      if (timeToHireDays !== null) item.timeToHireList.push(timeToHireDays);
     }
   });
 
-  // Calculate total sourcing costs across jobs
-  const totalSourcingCost = jobs.reduce((sum, j) => sum + (Number(j.sourcingCost) || 0), 0);
+  // Sourcing spend is stored by job, not channel. Allocating those job totals
+  // across source channels would create a misleading cost-per-hire figure.
 
   const sourceEffectiveness = Object.values(sourcesMap).map(src => {
     const qualRate = src.applications > 0 ? Number(((src.qualified / src.applications) * 100).toFixed(1)) : 0;
@@ -333,15 +448,10 @@ export function calculateAnalytics({
     const hireRate = src.applications > 0 ? Number(((src.hires / src.applications) * 100).toFixed(1)) : 0;
     const avgSourceTimeToHire = src.timeToHireList.length > 0
       ? Number((src.timeToHireList.reduce((a, b) => a + b, 0) / src.timeToHireList.length).toFixed(1))
-      : 0;
+      : null;
 
-    // Cost per hire: if sourcing cost exists, distribute proportionally or per hire
-    let costPerHire = null;
-    if (totalSourcingCost > 0 && src.hires > 0) {
-      const share = src.applications / Math.max(1, appsWithTimeline.length);
-      const allocatedCost = totalSourcingCost * share;
-      costPerHire = Math.round(allocatedCost / src.hires);
-    }
+    // No source-level spend is stored yet, so this cannot be calculated honestly.
+    const costPerHire = null;
 
     return {
       source: src.source,
@@ -361,9 +471,14 @@ export function calculateAnalytics({
 
   // Overall KPI highlights
   const totalHires = hiredApps.length;
+  const acceptedOfferCount = appsWithTimeline.filter(hasAcceptedOffer).length;
   const offerAcceptanceRate = funnelSteps[4]?.count > 0
-    ? Number(((totalHires / funnelSteps[4].count) * 100).toFixed(1))
+    ? Number(((acceptedOfferCount / funnelSteps[4].count) * 100).toFixed(1))
     : 0;
+  const attentionNeededCount = new Set([
+    ...stalledApplications.map(app => app.id),
+    ...overdueEvaluations.map(app => app.id)
+  ]).size;
 
   return {
     summary: {
@@ -374,7 +489,8 @@ export function calculateAnalytics({
       avgTimeToFill,
       offerAcceptanceRate,
       stalledCount: stalledApplications.length,
-      overdueEvaluationsCount: overdueEvaluations.length
+      overdueEvaluationsCount: overdueEvaluations.length,
+      attentionNeededCount
     },
     funnel,
     rejectionReasons,
@@ -410,9 +526,9 @@ export function generateAnalyticsCsv(analytics) {
   lines.push('Metric,Value');
   lines.push(`Total Applications,${analytics.summary.totalApplications}`);
   lines.push(`Total Hires,${analytics.summary.totalHires}`);
-  lines.push(`Avg Time to Hire (Days),${analytics.summary.avgTimeToHire}`);
-  lines.push(`Median Time to Hire (Days),${analytics.summary.medianTimeToHire}`);
-  lines.push(`Avg Time to Fill (Days),${analytics.summary.avgTimeToFill}`);
+  lines.push(`Avg Time to Hire (Days),${analytics.summary.avgTimeToHire ?? ''}`);
+  lines.push(`Median Time to Hire (Days),${analytics.summary.medianTimeToHire ?? ''}`);
+  lines.push(`Avg Time to Fill (Days),${analytics.summary.avgTimeToFill ?? ''}`);
   lines.push(`Offer Acceptance Rate (%),${analytics.summary.offerAcceptanceRate}%`);
   lines.push(`Stalled Applications,${analytics.summary.stalledCount}`);
   lines.push(`Overdue Evaluations,${analytics.summary.overdueEvaluationsCount}`);
@@ -438,7 +554,7 @@ export function generateAnalyticsCsv(analytics) {
   lines.push('--- SOURCE EFFECTIVENESS ---');
   lines.push('Source Channel,Applications,Qualified Count,Qualified Rate (%),Interviews,Interview Rate (%),Offers,Offer Rate (%),Hires,Hire Rate (%),Avg Time to Hire (Days),Cost Per Hire');
   (analytics.sources || []).forEach(s => {
-    lines.push(`"${s.source}",${s.applications},${s.qualified},${s.qualifiedRate}%,${s.interviews},${s.interviewRate}%,${s.offers},${s.offerRate}%,${s.hires},${s.hireRate}%,${s.avgTimeToHire},${s.costPerHire != null ? `₱${s.costPerHire}` : 'N/A'}`);
+    lines.push(`"${s.source}",${s.applications},${s.qualified},${s.qualifiedRate}%,${s.interviews},${s.interviewRate}%,${s.offers},${s.offerRate}%,${s.hires},${s.hireRate}%,${s.avgTimeToHire ?? ''},${s.costPerHire != null ? `₱${s.costPerHire}` : 'N/A'}`);
   });
   lines.push('');
 
@@ -446,7 +562,7 @@ export function generateAnalyticsCsv(analytics) {
   lines.push('--- AVERAGE DURATION PER RECRUITMENT STAGE ---');
   lines.push('Stage,Average Duration (Days)');
   ((analytics.speed && analytics.speed.averageStageDurations) || []).forEach(sd => {
-    lines.push(`"${sd.stage}",${sd.averageDays}`);
+    lines.push(`"${sd.stage}",${sd.averageDays ?? ''}`);
   });
 
   return lines.join('\n');

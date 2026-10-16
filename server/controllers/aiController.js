@@ -44,8 +44,8 @@ export async function screenCandidate(req, res) {
     });
   } catch (err) {
     console.error('[AIController] Screening error:', err);
-    await store.updateApplication(id, { isScreening: false, geminiError: err.message || 'Failed to complete screening' });
-    return res.status(400).json({ error: err.message || 'Failed to evaluate candidate' });
+    await store.updateApplication(id, { isScreening: false, geminiError: 'Screening could not be completed.' });
+    return res.status(500).json({ error: 'Screening could not be completed. Please try again later.' });
   }
 }
 

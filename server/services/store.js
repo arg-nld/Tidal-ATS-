@@ -562,6 +562,24 @@ class Store {
     return true;
   }
 
+  // Keep the JSON development store behavior aligned with PostgreSQL account
+  // deletion. Applicant data is private to that account; HR-owned company-wide
+  // recruiting data and candidate resumes are not deleted with an HR login.
+  deleteAccount(id, email = '') {
+    const index = this.data.users.findIndex(user => user.id === id);
+    if (index === -1) return { deleted: false, role: null };
+    const role = this.data.users[index].role;
+    if (role === 'applicant') {
+      const accountEmail = String(email || this.data.users[index].email || '').trim().toLowerCase();
+      this.data.applications = this.data.applications.filter(application => !(application.userId === id || (!application.userId && String(application.email || '').trim().toLowerCase() === accountEmail)));
+    }
+    this.data.users.splice(index, 1);
+    this.deleteSessionsForUser(id);
+    this.data.notifications = (this.data.notifications || []).filter(notification => notification.recipientUserId !== id);
+    this.save();
+    return { deleted: true, role };
+  }
+
   createUser(userData) {
     const newUser = {
       id: userData.id || `user-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -665,6 +683,14 @@ class Store {
       .filter(a => a.userId === userId)
       .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
       .map(a => this._enrichApplication(a));
+  }
+
+  getApplicationsForAccountDeletion(userId, email) {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    return this.data.applications
+      .filter(application => application.userId === userId || (!application.userId && String(application.email || '').trim().toLowerCase() === normalizedEmail))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .map(application => this._enrichApplication(application));
   }
 
   getApplicationsByJobId(jobId) {
@@ -1050,7 +1076,13 @@ class Store {
 export { Store };
 
 // PostgreSQL is selected when DATABASE_URL is configured. JSON remains available
-// for local development and the existing reliability test suite.
+// for local development and the existing reliability test suite. Never allow a
+// production deployment to silently fall back to seed/demo JSON accounts.
+const productionMode = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+if (productionMode && !String(process.env.DATABASE_URL || '').trim()) {
+  throw new Error('DATABASE_URL is required in production. Refusing to start with local JSON storage and demo seed data.');
+}
+
 let store;
 if (process.env.DATABASE_URL) {
   const { PostgresStore } = await import('./postgresStore.js');

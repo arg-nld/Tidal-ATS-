@@ -94,7 +94,7 @@ export function HrPortal() {
       setEditingJob(null);
       await loadData();
     } catch (err) {
-      alert("Failed to save job: " + err.message);
+      alert(err.message || 'We could not save the job. Please try again.');
     }
   };
 
@@ -118,7 +118,7 @@ export function HrPortal() {
       setDeleteModal({ isOpen: false, type: null, item: null, isDeleting: false });
       await loadData();
     } catch (err) {
-      alert("Failed to delete item: " + err.message);
+      alert(err.message || 'We could not delete that item. Please try again.');
       setDeleteModal(prev => ({ ...prev, isDeleting: false }));
     }
   };
@@ -134,7 +134,7 @@ export function HrPortal() {
       handleUpdateCandidateInState(res.application);
       return res.application;
     } catch (err) {
-      alert("Failed to update candidate stage: " + err.message);
+      alert(err.message || 'We could not update the candidate. Please try again.');
       return null;
     }
   };
@@ -169,7 +169,7 @@ export function HrPortal() {
       const res = await api.ai.screen(candidate.id);
       handleUpdateCandidateInState(res.application);
     } catch (err) {
-      alert("AI Screening failed: " + err.message);
+      alert(err.message || 'AI screening could not be completed. Please try again later.');
       setApplications(prev => prev.map(a => a.id === candidate.id ? { ...a, isScreening: false } : a));
     }
   };

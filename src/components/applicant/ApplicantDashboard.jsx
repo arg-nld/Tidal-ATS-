@@ -26,22 +26,29 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
     app: null,
     action: null, // 'accepted' | 'declined'
     comment: '',
-    isSubmitting: false
+    isSubmitting: false,
+    error: null
   });
 
   const handleOfferResponse = async () => {
     if (!offerModal.app || !offerModal.action) return;
-    setOfferModal(prev => ({ ...prev, isSubmitting: true }));
+    setOfferModal(prev => ({ ...prev, isSubmitting: true, error: null }));
     try {
+      const normalizedAction = offerModal.action === 'accepted' ? 'accept' : 'decline';
       await api.applications.respondToOffer(offerModal.app.id, {
-        response: offerModal.action,
-        comment: offerModal.comment
+        action: normalizedAction,
+        response: normalizedAction,
+        declineReason: normalizedAction === 'decline' ? (offerModal.comment || 'Declined by candidate') : undefined,
+        comments: offerModal.comment
       });
-      setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false });
+      setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false, error: null });
       if (onRefresh) onRefresh();
     } catch (err) {
-      alert(`Failed to submit offer response: ${err.message}`);
-      setOfferModal(prev => ({ ...prev, isSubmitting: false }));
+      setOfferModal(prev => ({
+        ...prev,
+        isSubmitting: false,
+        error: err.message || 'We could not submit your offer response. Please try again.'
+      }));
     }
   };
 
@@ -294,7 +301,26 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                         <div>
                           <span className="text-[10px] text-slate-500 uppercase font-semibold block">Proposed Compensation</span>
                           <span className="text-base font-extrabold text-emerald-400 mt-0.5 block">
-                            {app.offer.compensation.currency || '₱'}{Number(app.offer.compensation.amount || 0).toLocaleString()} <span className="text-xs text-slate-400 font-normal">{app.offer.compensation.period || '/ month'}</span>
+                            {(() => {
+                              // Current API stores compensation as a number with currency/period alongside it.
+                              // Also support the older object shape so existing records never display as ₱0.
+                              const rawCompensation = app.offer.compensation;
+                              const amount = typeof rawCompensation === 'object' && rawCompensation !== null
+                                ? rawCompensation.amount
+                                : rawCompensation;
+                              const currency = (typeof rawCompensation === 'object' && rawCompensation !== null
+                                ? rawCompensation.currency
+                                : app.offer.currency) || '₱';
+                              const period = (typeof rawCompensation === 'object' && rawCompensation !== null
+                                ? rawCompensation.period
+                                : app.offer.salaryPeriod) || 'monthly';
+                              const numericAmount = Number(amount);
+                              return `${currency}${Number.isFinite(numericAmount) ? numericAmount.toLocaleString() : '—'} `;
+                            })()}<span className="text-xs text-slate-400 font-normal">{(() => {
+                              const raw = app.offer.compensation;
+                              const period = (typeof raw === 'object' && raw !== null ? raw.period : app.offer.salaryPeriod) || 'monthly';
+                              return ({ monthly: '/ month', annual: '/ year', 'bi-weekly': '/ 2 weeks', hourly: '/ hour' })[String(period).toLowerCase()] || (String(period).startsWith('/') ? period : `/ ${period}`);
+                            })()}</span>
                           </span>
                         </div>
                         <div>
@@ -333,7 +359,8 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                             app,
                             action: 'declined',
                             comment: '',
-                            isSubmitting: false
+                            isSubmitting: false,
+                            error: null
                           })}
                           className="w-full sm:w-auto px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl transition cursor-pointer"
                         >
@@ -346,7 +373,8 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                             app,
                             action: 'accepted',
                             comment: '',
-                            isSubmitting: false
+                            isSubmitting: false,
+                            error: null
                           })}
                           className="w-full sm:w-auto px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
                         >
@@ -394,12 +422,19 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
                 )}
               </h3>
               <button
-                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false })}
+                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false, error: null })}
                 className="text-slate-400 hover:text-white"
               >
                 <X size={18} />
               </button>
             </div>
+
+            {offerModal.error && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0" />
+                <span>{offerModal.error}</span>
+              </div>
+            )}
 
             <p className="text-xs text-slate-300">
               {offerModal.action === 'accepted'
@@ -423,9 +458,9 @@ export function ApplicantDashboard({ applications, onRefresh, onExploreJobs }) {
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
                 type="button"
-                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false })}
+                onClick={() => setOfferModal({ isOpen: false, app: null, action: null, comment: '', isSubmitting: false, error: null })}
                 disabled={offerModal.isSubmitting}
-                className="px-3.5 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-800 rounded-xl"
+                className="px-3.5 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-800 rounded-xl cursor-pointer"
               >
                 Cancel
               </button>

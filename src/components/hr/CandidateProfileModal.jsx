@@ -147,7 +147,7 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
       onUpdateCandidate(res.application);
       setShowStageConfirmModal(false);
     } catch (err) {
-      alert(`Failed to update stage: ${err.message}`);
+      alert(err.message || 'We could not update the candidate stage. Please try again.');
     } finally {
       setIsUpdatingStage(false);
     }
@@ -166,7 +166,7 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
       setTimeout(() => setNotesSaved(false), 2500);
       setShowNotesConfirmModal(false);
     } catch (err) {
-      alert(`Failed to save notes: ${err.message}`);
+      alert(err.message || 'We could not save the notes. Please try again.');
     } finally {
       setIsSavingNotes(false);
     }
@@ -239,7 +239,7 @@ export function CandidateProfileModal({ candidate, job, applications = [], onClo
       setShowScheduleConfirmation(false);
       setTimeout(() => setInterviewSuccess(false), 4000);
     } catch (err) {
-      alert(`Failed to schedule interview: ${err.message}`);
+      alert(err.message || 'We could not schedule the interview. Please try again.');
     } finally {
       setIsScheduling(false);
     }

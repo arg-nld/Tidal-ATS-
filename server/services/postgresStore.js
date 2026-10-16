@@ -410,6 +410,34 @@ export class PostgresStore {
     return mapUser(rows[0]);
   }
   async deleteUser(id) { await this.ready(); const r=await this.pool.query('DELETE FROM users WHERE id=$1',[id]); return r.rowCount>0; }
+
+  // Delete an account atomically. Applicant-owned applications cascade through
+  // their resumes, interviews, evaluations, notes, and screening records. HR
+  // deletion deliberately preserves shared recruiting data and candidate files.
+  async deleteAccount(id, email = '') {
+    await this.ready();
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const { rows: userRows } = await client.query('SELECT id, role FROM users WHERE id=$1 FOR UPDATE', [id]);
+      const account = userRows[0];
+      if (!account) {
+        await client.query('ROLLBACK');
+        return { deleted: false, role: null };
+      }
+      if (account.role === 'applicant') {
+        await client.query('DELETE FROM applications WHERE user_id=$1 OR (user_id IS NULL AND lower(email)=lower($2))', [id, String(email || '')]);
+      }
+      await client.query('DELETE FROM users WHERE id=$1', [id]);
+      await client.query('COMMIT');
+      return { deleted: true, role: account.role };
+    } catch (error) {
+      try { await client.query('ROLLBACK'); } catch { /* Preserve the original error. */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
   async getUsersByRole(role) { await this.ready(); const {rows}=await this.pool.query('SELECT * FROM users WHERE role=$1 ORDER BY created_at ASC',[role]); return rows.map(mapUser); }
 
   async createSession(userId, ttlMs=12*60*60*1000) {
@@ -461,6 +489,7 @@ export class PostgresStore {
   async getApplications() { return this._applicationRows(); }
   async getApplicationById(id) { const rows=await this._applicationRows('WHERE a.id=$1',[id]); return rows[0]||null; }
   async getApplicationsByUserId(id) { return this._applicationRows('WHERE a.user_id=$1',[id]); }
+  async getApplicationsForAccountDeletion(id, email) { return this._applicationRows('WHERE a.user_id=$1 OR (a.user_id IS NULL AND lower(a.email)=lower($2))',[id,String(email||'')]); }
   async getApplicationsByJobId(id) { return this._applicationRows('WHERE a.job_id=$1',[id]); }
 
   async createApplication(d) {

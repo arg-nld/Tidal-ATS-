@@ -132,3 +132,11 @@ export const interviewEmailRateLimiter = createRateLimiter({
   keyBy: 'user',
   message: 'Too many interview emails have been sent. Please try again later.'
 });
+
+export const accountDeletionRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  keyBy: 'user',
+  namespace: 'account-deletion',
+  message: 'Too many account deletion attempts. Please wait and try again.'
+});

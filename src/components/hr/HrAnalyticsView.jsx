@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../services/api';
+import { Spinner } from '../common/Spinner';
 import { 
   BarChart3, TrendingUp, Clock, Users, ArrowUpRight, ArrowDownRight,
   Filter, Download, Printer, CheckCircle2, AlertTriangle, AlertCircle,
   Briefcase, Calendar, ChevronRight, X, ExternalLink, Sparkles, DollarSign,
   Layers, Check, FileSpreadsheet
 } from 'lucide-react';
-import { Spinner } from '../common/Spinner';
 
 export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
   const [loading, setLoading] = useState(true);
@@ -33,12 +33,16 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
   const computeDateRangeParams = (range) => {
     if (range === 'all') return {};
     const now = new Date();
-    const end = now.toISOString().slice(0, 10);
-    const start = new Date();
+    const start = new Date(now);
+    const end = new Date(now);
     if (range === '30d') start.setDate(now.getDate() - 30);
     else if (range === '90d') start.setDate(now.getDate() - 90);
     else if (range === 'year') start.setFullYear(now.getFullYear(), 0, 1);
-    return { startDate: start.toISOString().slice(0, 10), endDate: end };
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+    // Send exact local-day boundaries as instants so UTC deployments do not
+    // shift the selected date range by the browser/server timezone difference.
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
   };
 
   const loadAnalytics = async () => {
@@ -80,7 +84,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
       status: selectedStatus,
       recruiter: selectedRecruiter
     };
-    api.analytics.downloadCsv(params).catch(err => setError(err.message || 'CSV export failed.'));
+    api.analytics.downloadAnalystPack(params).catch(err => setError(err.message || 'Analyst export failed.'));
   };
 
   const handlePrint = () => {
@@ -125,7 +129,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-100">Recruitment Analytics & Reports</h1>
-              <p className="text-xs text-slate-400">Real-time funnel conversion, hiring velocity, and sourcing performance</p>
+              <p className="text-xs text-slate-400">Recruitment KPIs with traceable source data and calculation detail</p>
             </div>
           </div>
         </div>
@@ -134,10 +138,10 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
           <button
             onClick={handleExportCsv}
             className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2 transition-all hover:bg-slate-800"
-            title="Download CSV Report"
+            title="Download detailed analyst data pack"
           >
             <FileSpreadsheet size={14} className="text-emerald-400" />
-            <span>Export CSV</span>
+            <span>Export Analyst Pack</span>
           </button>
 
           <button
@@ -259,17 +263,17 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">Avg Time to Hire</span>
               <div className="text-2xl font-black text-indigo-400">
-                {summary.avgTimeToHire > 0 ? `${summary.avgTimeToHire}d` : '—'}
+                {summary.avgTimeToHire != null ? `${summary.avgTimeToHire}d` : '—'}
               </div>
-              <span className="text-[10px] text-slate-400">Median: {summary.medianTimeToHire || '—'} days</span>
+              <span className="text-[10px] text-slate-400">Median: {summary.medianTimeToHire != null ? summary.medianTimeToHire : '—'} days</span>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">Avg Time to Fill</span>
               <div className="text-2xl font-black text-violet-400">
-                {summary.avgTimeToFill > 0 ? `${summary.avgTimeToFill}d` : '—'}
+                {summary.avgTimeToFill != null ? `${summary.avgTimeToFill}d` : '—'}
               </div>
-              <span className="text-[10px] text-slate-400">Per open job role</span>
+              <span className="text-[10px] text-slate-400">Filled roles with recorded hire dates</span>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
@@ -284,7 +288,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">Attention Needed</span>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-black text-rose-400">
-                  {summary.stalledCount + summary.overdueEvaluationsCount}
+                  {summary.attentionNeededCount ?? (summary.stalledCount + summary.overdueEvaluationsCount)}
                 </span>
                 {summary.stalledCount > 0 && (
                   <span className="text-[10px] bg-rose-500/10 text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
@@ -402,12 +406,12 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
                   <div key={sd.stage} className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-300 font-medium">{sd.stage}</span>
-                      <span className="font-bold text-indigo-300 font-mono">{sd.averageDays} days avg</span>
+                      <span className="font-bold text-indigo-300 font-mono">{sd.averageDays != null ? `${sd.averageDays} days avg` : 'No verified data'}</span>
                     </div>
                     <div className="h-2 bg-slate-950 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-indigo-500 rounded-full transition-all"
-                        style={{ width: `${Math.min(100, Math.max(5, (sd.averageDays / 15) * 100))}%` }}
+                        style={{ width: sd.averageDays != null ? `${Math.min(100, Math.max(5, (sd.averageDays / 15) * 100))}%` : '0%' }}
                       />
                     </div>
                   </div>
@@ -417,6 +421,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
               {/* Time to fill per job table */}
               <div className="pt-3 border-t border-slate-800 space-y-2">
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Time to Fill By Job Role</h3>
+                <p className="text-[10px] text-slate-500">All-time job lifecycle. Completed fill duration requires a closed role and recorded hire date.</p>
                 <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-1.5 pr-1">
                   {speed.timeToFillByJob?.map(j => (
                     <div key={j.jobId} className="flex items-center justify-between p-2 rounded-xl bg-slate-950 text-xs">
@@ -425,7 +430,9 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
                         <span className="text-[10px] text-slate-500">{j.department} • {j.hiresCount} hires</span>
                       </div>
                       <span className={`font-mono text-xs font-bold shrink-0 ${j.isFilled ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        {j.daysToFill} days {j.isFilled ? '(filled)' : '(open)'}
+                        {j.isFilled
+                          ? (j.daysToFill != null ? `${j.daysToFill} days to fill` : 'Hire date unavailable')
+                          : (j.isClosed ? 'Closed — no hire recorded' : (j.daysOpen != null ? `${j.daysOpen} days open` : 'Open — date unavailable'))}
                       </span>
                     </div>
                   ))}
@@ -516,6 +523,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
                   Recruitment Source Channel Effectiveness
                 </h2>
                 <p className="text-xs text-slate-400">Applications, qualification rates, offer conversion, and cost per hire</p>
+                <p className="text-[11px] text-slate-500 mt-1">Cost per hire is left blank until spend is recorded by sourcing channel; the current data stores spend at job level only.</p>
               </div>
               <span className="text-[11px] text-slate-500">ROI & Channel Metrics</span>
             </div>
@@ -556,7 +564,7 @@ export function HrAnalyticsView({ jobs = [], onSelectCandidate }) {
                         </span>
                       </td>
                       <td className="py-3 px-3 font-mono text-slate-300">
-                        {src.avgTimeToHire > 0 ? `${src.avgTimeToHire}d` : '—'}
+                        {src.avgTimeToHire != null ? `${src.avgTimeToHire}d` : '—'}
                       </td>
                       <td className="py-3 px-3 font-mono text-slate-400">
                         {src.costPerHire != null ? `₱${src.costPerHire.toLocaleString()}` : '—'}

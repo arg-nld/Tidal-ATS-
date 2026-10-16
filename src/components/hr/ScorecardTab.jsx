@@ -34,7 +34,11 @@ export function ScorecardTab({ candidate: propCandidate, application, job, onUpd
     criteria.forEach(c => { initial[c.id] = 4; });
     return initial;
   });
-  const [overallRating, setOverallRating] = useState(4);
+  // Overall rating is derived from the individual 1–5 evaluation criteria.
+  const criteriaAverage = criteria.length > 0
+    ? criteria.reduce((sum, criterion) => sum + Number(ratings[criterion.id] || 4), 0) / criteria.length
+    : 0;
+  const overallRating = Number(criteriaAverage.toFixed(1));
   const [recommendation, setRecommendation] = useState('Hire');
   const [comments, setComments] = useState('');
   const [interviewerName, setInterviewerName] = useState('');
@@ -76,12 +80,15 @@ export function ScorecardTab({ candidate: propCandidate, application, job, onUpd
       const criteriaRatings = criteria.map(c => ({
         criterionId: c.id,
         criterionName: c.name,
-        score: ratings[c.id] || 3
+        score: Math.min(5, Math.max(1, Number(ratings[c.id] || 4)))
       }));
+      const derivedOverallRating = criteriaRatings.length
+        ? Number((criteriaRatings.reduce((sum, item) => sum + item.score, 0) / criteriaRatings.length).toFixed(1))
+        : 0;
 
       const payload = {
         criteriaRatings,
-        overallRating,
+        overallRating: derivedOverallRating,
         recommendation,
         comments,
         interviewerName: interviewerName.trim() || undefined
@@ -300,23 +307,17 @@ export function ScorecardTab({ candidate: propCandidate, application, job, onUpd
         {/* Overall Rating & Hiring Recommendation */}
         <div className="grid md:grid-cols-2 gap-4 pt-2 border-t border-slate-800">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Overall Rating *</label>
-            <div className="flex items-center gap-1.5">
-              {[1, 2, 3, 4, 5].map(num => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setOverallRating(num)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1 ${
-                    overallRating === num
-                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Star size={13} fill={overallRating === num ? 'currentColor' : 'none'} />
-                  <span>{num}</span>
-                </button>
-              ))}
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Overall Rating (calculated)</label>
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-amber-400">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star key={star} size={14} fill={star <= Math.round(overallRating) ? 'currentColor' : 'none'} />
+                  ))}
+                </div>
+                <span className="text-sm font-bold text-indigo-300">{overallRating.toFixed(1)} / 5</span>
+              </div>
+              <p className="mt-1 text-[10px] text-slate-400">Automatically calculated as the average of the evaluation criteria ratings above.</p>
             </div>
           </div>
 

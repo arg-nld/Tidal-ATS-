@@ -2,11 +2,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '../../services/api';
 import { Mail, X, Bell, Clock, ChevronRight, ArrowLeft, Trash2 } from 'lucide-react';
 import { StageBadge } from './Badge';
+import { ConfirmationModal } from './ConfirmationModal';
 
 export function NotificationDrawer({ isOpen, onClose, onRefreshCount }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const listRef = useRef(null);
   const listScrollTopRef = useRef(0);
@@ -71,8 +74,14 @@ export function NotificationDrawer({ isOpen, onClose, onRefreshCount }) {
   };
 
   const handleRemove = async (event, notif) => {
-    event.stopPropagation();
+    event?.stopPropagation?.();
+    setConfirmAction({ type: 'remove', notif });
+  };
 
+  const confirmRemove = async () => {
+    const notif = confirmAction?.notif;
+    if (!notif) return;
+    setActionLoading(true);
     try {
       await api.notifications.remove(notif.id);
 
@@ -88,12 +97,16 @@ export function NotificationDrawer({ isOpen, onClose, onRefreshCount }) {
     } catch (err) {
       console.warn('Could not remove notification:', err);
       void fetchNotifs();
-    }
+    } finally { setActionLoading(false); setConfirmAction(null); }
   };
 
   const handleClearAll = async () => {
     if (notifications.length === 0) return;
+    setConfirmAction({ type: 'clear' });
+  };
 
+  const confirmClearAll = async () => {
+    setActionLoading(true);
     try {
       await api.notifications.clearAll();
       setNotifications([]);
@@ -103,7 +116,7 @@ export function NotificationDrawer({ isOpen, onClose, onRefreshCount }) {
     } catch (err) {
       console.warn('Could not clear notifications:', err);
       void fetchNotifs();
-    }
+    } finally { setActionLoading(false); setConfirmAction(null); }
   };
 
   if (!isOpen) return null;
@@ -280,6 +293,16 @@ export function NotificationDrawer({ isOpen, onClose, onRefreshCount }) {
           </>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={Boolean(confirmAction)}
+        onClose={() => { if (!actionLoading) setConfirmAction(null); }}
+        onConfirm={confirmAction?.type === 'clear' ? confirmClearAll : confirmRemove}
+        isLoading={actionLoading}
+        variant="danger"
+        title={confirmAction?.type === 'clear' ? 'Clear all notifications?' : 'Delete notification?'}
+        message={confirmAction?.type === 'clear' ? `This will permanently delete all ${notifications.length} notifications from your account.` : `This will permanently delete “${confirmAction?.notif?.subject || 'this notification'}” from your account.`}
+        confirmText={confirmAction?.type === 'clear' ? 'Clear all' : 'Delete notification'}
+      />
     </div>
   );
 }

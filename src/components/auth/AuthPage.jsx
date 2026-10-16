@@ -7,6 +7,13 @@ import {
 import { api } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import { ThemeToggle } from '../common/ThemeToggle';
+import { Spinner } from '../common/Spinner';
+
+const normalizeNameInput = value => String(value || '')
+  .replace(/[^\p{L}\p{M}\s]/gu, '')
+  .replace(/\s{2,}/g, ' ')
+  .toUpperCase();
+const isValidPersonName = value => /^[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*$/u.test(String(value || '').trim());
 
 
 export function AuthPage() {
@@ -32,6 +39,9 @@ export function AuthPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmResetPassword, setConfirmResetPassword] = useState('');
   const [resetMessage, setResetMessage] = useState('');
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [registering, setRegistering] = useState(false);
+  const forgotPasswordRequestRef = useRef(false);
   const verificationAttemptRef = useRef(null);
   const [signUpForm, setSignUpForm] = useState({
     firstName: '', lastName: '', middleInitial: '', suffix: '',
@@ -58,6 +68,10 @@ export function AuthPage() {
 
   const handleForgotPassword = async e => {
     e.preventDefault();
+    // The ref blocks same-tick double submits before React has rendered the disabled button.
+    if (forgotPasswordRequestRef.current) return;
+    forgotPasswordRequestRef.current = true;
+    setForgotPasswordLoading(true);
     setLocalError(null);
     setResetMessage('');
     try {
@@ -67,7 +81,12 @@ export function AuthPage() {
       // return the user to the password-reset request form after success.
       window.history.replaceState({}, '', '/forgot-password-sent');
       setMode('forgotPasswordSent');
-    } catch (err) { setLocalError(err.message || 'Could not request a password reset.'); }
+    } catch (err) {
+      setLocalError(err.message || 'Could not request a password reset.');
+    } finally {
+      forgotPasswordRequestRef.current = false;
+      setForgotPasswordLoading(false);
+    }
   };
 
   const returnToSignIn = () => {
@@ -109,8 +128,14 @@ export function AuthPage() {
   const handleSignUp = async e => {
     e.preventDefault();
     setLocalError(null);
-    if (!signUpForm.firstName.trim() || !signUpForm.lastName.trim() || !signUpForm.email.trim() || !signUpForm.password) {
+    const normalizedFirstName = normalizeNameInput(signUpForm.firstName).trim();
+    const normalizedLastName = normalizeNameInput(signUpForm.lastName).trim();
+    if (!normalizedFirstName || !normalizedLastName || !signUpForm.email.trim() || !signUpForm.password) {
       setLocalError('First name, last name, email, and password are required.');
+      return;
+    }
+    if (!isValidPersonName(normalizedFirstName) || !isValidPersonName(normalizedLastName)) {
+      setLocalError('First and last names may contain letters and spaces only.');
       return;
     }
     if (signUpForm.password !== signUpForm.confirm) {
@@ -121,12 +146,18 @@ export function AuthPage() {
       setLocalError('Password must be at least 8 characters.');
       return;
     }
+    if (signUpForm.middleInitial && !/^[\p{L}\p{M}]$/u.test(signUpForm.middleInitial.trim())) {
+      setLocalError('Middle initial must be one letter only.');
+      return;
+    }
+    setRegistering(true);
     try {
-      const result = await register({ ...signUpForm, role: 'applicant' });
+      const result = await register({ ...signUpForm, firstName: normalizedFirstName, lastName: normalizedLastName, middleInitial: signUpForm.middleInitial.trim().toUpperCase(), suffix: signUpForm.suffix, role: 'applicant' });
       setMode('verificationSent');
       setLocalError(null);
       setVerificationMessage(result.message || `Verification email sent to ${signUpForm.email}.`);
     } catch { /* handled in context */ }
+    finally { setRegistering(false); }
   };
 
 
@@ -199,10 +230,12 @@ export function AuthPage() {
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <h3 className="text-lg font-bold text-slate-100">Forgot your password?</h3>
                 <p className="text-sm text-slate-400">Enter your account email and we’ll send a password reset link if the account exists.</p>
-                <input type="email" required autoComplete="email" value={resetEmail} onChange={e => setResetEmail(e.target.value)} placeholder="you@example.com" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" />
-                <button type="submit" className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm">Send reset link</button>
+                <input type="email" required autoComplete="email" disabled={forgotPasswordLoading} value={resetEmail} onChange={e => setResetEmail(e.target.value)} placeholder="you@example.com" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100 disabled:opacity-60" />
+                <button type="submit" disabled={forgotPasswordLoading} aria-busy={forgotPasswordLoading} className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                  {forgotPasswordLoading ? <><Spinner className="w-4 h-4" /> Sending reset link...</> : 'Send reset link'}
+                </button>
                 {resetMessage && <p role="status" className="text-sm text-emerald-300">{resetMessage}</p>}
-                <p className="text-center text-xs"><button type="button" onClick={() => setMode('signin')} className="text-indigo-400 font-semibold">Back to sign in</button></p>
+                <p className="text-center text-xs"><button type="button" disabled={forgotPasswordLoading} onClick={() => setMode('signin')} className="text-indigo-400 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Back to sign in</button></p>
               </form>
             )}
 
@@ -253,10 +286,10 @@ export function AuthPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">First Name *</label><input required value={signUpForm.firstName} onChange={e => setSignUpForm({ ...signUpForm, firstName: e.target.value })} placeholder="First name" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Last Name *</label><input required value={signUpForm.lastName} onChange={e => setSignUpForm({ ...signUpForm, lastName: e.target.value })} placeholder="Last name" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Middle Initial</label><input maxLength={1} value={signUpForm.middleInitial} onChange={e => setSignUpForm({ ...signUpForm, middleInitial: e.target.value.slice(0,1).toUpperCase() })} placeholder="M" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Suffix</label><input value={signUpForm.suffix} onChange={e => setSignUpForm({ ...signUpForm, suffix: e.target.value })} placeholder="Jr., III" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">First Name *</label><input required maxLength={80} autoComplete="given-name" value={signUpForm.firstName} onChange={e => setSignUpForm({ ...signUpForm, firstName: normalizeNameInput(e.target.value) })} placeholder="FIRST NAME" title="Letters and spaces only; displayed in uppercase." className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Last Name *</label><input required maxLength={80} autoComplete="family-name" value={signUpForm.lastName} onChange={e => setSignUpForm({ ...signUpForm, lastName: normalizeNameInput(e.target.value) })} placeholder="LAST NAME" title="Letters and spaces only; displayed in uppercase." className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
+                <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Middle Initial</label><input maxLength={1} pattern="[A-Za-zÀ-ÖØ-öø-ÿ]\.?" title="Enter one letter only." value={signUpForm.middleInitial} onChange={e => setSignUpForm({ ...signUpForm, middleInitial: e.target.value.replace(/[^\p{L}\p{M}]/gu, '').slice(0,1).toUpperCase() })} placeholder="M" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100" /></div>
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Suffix</label><select value={signUpForm.suffix} onChange={e => setSignUpForm({ ...signUpForm, suffix: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100"><option value="">None</option><option value="Jr.">Jr.</option><option value="Sr.">Sr.</option>{['I','II','III','IV','V','VI','VII','VIII','IX','X'].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
                 </div>
 
                 <div><label className="block text-xs font-medium text-slate-400 mb-1.5">Email Address *</label><div className="relative"><Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" /><input type="email" required autoComplete="email" value={signUpForm.email} onChange={e => setSignUpForm({ ...signUpForm, email: e.target.value })} placeholder="you@example.com" className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100" /></div></div>
@@ -308,8 +341,8 @@ export function AuthPage() {
                     </div>
                   </div>
                 </div>
-                <button type="submit" disabled={loading} className="auth-submit-btn w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all">
-                  {loading ? 'Sending verification email...' : <>Send Verification Link <ArrowRight size={16} /></>}
+                <button type="submit" disabled={loading || registering} aria-busy={loading || registering} className="auth-submit-btn w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                  {loading || registering ? <><Spinner className="w-4 h-4" /> Sending verification email...</> : <>Send Verification Link <ArrowRight size={16} /></>}
                 </button>
                 <p className="text-[11px] text-slate-500 text-center">You will need to verify your email before you can sign in.</p>
                 <p className="text-center text-xs text-slate-500">Already have an account? <button type="button" onClick={() => setMode('signin')} className="text-indigo-400 font-semibold">Sign in</button></p>

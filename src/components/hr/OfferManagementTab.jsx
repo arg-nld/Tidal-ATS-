@@ -5,6 +5,7 @@ import {
   Calendar, DollarSign, Clock, ShieldCheck, RefreshCw, FileText
 } from 'lucide-react';
 import { Spinner } from '../common/Spinner';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 
 const STATUS_BADGES = {
   draft: { label: 'Draft', color: 'bg-slate-800 text-slate-300 border-slate-700' },
@@ -42,6 +43,10 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
     action: null, // 'decline' | 'withdraw'
     reason: ''
   });
+
+  // Modal dialog states for send offer and accept offer confirmation
+  const [showSendConfirmModal, setShowSendConfirmModal] = useState(false);
+  const [showAcceptConfirmModal, setShowAcceptConfirmModal] = useState(false);
 
   const handleSaveOfferDraft = async (e) => {
     e.preventDefault();
@@ -86,14 +91,13 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
     }
   };
 
-  const handleSendOffer = async () => {
-    if (!window.confirm(`Are you sure you want to extend this formal offer to ${candidate.name} (${candidate.email})? An official offer email will be sent and the stage will move to "Job Offer".`)) return;
-
+  const handleExecuteSendOffer = async () => {
     setIsSubmitting(true);
     setError(null);
     try {
       const res = await api.applications.sendOffer(candidate.id);
       onUpdateCandidate(res.application);
+      setShowSendConfirmModal(false);
       setActionMessage('Job offer dispatched and candidate notified via email!');
       setTimeout(() => setActionMessage(null), 4000);
     } catch (err) {
@@ -127,14 +131,13 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
     }
   };
 
-  const handleAcceptOffer = async () => {
-    if (!window.confirm(`Confirm acceptance of this offer for ${candidate.name}? This will mark the candidate as "Hired" and complete the hiring pipeline.`)) return;
-
+  const handleExecuteAcceptOffer = async () => {
     setIsSubmitting(true);
     setError(null);
     try {
       const res = await api.applications.respondToOffer(candidate.id, { action: 'accept' });
       onUpdateCandidate(res.application);
+      setShowAcceptConfirmModal(false);
       setActionMessage('Offer marked as accepted! Candidate status updated to Hired.');
       setTimeout(() => setActionMessage(null), 4000);
     } catch (err) {
@@ -251,9 +254,9 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
 
                 {(offer.status === 'approved' || offer.status === 'draft') && (
                   <button
-                    onClick={handleSendOffer}
+                    onClick={() => setShowSendConfirmModal(true)}
                     disabled={isSubmitting}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/20"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/20 cursor-pointer"
                   >
                     <Send size={14} /> Send Formal Offer
                   </button>
@@ -262,9 +265,9 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
                 {offer.status === 'sent' && (
                   <>
                     <button
-                      onClick={handleAcceptOffer}
+                      onClick={() => setShowAcceptConfirmModal(true)}
                       disabled={isSubmitting}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all cursor-pointer"
                     >
                       <CheckCircle2 size={14} /> Mark as Accepted
                     </button>
@@ -468,6 +471,46 @@ export function OfferManagementTab({ candidate: propCandidate, application, job,
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal for Sending Formal Offer */}
+      <ConfirmationModal
+        isOpen={showSendConfirmModal}
+        onClose={() => setShowSendConfirmModal(false)}
+        onConfirm={handleExecuteSendOffer}
+        isLoading={isSubmitting}
+        title="Extend Formal Job Offer"
+        message={`Are you sure you want to extend this formal offer to ${candidate.name} (${candidate.email})? An official offer email will be sent and the stage will move to "Job Offer".`}
+        details={{
+          'Candidate': candidate.name,
+          'Email': candidate.email,
+          'Role': job?.title || candidate.role || 'Position',
+          'Compensation': `${offer?.currency || '₱'}${Number(offer?.compensation || 0).toLocaleString()} / ${offer?.salaryPeriod || 'monthly'}`,
+          'Target Start Date': offer?.proposedStartDate ? new Date(offer.proposedStartDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Flexible',
+          'Offer Expiry': offer?.expiryDate ? new Date(offer.expiryDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Open'
+        }}
+        confirmText="Send Formal Offer"
+        variant="primary"
+        icon={Send}
+      />
+
+      {/* Confirmation Modal for Marking Offer Accepted (Hired) */}
+      <ConfirmationModal
+        isOpen={showAcceptConfirmModal}
+        onClose={() => setShowAcceptConfirmModal(false)}
+        onConfirm={handleExecuteAcceptOffer}
+        isLoading={isSubmitting}
+        title="Confirm Offer Acceptance"
+        message={`Confirm acceptance of this offer for ${candidate.name}? This will mark the candidate as "Hired" and complete the hiring pipeline.`}
+        details={{
+          'Candidate': candidate.name,
+          'Role': job?.title || candidate.role || 'Position',
+          'Compensation': `${offer?.currency || '₱'}${Number(offer?.compensation || 0).toLocaleString()} / ${offer?.salaryPeriod || 'monthly'}`,
+          'Pipeline Status': 'Hired 🎉'
+        }}
+        confirmText="Confirm & Mark Hired"
+        variant="success"
+        icon={CheckCircle2}
+      />
 
     </div>
   );

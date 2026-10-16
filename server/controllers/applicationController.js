@@ -475,16 +475,26 @@ export async function recordScorecard(req, res) {
 
   const { criteriaRatings, overallRating, recommendation, comments, interviewerName } = req.body;
 
+  const normalizedCriteriaRatings = (Array.isArray(criteriaRatings) ? criteriaRatings : []).map(item => ({
+    ...item,
+    score: Math.min(5, Math.max(1, Number(item?.score) || 1))
+  }));
+  // Trust the submitted criteria, not a client-supplied overall score.
+  // This keeps the overall rating consistently derived from the 1–5 rubric.
+  const derivedOverallRating = normalizedCriteriaRatings.length > 0
+    ? Number((normalizedCriteriaRatings.reduce((sum, item) => sum + item.score, 0) / normalizedCriteriaRatings.length).toFixed(1))
+    : Math.min(5, Math.max(1, Number(overallRating) || 3));
+
   const interviewer = String(interviewerName || req.user?.name || 'Interviewer').trim();
   const scorecard = {
     id: `sc-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
     interviewerName: interviewer,
     interviewerEmail: req.user?.email || null,
     submittedAt: Date.now(),
-    overallRating: Number(overallRating) || 3,
+    overallRating: derivedOverallRating,
     recommendation: String(recommendation || 'Hire').trim(),
     comments: String(comments || '').trim(),
-    criteriaRatings: Array.isArray(criteriaRatings) ? criteriaRatings : []
+    criteriaRatings: normalizedCriteriaRatings
   };
 
   const currentScorecards = Array.isArray(app.scorecards) ? [...app.scorecards] : [];
@@ -798,27 +808,40 @@ export async function sendOffer(req, res) {
 export async function respondToOffer(req, res) {
   const app = await store.getApplicationById(req.params.id);
   if (!app) return res.status(404).json({ error: 'Application not found' });
+  
+  const isHr = req.user?.role === 'hr' || req.user?.role === 'admin';
+  const isCandidateOwner = req.user?.role === 'applicant' && app.userId === req.user.id;
+  if (!isHr && !isCandidateOwner) {
+    return res.status(403).json({ error: 'You can only respond to an offer addressed to your account.' });
+  }
   if (!app.offer) return res.status(400).json({ error: 'No offer found for this candidate.' });
 
-  const { action, declineReason, comments } = req.body;
-  if (!['accept', 'decline'].includes(action)) {
+  const { action, declineReason, comments, response, comment } = req.body;
+  let normalizedAction = action || response;
+  if (normalizedAction === 'accepted') normalizedAction = 'accept';
+  if (normalizedAction === 'declined') normalizedAction = 'decline';
+
+  if (!['accept', 'decline'].includes(normalizedAction)) {
     return res.status(400).json({ error: 'action must be either "accept" or "decline".' });
   }
 
-  const isAccept = action === 'accept';
+  const isAccept = normalizedAction === 'accept';
+  const effectiveReason = declineReason || (isAccept ? null : (comment || comments || 'Not specified'));
+  const effectiveComments = comments || comment;
+
   const history = Array.isArray(app.offer.history) ? [...app.offer.history] : [];
   history.push({
     action: isAccept ? 'accepted' : 'declined',
     performedBy: req.user?.name || app.name,
     timestamp: Date.now(),
-    notes: isAccept ? (comments || 'Candidate accepted offer!') : `Declined. Reason: ${declineReason || 'Not specified'}. ${comments || ''}`
+    notes: isAccept ? (effectiveComments || 'Candidate accepted offer!') : `Declined. Reason: ${effectiveReason || 'Not specified'}. ${effectiveComments || ''}`.trim()
   });
 
   const offer = {
     ...app.offer,
     status: isAccept ? 'accepted' : 'declined',
     respondedAt: Date.now(),
-    declineReason: isAccept ? null : (declineReason || 'Not specified'),
+    declineReason: isAccept ? null : (effectiveReason || 'Not specified'),
     history
   };
 
@@ -830,7 +853,7 @@ export async function respondToOffer(req, res) {
       title: isAccept ? '🎉 Offer Accepted!' : 'Offer Declined',
       description: isAccept
         ? `${app.name} has accepted the job offer! Transitioned to Hired.`
-        : `${app.name} declined the offer. Reason: ${declineReason || 'None specified'}.`,
+        : `${app.name} declined the offer. Reason: ${effectiveReason || 'None specified'}.`,
       performedBy: req.user?.name || app.name,
       performedByRole: req.user?.role || 'applicant',
       metadata: { offerId: offer.id, declineReason: offer.declineReason }
@@ -902,11 +925,14 @@ export async function deleteApplication(req, res) {
   if (!app) return res.status(404).json({ error: 'Application not found' });
 
   try {
+    // Remove the original file before deleting the database record. If storage
+    // is unavailable, keep the application visible so HR can retry the deletion.
     await deleteResume(app.resumeFile);
-  } catch (err) {
-    console.warn('[ApplicationController] Failed to delete resume object:', err.message);
+  } catch (error) {
+    console.error('[ApplicationController] Failed to delete linked resume file:', error);
+    return res.status(503).json({ error: 'The resume file could not be removed. Please try again later.' });
   }
 
   await store.deleteApplication(app.id);
-  return res.json({ message: 'Application deleted successfully' });
+  return res.json({ message: 'Application and linked resume file deleted successfully.' });
 }

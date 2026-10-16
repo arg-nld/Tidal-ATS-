@@ -20,6 +20,14 @@ function cleanString(value, { field, max, min = 0, allowEmpty = true, singleLine
   return normalized;
 }
 
+function validPersonName(value, field) {
+  const name = cleanString(value, { field, max: 80, allowEmpty: false }).replace(/\s+/g, ' ').toUpperCase();
+  if (!/^[\p{L}\p{M}]+(?:\s+[\p{L}\p{M}]+)*$/u.test(name)) {
+    throw new Error(`${field} may contain letters and spaces only.`);
+  }
+  return name;
+}
+
 function validEmail(value) {
   const email = cleanString(value, { field: 'Email', max: 254, min: 3, allowEmpty: false });
   if (!EMAIL_PATTERN.test(email)) throw new Error('Email address is invalid.');
@@ -74,9 +82,12 @@ export function validateLoginBody(req, res, next) {
 
 export function validateRegistrationBody(req, res, next) {
   try {
-    req.body.firstName = cleanString(req.body.firstName, { field: 'First name', max: 80, allowEmpty: false });
-    req.body.lastName = cleanString(req.body.lastName, { field: 'Last name', max: 80, allowEmpty: false });
-    req.body.middleInitial = cleanString(req.body.middleInitial, { field: 'Middle initial', max: 2, allowEmpty: true });
+    req.body.firstName = validPersonName(req.body.firstName, 'First name');
+    req.body.lastName = validPersonName(req.body.lastName, 'Last name');
+    req.body.middleInitial = cleanString(req.body.middleInitial, { field: 'Middle initial', max: 2, allowEmpty: true }).toUpperCase();
+    if (req.body.middleInitial && !/^[\p{L}\p{M}]$/u.test(req.body.middleInitial)) {
+      throw new Error('Middle initial must be a single letter.');
+    }
     req.body.suffix = cleanString(req.body.suffix, { field: 'Suffix', max: 20, allowEmpty: true });
     req.body.email = validEmail(req.body.email);
     req.body.password = cleanString(req.body.password, { field: 'Password', max: 128, min: 8, allowEmpty: false });

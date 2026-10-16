@@ -57,3 +57,12 @@ export function verifyPassword(password, storedHash) {
     return false;
   }
 }
+/** Returns true when a candidate password matches the stored user's current password. */
+export function matchesExistingPassword(candidatePassword, user) {
+  if (!user) return false;
+  // When a canonical hash exists, trust it rather than a possible legacy
+  // plaintext field left over from an imported record.
+  if (user.passwordHash) return verifyPassword(candidatePassword, user.passwordHash);
+  return typeof user.password === 'string' && user.password === String(candidatePassword ?? '');
+}
+
